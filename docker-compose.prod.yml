@@ -1,0 +1,117 @@
+services:
+  # MongoDB para producción
+  mongodb:
+    image: mongo:7.0
+    container_name: imposter-mongodb-prod
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: imposter-premium
+      # Para producción, configura autenticación:
+      # MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      # MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - mongodb_data_prod:/data/db
+      - mongodb_config_prod:/data/configdb
+    networks:
+      - imposter-network-prod
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    # No exponer puertos en producción (solo acceso interno)
+    # ports:
+    #   - "27017:27017"
+
+  # Backend para producción
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: imposter-backend-prod
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - MONGODB_URI=mongodb://mongodb:27017/imposter-premium
+      # Añade más variables de entorno según necesites
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - imposter-network-prod
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:4000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend para producción
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+    container_name: imposter-frontend-prod
+    restart: always
+    ports:
+      - "80:80"
+      # Para HTTPS, descomenta y configura:
+      # - "443:443"
+    depends_on:
+      - backend
+    networks:
+      - imposter-network-prod
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Nginx Reverse Proxy (opcional, para producción avanzada)
+  # Descomenta si quieres usar nginx como reverse proxy
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: imposter-nginx-prod
+  #   restart: always
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - ./nginx/ssl:/etc/nginx/ssl:ro
+  #   depends_on:
+  #     - frontend
+  #     - backend
+  #   networks:
+  #     - imposter-network-prod
+
+volumes:
+  mongodb_data_prod:
+    driver: local
+  mongodb_config_prod:
+    driver: local
+
+networks:
+  imposter-network-prod:
+    driver: bridge

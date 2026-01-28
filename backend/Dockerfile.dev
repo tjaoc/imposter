@@ -1,0 +1,22 @@
+# Dockerfile para desarrollo local del Backend
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Instalar dependencias globales útiles
+RUN apk add --no-cache git
+
+# Copiar archivos de dependencias
+COPY package*.json ./
+
+# Instalar todas las dependencias
+RUN npm install
+
+# Copiar código fuente
+COPY . .
+
+# Exponer puerto
+EXPOSE 4000
+
+# Comando para desarrollo con hot reload
+CMD ["npm", "run", "dev"]

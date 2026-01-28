@@ -1,0 +1,20 @@
+# Archivo de ejemplo para override de docker-compose
+# Copia este archivo como docker-compose.override.yml para personalizar tu entorno local
+# Este archivo es ignorado por git por defecto
+
+version: '3.8'
+
+services:
+  backend:
+    environment:
+      # Añade variables de entorno personalizadas aquí
+      - DEBUG=*
+    # volumes:
+    #   - ./backend/custom-config:/app/config
+
+  frontend:
+    environment:
+      # Añade variables de entorno personalizadas aquí
+      - VITE_DEBUG=true
+    # ports:
+    #   - "3001:3000"  # Cambiar puerto si 3000 está ocupado
