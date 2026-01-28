@@ -15,9 +15,9 @@ function Home() {
 
   const handleCreateRoom = async () => {
     if (!playerName.trim()) return;
-    
+
     setIsCreating(true);
-    
+
     // Asegurar que el socket está conectado
     let activeSocket = socket;
     if (!socket || !socket.connected) {
@@ -26,16 +26,23 @@ function Home() {
 
     // Esperar un momento para asegurar la conexión
     if (activeSocket && activeSocket.connected) {
-      activeSocket.emit('room:create', { name: playerName.trim() }, (response) => {
-        setIsCreating(false);
-        if (response && response.ok) {
-          console.log('✅ Sala creada:', response.room.code);
-          navigate(`/room/${response.room.code}`);
-        } else {
-          console.error('❌ Error creando sala:', response?.error);
-          alert('Error al crear la sala. Intenta de nuevo.');
-        }
-      });
+      // Guardar el nombre en localStorage para uso futuro
+      localStorage.setItem('playerName', playerName.trim());
+      
+      activeSocket.emit(
+        'room:create',
+        { name: playerName.trim() },
+        (response) => {
+          setIsCreating(false);
+          if (response && response.ok) {
+            console.log('✅ Sala creada:', response.room.code);
+            navigate(`/room/${response.room.code}`);
+          } else {
+            console.error('❌ Error creando sala:', response?.error);
+            alert('Error al crear la sala. Intenta de nuevo.');
+          }
+        },
+      );
     } else {
       setIsCreating(false);
       alert('No se pudo conectar al servidor. Verifica tu conexión.');
@@ -44,15 +51,15 @@ function Home() {
 
   const handleJoinRoom = async () => {
     console.log('🔵 handleJoinRoom llamado', { playerName, roomCode });
-    
+
     if (!playerName.trim() || !roomCode.trim()) {
       console.log('❌ Nombre o código vacío');
       return;
     }
-    
+
     setIsJoining(true);
     console.log('🔄 Verificando conexión del socket...');
-    
+
     // Asegurar que el socket está conectado
     let activeSocket = socket;
     if (!socket || !socket.connected) {
@@ -60,18 +67,21 @@ function Home() {
       activeSocket = await connectSocket();
     }
 
-    console.log('📡 Socket estado:', { 
-      exists: !!activeSocket, 
-      connected: activeSocket?.connected 
+    console.log('📡 Socket estado:', {
+      exists: !!activeSocket,
+      connected: activeSocket?.connected,
     });
 
     if (activeSocket && activeSocket.connected) {
-      const joinData = { 
-        code: roomCode.trim().toUpperCase(), 
-        name: playerName.trim() 
+      // Guardar el nombre en localStorage para uso futuro
+      localStorage.setItem('playerName', playerName.trim());
+      
+      const joinData = {
+        code: roomCode.trim().toUpperCase(),
+        name: playerName.trim(),
       };
       console.log('📤 Emitiendo room:join con:', joinData);
-      
+
       activeSocket.emit('room:join', joinData, (response) => {
         console.log('📥 Respuesta de room:join:', response);
         setIsJoining(false);
@@ -104,6 +114,11 @@ function Home() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="text-center mb-12"
         >
+          <img
+            src="/favicon.svg"
+            alt="Imposter"
+            className="w-20 h-20 mx-auto mb-4"
+          />
           <h1 className="text-5xl font-bold text-glow mb-4">IMPOSTER</h1>
           <p className="text-space-cyan text-lg">Who is the Spy?</p>
         </motion.div>
@@ -161,10 +176,11 @@ function Home() {
               <button
                 onClick={(e) => {
                   e.preventDefault();
-                  console.log('🖱️ Botón Unirse clickeado', { 
-                    playerName, 
-                    roomCode, 
-                    disabled: isJoining || !playerName.trim() || !roomCode.trim() 
+                  console.log('🖱️ Botón Unirse clickeado', {
+                    playerName,
+                    roomCode,
+                    disabled:
+                      isJoining || !playerName.trim() || !roomCode.trim(),
                   });
                   handleJoinRoom();
                 }}
@@ -174,7 +190,8 @@ function Home() {
                 {isJoining ? 'Uniéndose...' : 'Unirse a Sala'}
               </button>
               <p className="text-xs text-gray-500 mt-2 text-center">
-                Debug: Nombre: {playerName ? '✅' : '❌'} | Código: {roomCode ? '✅' : '❌'}
+                Debug: Nombre: {playerName ? '✅' : '❌'} | Código:{' '}
+                {roomCode ? '✅' : '❌'}
               </p>
             </div>
           </div>

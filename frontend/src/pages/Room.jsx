@@ -11,7 +11,7 @@ function Room() {
   const [room, setRoom] = useState(null);
   const [isHost, setIsHost] = useState(false);
   const [error, setError] = useState(null);
-  const [selectedPack, setSelectedPack] = useState(null);
+  const [selectedPacks, setSelectedPacks] = useState([]);
   const [isStarting, setIsStarting] = useState(false);
   const [settings, setSettings] = useState({
     impostorCount: 1,
@@ -61,13 +61,18 @@ function Room() {
   }, [code, socket, isConnected]);
 
   const handleStartGame = () => {
-    if (!isHost || !room || room.players.length < 3 || !selectedPack) {
+    if (!isHost || !room || room.players.length < 3 || selectedPacks.length === 0) {
       return;
     }
 
     setIsStarting(true);
+    
+    // Si hay múltiples packs, seleccionar uno aleatorio
+    const randomPackId = selectedPacks[Math.floor(Math.random() * selectedPacks.length)];
+    
     socket.emit('game:start', { 
-      packId: selectedPack,
+      packId: randomPackId,
+      selectedPacks: selectedPacks, // Enviar todos los packs seleccionados para guardarlos
       hintForImpostors: settings.hintForImpostors,
       discussionSeconds: settings.discussionSeconds,
       impostorCount: settings.impostorCount,
@@ -210,9 +215,9 @@ function Room() {
                 animate={{ y: 0, opacity: 1 }}
                 className="glass-effect rounded-2xl p-6"
               >
-                <PackSelector 
-                  onSelectPack={setSelectedPack}
-                  selectedPackId={selectedPack}
+                <PackSelector
+                  onSelectPacks={setSelectedPacks}
+                  selectedPackIds={selectedPacks}
                 />
               </motion.div>
 
@@ -336,12 +341,12 @@ function Room() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleStartGame}
-              disabled={room.players.length < 3 || !selectedPack || isStarting}
+              disabled={room.players.length < 3 || selectedPacks.length === 0 || isStarting}
               className="w-full py-5 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-2xl font-bold text-white text-lg shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {isStarting ? '⏳ Iniciando...' :
                room.players.length < 3 ? `⏸️ Esperando más jugadores (${room.players.length}/3)` :
-               !selectedPack ? '📦 Selecciona un pack primero' :
+               selectedPacks.length === 0 ? '📦 Selecciona al menos un pack' :
                '🚀 Comenzar Juego'}
             </motion.button>
           </>

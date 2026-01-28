@@ -1,5 +1,48 @@
 # 📝 Changelog - Imposter
 
+## [1.0.0-beta2] - 2026-01-28
+
+### 🎯 Mejoras y Correcciones
+
+#### ✨ Nuevas Funcionalidades
+
+- ✅ **Sistema de "Nueva Partida"**: El creador original de la sala puede iniciar una nueva partida desde los resultados
+- ✅ **Selección múltiple de packs**: Los jugadores pueden seleccionar múltiples temas o todos los temas al crear una sala
+- ✅ **Botón "Volver al Inicio"**: Disponible en todas las fases del juego (discusión, votación, resultados)
+- ✅ **Persistencia de nombres**: Los nombres de los jugadores se mantienen entre partidas y reconexiones
+- ✅ **Detección de impostor descubierto**: Cuando todos los civiles acertan, se muestra "El Impostor fue descubierto" en lugar de "eliminado"
+
+#### 🐛 Correcciones de Bugs
+
+- ✅ **Corregido**: El nombre del jugador ya no aparece en su propia lista de votación
+- ✅ **Corregido**: Los resultados se muestran correctamente después de que todos votan
+- ✅ **Corregido**: El juego procesa la votación inmediatamente cuando todos los civiles votan, sin esperar al impostor
+- ✅ **Corregido**: El botón "Nueva Partida" solo aparece para el creador original de la sala
+- ✅ **Corregido**: Los nombres de los jugadores se preservan correctamente al crear una nueva partida
+- ✅ **Corregido**: Error `ROOM_NOT_FOUND` al intentar crear nueva partida desde resultados finales
+- ✅ **Corregido**: El socket mantiene su referencia a la sala incluso después de que el juego termina
+
+#### 🔧 Mejoras Técnicas
+
+- ✅ **Backend**: Mejorado el manejo de `originalHostId` para identificar al creador original de la sala
+- ✅ **Backend**: Optimizado el procesamiento de votaciones para no eliminar jugadores, solo mostrar resultados
+- ✅ **Backend**: Mejorada la lógica de detección de "impostor descubierto" cuando todos los civiles acertan
+- ✅ **Frontend**: Mejorado el filtrado de jugadores en la lista de votación
+- ✅ **Frontend**: Mejorada la visualización de resultados mostrando quién votó por quién
+- ✅ **Frontend**: Añadida lógica para re-unirse a la sala antes de crear nueva partida
+
+#### 📊 Cambios en la Lógica del Juego
+
+- ✅ **Sin eliminaciones**: El juego ya no elimina jugadores, solo muestra resultados
+- ✅ **Sin empates**: Se eliminó la lógica de empates, solo se muestran resultados de votación
+- ✅ **Resultados mejorados**: 
+  - Si todos los civiles acertan: Muestra "🎯 El Impostor fue descubierto: [nombre]"
+  - Si no todos acertan: Solo muestra en verde a los jugadores que acertaron
+  - El impostor siempre muestra "🕵️ IMPOSTOR" en los resultados
+  - Los civiles muestran "→ [nombre del votado]" en los resultados
+
+---
+
 ## [1.0.0-beta] - 2026-01-28
 
 ### 🎉 Primera versión Beta completa

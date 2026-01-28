@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Imposter">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a0e27"/>
+      <stop offset="1" stop-color="#05081a"/>
+    </linearGradient>
+    <linearGradient id="visor" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d8fbff"/>
+      <stop offset="1" stop-color="#3bd6ff"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="256" cy="256" r="248" fill="url(#bg)"/>
+
+  <!-- Backpack -->
+  <path d="M344 206c32 18 54 54 54 92v44c0 22-18 40-40 40h-36c-10 0-18-8-18-18V232c0-18 18-30 40-26z" fill="#b10f2e"/>
+  <path d="M338 234c22 12 36 36 36 64v44c0 10-8 18-18 18h-16c-6 0-10-4-10-10V244c0-8 4-12 8-10z" fill="#8e0b24"/>
+
+  <!-- Body -->
+  <path d="M138 210c0-66 54-120 120-120h8c66 0 120 54 120 120v114c0 70-56 126-126 126h-4c-70 0-126-56-126-126V210z" fill="#e11d48"/>
+  <path d="M170 220c0-50 40-90 90-90h6c50 0 90 40 90 90v104c0 52-42 94-94 94h-2c-52 0-94-42-94-94V220z" fill="#c5163c" opacity="0.55"/>
+
+  <!-- Visor -->
+  <path d="M206 172h124c22 0 40 18 40 40v18c0 36-30 66-66 66H210c-36 0-66-30-66-66v-18c0-22 18-40 40-40z" fill="url(#visor)"/>
+  <path d="M226 188h88c20 0 36 16 36 36v6c0 22-18 40-40 40h-80c-22 0-40-18-40-40v-6c0-20 16-36 36-36z" fill="#0a0e27" opacity="0.18"/>
+  <path d="M236 194c26-10 70-10 96 0" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity="0.35"/>
+
+  <!-- Legs -->
+  <path d="M170 366h86c10 0 18 8 18 18v52c0 10-8 18-18 18h-54c-22 0-40-18-40-40v-48c0-10 8-18 18-18z" fill="#e11d48"/>
+  <path d="M266 366h76c10 0 18 8 18 18v30c0 22-18 40-40 40h-36c-10 0-18-8-18-18v-52c0-10 8-18 18-18z" fill="#c5163c"/>
+
+  <!-- Shadow -->
+  <ellipse cx="256" cy="468" rx="150" ry="22" fill="#000" opacity="0.22"/>
+</svg>

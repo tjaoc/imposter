@@ -1,4 +1,4 @@
-# 🎮 Imposter - Version 1.0.0-beta
+# 🎮 Imposter - Version 1.0.0-beta2
 
 **Fecha de lanzamiento:** 28 de Enero, 2026  
 **Estado:** ✅ Beta estable
@@ -195,6 +195,6 @@ ISC - Proyecto personal y educativo
 
 ---
 
-**¡Gracias por probar Imposter Premium v1.0.0-beta!** 🎉
+**¡Gracias por probar Imposter Premium v1.0.0-beta2!** 🎉
 
 Desarrollado con ❤️ por Tiago Cruz
