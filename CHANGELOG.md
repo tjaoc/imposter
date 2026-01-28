@@ -1,4 +1,4 @@
-# 📝 Changelog - Imposter Premium
+# 📝 Changelog - Imposter
 
 ## [1.0.0-beta] - 2026-01-28
 
@@ -11,6 +11,7 @@
 ### ✨ Funcionalidades Implementadas
 
 #### Backend
+
 - ✅ Servidor Express con Socket.io para comunicación en tiempo real
 - ✅ MongoDB integrado con Mongoose
 - ✅ Sistema de salas con códigos de 6 caracteres
@@ -25,6 +26,7 @@
 - ✅ Modo personalizado (añadir palabras propias)
 
 #### Frontend
+
 - ✅ React 19 con Router 7
 - ✅ Diseño dark mode con estética espacial/misteriosa
 - ✅ Tailwind CSS 3.4.19
@@ -41,12 +43,14 @@
 - ✅ Manejo de errores con feedback visual
 
 #### Juego Completo
+
 - ✅ **Fase 1: Revelación** - Cada jugador ve su rol (palabra secreta o IMPOSTOR)
 - ✅ **Fase 2: Discusión** - Temporizador de 120 segundos + recordatorio de rol
 - ✅ **Fase 3: Votación** - Sistema de votación para eliminar sospechosos
 - ✅ **Fase 4: Resultados** - Pantalla de ganador con revelación de roles
 
 #### Infraestructura
+
 - ✅ Docker Compose para desarrollo local
 - ✅ Docker Compose para producción
 - ✅ Dockerfiles optimizados (multi-stage builds)
@@ -77,6 +81,7 @@
 ### 🛠️ Stack Tecnológico
 
 **Backend:**
+
 - Node.js 20 (Alpine)
 - Express 5.2.1
 - Socket.io 4.8.3
@@ -86,6 +91,7 @@
 - dotenv 17.2.3
 
 **Frontend:**
+
 - React 19.2.4
 - React Router DOM 7.13.0
 - Socket.io Client 4.8.3
@@ -96,6 +102,7 @@
 - PWA Plugin 1.2.0
 
 **DevOps:**
+
 - Docker & Docker Compose
 - Nginx Alpine
 - Nodemon 3.1.11
@@ -105,26 +112,31 @@
 ### 🐛 Problemas Conocidos y Soluciones
 
 #### 1. WebSocket cerrado antes de conexión
+
 - **Problema:** Error "WebSocket is closed before the connection is established"
 - **Solución:** Usar transports: ['polling', 'websocket'] para empezar con polling
 - **Estado:** ✅ Resuelto
 
 #### 2. Warning HydrateFallback en React 19
+
 - **Problema:** React 19 genera warnings de hydration innecesarios en SPAs
 - **Solución:** Suprimir warnings específicos en main.jsx
 - **Estado:** ✅ Resuelto
 
 #### 3. Loop infinito en useEffect
+
 - **Problema:** Socket en dependencias causaba re-renders infinitos
 - **Solución:** Socket global compartido entre componentes
 - **Estado:** ✅ Resuelto
 
 #### 4. Salas se eliminan al navegar
+
 - **Problema:** Socket se desconectaba al cambiar de componente
 - **Solución:** Socket singleton global que persiste entre navegaciones
 - **Estado:** ✅ Resuelto
 
 #### 5. Eventos no recibidos en Game
+
 - **Problema:** Timing de listeners vs emisión de eventos
 - **Solución:** Listeners registrados antes + emisión individual a jugadores
 - **Estado:** ✅ Resuelto
@@ -134,6 +146,7 @@
 ### 📊 Métricas de Pruebas
 
 **Backend:**
+
 - ✅ Health Check: 100%
 - ✅ MongoDB Connection: 100%
 - ✅ Socket.io Crear Sala: 100%
@@ -142,6 +155,7 @@
 - ✅ Socket.io Desconexión: 100%
 
 **Frontend:**
+
 - ✅ HTTP Accesibilidad: 100%
 - ✅ Título de página: 100%
 - ✅ Meta tags: 100%
@@ -158,6 +172,7 @@
 ### 🚀 Cómo Ejecutar
 
 #### Desarrollo Local
+
 ```bash
 # Opción 1: Script automatizado
 ./scripts/docker-dev.sh
@@ -167,6 +182,7 @@ docker-compose up -d
 ```
 
 #### Producción
+
 ```bash
 # Opción 1: Script automatizado
 ./scripts/docker-prod.sh
@@ -176,6 +192,7 @@ docker-compose -f docker-compose.prod.yml up -d
 ```
 
 #### Sin Docker
+
 ```bash
 # Backend
 cd backend

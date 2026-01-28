@@ -7,7 +7,7 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_DATABASE: imposter-premium
+      MONGO_INITDB_DATABASE: imposter
     volumes:
       - mongodb_data:/data/db
       - mongodb_config:/data/configdb
@@ -31,7 +31,7 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=4000
-      - MONGODB_URI=mongodb://mongodb:27017/imposter-premium
+      - MONGODB_URI=mongodb://mongodb:27017/imposter
     volumes:
       - ./backend:/app
       - /app/node_modules

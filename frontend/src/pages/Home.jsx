@@ -105,7 +105,7 @@ function Home() {
           className="text-center mb-12"
         >
           <h1 className="text-5xl font-bold text-glow mb-4">IMPOSTER</h1>
-          <p className="text-space-cyan text-lg">Premium Edition</p>
+          <p className="text-space-cyan text-lg">Who is the Spy?</p>
         </motion.div>
 
         <motion.div

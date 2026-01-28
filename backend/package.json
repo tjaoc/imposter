@@ -1,7 +1,7 @@
 {
-  "name": "imposter-premium-backend",
+  "name": "imposter-backend",
   "version": "1.0.0-beta",
-  "description": "Backend para PWA Premium de Imposter (Who is the Spy?)",
+  "description": "Backend para PWA de Imposter (Who is the Spy?)",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {

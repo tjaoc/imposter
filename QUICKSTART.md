@@ -1,4 +1,4 @@
-# ⚡ Quick Start - Imposter Premium v1.0.0-beta
+# ⚡ Quick Start - Imposter v1.0.0-beta
 
 Guía rápida para empezar a jugar en 5 minutos.
 

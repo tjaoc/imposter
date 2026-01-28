@@ -1,4 +1,4 @@
-# 🎮 Imposter Premium - Version 1.0.0-beta
+# 🎮 Imposter - Version 1.0.0-beta
 
 **Fecha de lanzamiento:** 28 de Enero, 2026  
 **Estado:** ✅ Beta estable
@@ -7,7 +7,7 @@
 
 ## 🎯 Resumen de la Versión
 
-Esta es la **primera versión beta completa** del juego Imposter Premium, un clon premium de alta calidad del popular juego "Who is the Spy?" (Imposter).
+Esta es la **primera versión beta completa** del juego Imposter, un clon de alta calidad del popular juego "Who is the Spy?" (Imposter).
 
 ### ✨ Características Principales
 

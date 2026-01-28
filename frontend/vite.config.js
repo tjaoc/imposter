@@ -9,9 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png'],
       manifest: {
-        name: 'Imposter Premium',
+        name: 'Imposter',
         short_name: 'Imposter',
-        description: 'Premium PWA clone of Imposter (Who is the Spy?)',
+        description: 'PWA clone of Imposter (Who is the Spy?)',
         theme_color: '#0a0e27',
         background_color: '#0a0e27',
         display: 'standalone',

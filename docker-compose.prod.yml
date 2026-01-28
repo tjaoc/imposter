@@ -5,7 +5,7 @@ services:
     container_name: imposter-mongodb-prod
     restart: always
     environment:
-      MONGO_INITDB_DATABASE: imposter-premium
+      MONGO_INITDB_DATABASE: imposter
       # Para producción, configura autenticación:
       # MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
       # MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
@@ -37,7 +37,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=4000
-      - MONGODB_URI=mongodb://mongodb:27017/imposter-premium
+      - MONGODB_URI=mongodb://mongodb:27017/imposter
       # Añade más variables de entorno según necesites
     depends_on:
       mongodb:
