@@ -13,6 +13,11 @@ function Room() {
   const [error, setError] = useState(null);
   const [selectedPack, setSelectedPack] = useState(null);
   const [isStarting, setIsStarting] = useState(false);
+  const [settings, setSettings] = useState({
+    impostorCount: 1,
+    discussionSeconds: 240, // 4 minutos
+    hintForImpostors: true,
+  });
 
   useEffect(() => {
     if (!socket || !isConnected) {
@@ -61,7 +66,12 @@ function Room() {
     }
 
     setIsStarting(true);
-    socket.emit('game:start', { packId: selectedPack }, (response) => {
+    socket.emit('game:start', { 
+      packId: selectedPack,
+      hintForImpostors: settings.hintForImpostors,
+      discussionSeconds: settings.discussionSeconds,
+      impostorCount: settings.impostorCount,
+    }, (response) => {
       setIsStarting(false);
       if (response && response.ok) {
         // La navegación se hará cuando recibamos el evento game:started
@@ -188,30 +198,151 @@ function Room() {
 
         {isHost && (
           <>
+            {/* Configuración Avanzada - Estilo del video */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="glass-effect rounded-2xl p-6 mb-6"
+              className="space-y-4 mb-6"
             >
-              <PackSelector 
-                onSelectPack={setSelectedPack}
-                selectedPackId={selectedPack}
-              />
+              {/* Pack Selector */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="glass-effect rounded-2xl p-6"
+              >
+                <PackSelector 
+                  onSelectPack={setSelectedPack}
+                  selectedPackId={selectedPack}
+                />
+              </motion.div>
+
+              {/* Número de Impostores */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="glass-effect rounded-2xl p-6"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="text-2xl">🕵️</div>
+                    <div>
+                      <div className="text-white font-semibold">Impostores</div>
+                      <div className="text-xs text-gray-400">Número de impostores en el juego</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setSettings(prev => ({
+                        ...prev,
+                        impostorCount: Math.max(1, prev.impostorCount - 1)
+                      }))}
+                      disabled={settings.impostorCount <= 1}
+                      className="w-10 h-10 rounded-lg bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xl flex items-center justify-center"
+                    >
+                      −
+                    </button>
+                    <span className="text-2xl font-bold text-white w-12 text-center">
+                      {settings.impostorCount}
+                    </span>
+                    <button
+                      onClick={() => setSettings(prev => ({
+                        ...prev,
+                        impostorCount: Math.min(room.players.length - 1, prev.impostorCount + 1)
+                      }))}
+                      disabled={settings.impostorCount >= room.players.length - 1}
+                      className="w-10 h-10 rounded-lg bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xl flex items-center justify-center"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Pista para Impostores */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="glass-effect rounded-2xl p-6"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="text-2xl">🔍</div>
+                    <div>
+                      <div className="text-white font-semibold">Pista para Impostores</div>
+                      <div className="text-xs text-gray-400">Mostrar categoría a los impostores</div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSettings(prev => ({
+                      ...prev,
+                      hintForImpostors: !prev.hintForImpostors
+                    }))}
+                    className={`relative w-14 h-8 rounded-full transition-colors ${
+                      settings.hintForImpostors ? 'bg-emerald-500' : 'bg-gray-600'
+                    }`}
+                  >
+                    <motion.div
+                      animate={{ x: settings.hintForImpostors ? 24 : 4 }}
+                      className="absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-lg"
+                    />
+                  </button>
+                </div>
+              </motion.div>
+
+              {/* Duración */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="glass-effect rounded-2xl p-6"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="text-2xl">⏱️</div>
+                    <div>
+                      <div className="text-white font-semibold">Duración</div>
+                      <div className="text-xs text-gray-400">Tiempo de discusión</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {[60, 120, 180, 240, 300].map((seconds) => (
+                      <button
+                        key={seconds}
+                        onClick={() => setSettings(prev => ({
+                          ...prev,
+                          discussionSeconds: seconds
+                        }))}
+                        className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all ${
+                          settings.discussionSeconds === seconds
+                            ? 'bg-space-cyan text-black'
+                            : 'bg-gray-700 text-white hover:bg-gray-600'
+                        }`}
+                      >
+                        {seconds / 60}min
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
             </motion.div>
 
+            {/* Botón Iniciar Juego - Estilo del video */}
             <motion.button
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              transition={{ delay: 0.4 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={handleStartGame}
               disabled={room.players.length < 3 || !selectedPack || isStarting}
-              className="w-full py-4 bg-gradient-to-r from-space-purple to-space-pink rounded-lg font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-5 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-2xl font-bold text-white text-lg shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
-              {isStarting ? 'Iniciando...' :
-               room.players.length < 3 ? `Esperando más jugadores (${room.players.length}/3)` :
-               !selectedPack ? 'Selecciona un pack primero' :
-               'Iniciar Juego'}
+              {isStarting ? '⏳ Iniciando...' :
+               room.players.length < 3 ? `⏸️ Esperando más jugadores (${room.players.length}/3)` :
+               !selectedPack ? '📦 Selecciona un pack primero' :
+               '🚀 Comenzar Juego'}
             </motion.button>
           </>
         )}

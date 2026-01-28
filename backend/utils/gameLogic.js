@@ -6,10 +6,11 @@
  * Asignar roles a los jugadores
  * @param {Array} players - Lista de jugadores
  * @param {string} secretWord - Palabra secreta
+ * @param {string} [hintWord] - Pista/categoría para el impostor
  * @param {number} impostorCount - Número de impostores
  * @returns {Array} Jugadores con roles asignados
  */
-function assignRoles(players, secretWord, impostorCount = 1) {
+function assignRoles(players, secretWord, impostorCount = 1, hintWord = null) {
   if (players.length < 3) {
     throw new Error('Se necesitan al menos 3 jugadores');
   }
@@ -25,24 +26,31 @@ function assignRoles(players, secretWord, impostorCount = 1) {
   const impostors = shuffled.slice(0, impostorCount);
   const civilians = shuffled.slice(impostorCount);
 
-  return shuffled.map((player) => ({
-    ...player,
-    role: impostors.includes(player) ? 'impostor' : 'civilian',
-    word: impostors.includes(player) ? null : secretWord,
-  }));
+  return shuffled.map((player) => {
+    const isImpostor = impostors.includes(player);
+
+    return {
+      ...player,
+      role: isImpostor ? 'impostor' : 'civilian',
+      // Los civiles ven la palabra secreta, el impostor ve solo una pista/categoría
+      word: isImpostor ? hintWord : secretWord,
+    };
+  });
 }
 
 /**
  * Generar estado inicial del juego
  * @param {Object} room - Sala de juego
  * @param {string} secretWord - Palabra secreta
+ * @param {string} [hintWord] - Pista/categoría para el impostor
  * @returns {Object} Estado del juego
  */
-function initializeGame(room, secretWord) {
+function initializeGame(room, secretWord, hintWord = null) {
   const playersWithRoles = assignRoles(
     room.players,
     secretWord,
-    room.settings.impostorCount
+    room.settings.impostorCount,
+    hintWord
   );
 
   return {

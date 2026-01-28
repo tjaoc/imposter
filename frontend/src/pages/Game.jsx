@@ -12,10 +12,13 @@ function Game() {
   const [myRole, setMyRole] = useState(null); // { role, word, isImpostor }
   const [hasSeenRole, setHasSeenRole] = useState(false);
   const [players, setPlayers] = useState([]);
+  const [allPlayers, setAllPlayers] = useState([]); // Lista completa de jugadores con nombres
   const [timeLeft, setTimeLeft] = useState(null);
   const [discussionEndsAt, setDiscussionEndsAt] = useState(null);
   const [selectedVote, setSelectedVote] = useState(null);
   const [gameResult, setGameResult] = useState(null);
+  const [showCardBack, setShowCardBack] = useState(true); // Control del flip de carta
+  const [room, setRoom] = useState(null); // Información de la sala
 
   // Debug: Log cuando cambian los estados
   useEffect(() => {
@@ -58,12 +61,24 @@ function Game() {
       );
       setMyRole(roleData);
       setGamePhase('revealing');
+      setShowCardBack(true);
+      // Auto-flip después de 600ms
+      setTimeout(() => setShowCardBack(false), 600);
+    });
+    
+    // Recibir lista de jugadores
+    socket.on('game:players-update', (playersList) => {
+      setAllPlayers(playersList);
     });
 
     // Juego iniciado
     socket.on('game:started', (data) => {
       console.log('🎮 Juego iniciado:', data);
       setPlayers(Array(data.playerCount).fill(null));
+      if (data.players) {
+        setAllPlayers(data.players);
+      }
+      setShowCardBack(true); // Resetear carta al iniciar
     });
 
     // Fase de discusión
@@ -125,6 +140,8 @@ function Game() {
           setGamePhase('discussion');
         } else {
           setGamePhase('revealing');
+          setShowCardBack(true);
+          setTimeout(() => setShowCardBack(false), 600);
         }
       } else {
         console.log('⚠️ No se pudo obtener estado:', response?.error);
@@ -195,20 +212,26 @@ function Game() {
     // Si ya vio su rol, mostrar pantalla de espera
     if (hasSeenRole) {
       return (
-        <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-black via-slate-950 to-black">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="text-center"
           >
-            <div className="text-6xl mb-6">⏳</div>
+            <motion.div
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="text-6xl mb-6"
+            >
+              ⏳
+            </motion.div>
             <h2 className="text-2xl font-bold text-space-cyan mb-4">
               Esperando a los demás jugadores...
             </h2>
-            <p className="text-gray-400">
+            <p className="text-gray-400 mb-4">
               Todos deben confirmar su rol antes de continuar
             </p>
-            <div className="text-xs text-gray-500 mt-4">
+            <div className="text-xs text-gray-500 mt-4 p-3 bg-space-blue/30 rounded-lg inline-block">
               Tu rol:{' '}
               {myRole?.isImpostor ? '🕵️ IMPOSTOR' : `🎯 ${myRole?.word}`}
             </div>
@@ -217,72 +240,152 @@ function Game() {
       );
     }
 
-    // Mostrar rol
+    // Mostrar rol con animación premium de flip 3D
+    const isImpostor = myRole?.isImpostor;
+    const displayWord = myRole?.word || '';
+
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-black via-slate-950 to-black">
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="max-w-md w-full"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 text-center"
         >
-          <div className="glass-effect rounded-2xl p-8 text-center">
-            <motion.div
-              initial={{ rotateY: 180 }}
-              animate={{ rotateY: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-            >
-              {myRole?.isImpostor ? (
+          <h1 className="text-3xl font-extrabold tracking-wide text-red-400 drop-shadow-lg mb-2">
+            {isImpostor ? 'IMPOSTOR' : 'TU PALABRA'}
+          </h1>
+          <p className="text-xs text-slate-400 uppercase tracking-[0.2em]">
+            Desliza tu mirada, no reveles tu carta
+          </p>
+        </motion.div>
+
+        {/* Carta con flip 3D premium */}
+        <div className="relative w-72 h-96 mb-8" style={{ perspective: '1200px' }}>
+          <AnimatePresence mode="wait">
+            {showCardBack ? (
+              <motion.div
+                key="card-back"
+                initial={{ rotateY: 180, opacity: 0 }}
+                animate={{ rotateY: 0, opacity: 1 }}
+                exit={{ rotateY: -180, opacity: 0 }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-900 via-indigo-900 to-slate-900 border-2 border-purple-500/50 shadow-[0_0_40px_rgba(139,92,246,0.5)] flex items-center justify-center cursor-pointer"
+                onClick={() => setShowCardBack(false)}
+                style={{ transformStyle: 'preserve-3d' }}
+              >
+                <div className="text-center" style={{ transform: 'translateZ(20px)' }}>
+                  <motion.div
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="text-6xl mb-4"
+                  >
+                    👁️‍🗨️
+                  </motion.div>
+                  <p className="text-slate-200 text-sm font-medium">
+                    Toca para revelar tu rol
+                  </p>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="card-front"
+                initial={{ rotateY: 180, opacity: 0 }}
+                animate={{ rotateY: 0, opacity: 1 }}
+                exit={{ rotateY: 180, opacity: 0 }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute inset-0 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-950 to-black border-2 border-slate-700 shadow-[0_0_40px_rgba(15,23,42,0.8)] flex flex-col items-center justify-center px-6"
+                style={{ transformStyle: 'preserve-3d', backfaceVisibility: 'hidden' }}
+              >
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 1, type: 'spring', stiffness: 200 }}
+                className="text-7xl mb-4"
+              >
+                {isImpostor ? '🕵️' : '🎯'}
+              </motion.div>
+              {isImpostor ? (
                 <>
-                  <div className="text-8xl mb-6">🕵️</div>
-                  <h1 className="text-4xl font-bold text-red-500 mb-4">
-                    IMPOSTOR
-                  </h1>
-                  <p className="text-gray-300 mb-6">
-                    No sabes la palabra secreta. Intenta descubrirla sin que te
-                    descubran.
+                  <p className="text-red-400 font-semibold text-xl mb-2">
+                    Eres el IMPOSTOR
+                  </p>
+                  {displayWord && (
+                    <p className="text-xs text-emerald-300 mb-4 px-4 py-2 bg-emerald-900/30 rounded-lg">
+                      Pista: categoría{' '}
+                      <span className="font-bold text-emerald-200">{displayWord}</span>
+                    </p>
+                  )}
+                  <p className="text-xs text-slate-400 text-center px-4">
+                    Finge que conoces la palabra secreta sin delatarte.
                   </p>
                 </>
               ) : (
                 <>
-                  <div className="text-8xl mb-6">🎯</div>
-                  <h1 className="text-2xl font-bold text-space-cyan mb-4">
-                    Tu palabra es:
-                  </h1>
-                  <div className="text-5xl font-bold text-glow mb-6">
-                    {myRole?.word}
-                  </div>
-                  <p className="text-gray-300 mb-6">
-                    Hay {players.length > 5 ? '1-2' : '1'} impostor(es) que no
-                    saben esta palabra.
+                  <p className="text-sm text-slate-400 mb-2">Tu palabra secreta es:</p>
+                  <motion.p
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 1.2 }}
+                    className="text-4xl font-extrabold text-emerald-400 drop-shadow-lg mb-4 text-center"
+                    style={{ textShadow: '0 0 20px rgba(16, 185, 129, 0.5)' }}
+                  >
+                    {displayWord}
+                  </motion.p>
+                  <p className="text-xs text-slate-400 text-center px-4">
+                    Describe sin decirla. Hay {players.length > 5 ? '1-2' : '1'} impostor(es) intentando adivinarla.
                   </p>
                 </>
               )}
-            </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
-            <motion.button
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleRevealConfirm}
-              className="w-full py-4 bg-gradient-to-r from-space-purple to-space-pink rounded-lg font-semibold text-white"
-            >
-              Continuar
-            </motion.button>
-          </div>
-        </motion.div>
+        <motion.button
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 1.5 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={handleRevealConfirm}
+          className="w-full max-w-xs py-4 rounded-full bg-emerald-500 hover:bg-emerald-400 font-semibold text-black tracking-wide shadow-lg shadow-emerald-500/40 transition"
+        >
+          He visto mi rol
+        </motion.button>
       </div>
     );
   }
+
+  // Obtener información de la sala
+  useEffect(() => {
+    if (!socket || !isConnected) return;
+    
+    socket.emit('room:get-info', { code }, (response) => {
+      if (response && response.ok) {
+        setRoom(response.room);
+      }
+    });
+  }, [socket, isConnected, code]);
 
   // ===== FASE: DISCUSIÓN =====
   if (gamePhase === 'discussion') {
     const minutes = Math.floor((timeLeft || 0) / 60);
     const seconds = (timeLeft || 0) % 60;
+    const isHost = room?.hostId === socket?.id;
+
+    const handleStartVoting = () => {
+      if (!isHost) return;
+      socket.emit('game:start-voting', { code }, (response) => {
+        if (response && response.ok) {
+          console.log('✅ Votación iniciada por el host');
+        } else {
+          console.error('❌ Error iniciando votación:', response?.error);
+        }
+      });
+    };
 
     return (
-      <div className="min-h-screen p-4">
+      <div className="min-h-screen p-4 bg-gradient-to-b from-black via-slate-950 to-black">
         <div className="max-w-2xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -290,29 +393,69 @@ function Game() {
             className="text-center mb-8"
           >
             <h1 className="text-4xl font-bold text-glow mb-4">💬 Discusión</h1>
-            <div className="text-6xl font-bold text-space-cyan">
+            <motion.div
+              animate={timeLeft === 0 ? {} : { scale: [1, 1.05, 1] }}
+              transition={{ duration: 1, repeat: timeLeft === 0 ? 0 : Infinity }}
+              className="text-7xl font-bold text-space-cyan mb-4"
+            >
               {String(minutes).padStart(2, '0')}:
               {String(seconds).padStart(2, '0')}
-            </div>
-            <p className="text-gray-400 mt-4">
+            </motion.div>
+            <p className="text-gray-400 mt-4 text-lg">
               Discutan y descubran quién es el impostor
             </p>
           </motion.div>
 
-          <div className="glass-effect rounded-2xl p-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass-effect rounded-2xl p-6 mb-6"
+          >
             <div className="text-center">
               <div className="text-2xl mb-4">
-                {myRole?.isImpostor
-                  ? '🕵️ Eres el IMPOSTOR'
-                  : `🎯 Tu palabra: ${myRole?.word}`}
+                {myRole?.isImpostor ? (
+                  <>
+                    <span className="text-red-400">🕵️ Eres el IMPOSTOR</span>
+                    {myRole?.word && (
+                      <p className="text-sm text-emerald-300 mt-2">
+                        Pista: {myRole.word}
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-space-cyan">🎯 Tu palabra: <span className="font-bold text-emerald-400">{myRole?.word}</span></span>
+                )}
               </div>
-              <p className="text-gray-300">
+              <p className="text-gray-300 text-sm">
                 {myRole?.isImpostor
                   ? 'Intenta descubrir la palabra sin revelar que eres el impostor'
                   : 'Habla sobre la palabra sin decirla directamente'}
               </p>
             </div>
-          </div>
+          </motion.div>
+
+          {isHost && (
+            <motion.button
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleStartVoting}
+              className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-semibold text-white shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70 transition-all"
+            >
+              🗳️ Iniciar Votación
+            </motion.button>
+          )}
+
+          {timeLeft === 0 && !isHost && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center mt-4 text-yellow-400"
+            >
+              ⏰ Tiempo agotado. Esperando que el host inicie la votación...
+            </motion.div>
+          )}
         </div>
       </div>
     );
@@ -320,47 +463,83 @@ function Game() {
 
   // ===== FASE: VOTACIÓN =====
   if (gamePhase === 'voting') {
+    // Obtener jugadores activos (no eliminados) para votar
+    const activePlayersForVote = allPlayers.length > 0 
+      ? allPlayers.filter((p, idx) => !gameResult?.eliminatedPlayers?.includes(p.id))
+      : players.map((_, idx) => ({ id: `player-${idx}`, name: `Jugador ${idx + 1}` }));
+
     return (
-      <div className="min-h-screen p-4">
+      <div className="min-h-screen p-4 bg-gradient-to-b from-black via-slate-950 to-black">
         <div className="max-w-2xl mx-auto">
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
             className="text-center mb-8"
           >
             <h1 className="text-4xl font-bold text-glow mb-4">🗳️ Votación</h1>
-            <p className="text-gray-400">¿Quién crees que es el impostor?</p>
+            <p className="text-gray-400 text-lg">¿Quién crees que es el impostor?</p>
           </motion.div>
 
-          <div className="glass-effect rounded-2xl p-6 space-y-3">
-            {players.map((player, index) => (
-              <motion.button
-                key={index}
-                onClick={() => handleVote(`player-${index}`)}
-                disabled={selectedVote !== null}
-                whileHover={{ scale: selectedVote ? 1 : 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`w-full p-4 rounded-lg border-2 transition-all ${
-                  selectedVote === `player-${index}`
-                    ? 'border-space-cyan bg-space-cyan/20'
-                    : 'border-space-blue bg-space-blue hover:border-space-cyan/50'
-                } disabled:opacity-50`}
-              >
-                <span className="text-white font-semibold">
-                  Jugador {index + 1}
-                  {selectedVote === `player-${index}` && ' ✓'}
-                </span>
-              </motion.button>
-            ))}
+          <div className="glass-effect rounded-2xl p-6 space-y-4">
+            <AnimatePresence>
+              {activePlayersForVote.map((player, index) => {
+                const playerId = player.id || `player-${index}`;
+                const playerName = player.name || `Jugador ${index + 1}`;
+                const isSelected = selectedVote === playerId;
+                const isMe = player.id === socket?.id;
+
+                return (
+                  <motion.button
+                    key={playerId}
+                    initial={{ x: -50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: 50, opacity: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    onClick={() => !isMe && handleVote(playerId)}
+                    disabled={selectedVote !== null || isMe}
+                    whileHover={selectedVote || isMe ? {} : { scale: 1.02, x: 5 }}
+                    whileTap={selectedVote || isMe ? {} : { scale: 0.98 }}
+                    className={`w-full p-4 rounded-xl border-2 transition-all flex items-center justify-between ${
+                      isSelected
+                        ? 'border-emerald-400 bg-emerald-500/20 shadow-lg shadow-emerald-500/30'
+                        : isMe
+                        ? 'border-gray-600 bg-gray-800/50 opacity-60 cursor-not-allowed'
+                        : 'border-space-blue bg-space-blue/50 hover:border-space-cyan hover:bg-space-cyan/20'
+                    } disabled:opacity-50`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="text-2xl">
+                        {isMe ? '👤' : '🎭'}
+                      </div>
+                      <span className="text-white font-semibold text-lg">
+                        {playerName}
+                        {isMe && ' (Tú)'}
+                      </span>
+                    </div>
+                    {isSelected && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="text-2xl"
+                      >
+                        ✓
+                      </motion.div>
+                    )}
+                  </motion.button>
+                );
+              })}
+            </AnimatePresence>
           </div>
 
           {selectedVote && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center mt-6 text-space-cyan"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center mt-6 p-4 bg-emerald-500/20 rounded-xl border border-emerald-400/50"
             >
-              Voto enviado. Esperando a los demás...
+              <p className="text-emerald-300 font-semibold">
+                ✓ Voto enviado. Esperando a los demás...
+              </p>
             </motion.div>
           )}
         </div>
@@ -375,62 +554,115 @@ function Game() {
       : gameResult.winner === 'civilians';
 
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-black via-slate-950 to-black">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 100 }}
           className="max-w-2xl w-full"
         >
-          <div className="glass-effect rounded-2xl p-8 text-center">
-            <div className="text-8xl mb-6">{didIWin ? '🎉' : '😢'}</div>
-            <h1 className="text-4xl font-bold mb-4">
+          <div className="glass-effect rounded-3xl p-8 text-center">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+              className="text-9xl mb-6"
+            >
+              {didIWin ? '🎉' : '😢'}
+            </motion.div>
+            
+            <motion.h1
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className={`text-5xl font-bold mb-6 ${
+                gameResult.winner === 'impostors'
+                  ? 'text-red-400'
+                  : 'text-emerald-400'
+              }`}
+            >
               {gameResult.winner === 'impostors'
                 ? '🕵️ Impostores Ganan!'
                 : '🎯 Civiles Ganan!'}
-            </h1>
+            </motion.h1>
 
-            <div className="text-2xl text-space-cyan mb-6">
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-2xl text-space-cyan mb-8 p-4 bg-space-blue/30 rounded-xl"
+            >
               La palabra secreta era:{' '}
-              <span className="text-glow font-bold">
+              <span className="text-glow font-bold text-3xl text-emerald-400">
                 {gameResult.secretWord}
               </span>
-            </div>
+            </motion.div>
 
             {gameResult.eliminated && (
-              <p className="text-gray-300 mb-6">
-                {gameResult.eliminated.name} fue eliminado
-              </p>
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="mb-8 p-4 bg-red-500/20 border border-red-500/50 rounded-xl"
+              >
+                <p className="text-red-300 font-semibold text-lg">
+                  ❌ {gameResult.eliminated.name} fue eliminado
+                </p>
+              </motion.div>
             )}
 
-            <div className="space-y-4 mb-8">
-              <h3 className="text-xl font-semibold text-white">Roles:</h3>
-              {gameResult.players.map((player, index) => (
-                <div
-                  key={index}
-                  className={`p-3 rounded-lg ${
-                    player.role === 'impostor'
-                      ? 'bg-red-500/20 border border-red-500'
-                      : 'bg-space-blue'
-                  }`}
-                >
-                  <span className="text-white font-semibold">
-                    {player.name}
-                  </span>
-                  <span className="ml-2">
-                    {player.role === 'impostor'
-                      ? '🕵️ IMPOSTOR'
-                      : `🎯 ${player.word}`}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <button
-              onClick={handleBackToLobby}
-              className="w-full py-4 bg-gradient-to-r from-space-purple to-space-pink rounded-lg font-semibold text-white hover:opacity-90 transition-opacity"
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="space-y-3 mb-8"
             >
-              Volver al inicio
-            </button>
+              <h3 className="text-2xl font-semibold text-white mb-4">📋 Roles Finales:</h3>
+              <div className="grid gap-3">
+                {gameResult.players.map((player, index) => {
+                  const isImpostor = player.role === 'impostor';
+                  return (
+                    <motion.div
+                      key={player.id || index}
+                      initial={{ x: -50, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.7 + index * 0.1 }}
+                      className={`p-4 rounded-xl flex items-center justify-between ${
+                        isImpostor
+                          ? 'bg-red-500/20 border-2 border-red-500'
+                          : 'bg-space-blue border-2 border-space-cyan/30'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">
+                          {isImpostor ? '🕵️' : '🎯'}
+                        </span>
+                        <span className="text-white font-semibold text-lg">
+                          {player.name || `Jugador ${index + 1}`}
+                        </span>
+                      </div>
+                      <span className={`font-bold ${
+                        isImpostor ? 'text-red-400' : 'text-emerald-400'
+                      }`}>
+                        {isImpostor ? 'IMPOSTOR' : player.word}
+                      </span>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.div>
+
+            <motion.button
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleBackToLobby}
+              className="w-full py-5 bg-gradient-to-r from-space-purple to-space-pink rounded-xl font-bold text-white text-lg shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70 transition-all"
+            >
+              🏠 Volver al Inicio
+            </motion.button>
           </div>
         </motion.div>
       </div>

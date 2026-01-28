@@ -124,6 +124,15 @@ io.on("connection", (socket) => {
     io.to(code).emit("room:updated", getPublicRoomState(room));
   });
 
+  socket.on("room:get-info", ({ code }, callback) => {
+    const room = rooms.get(code);
+    if (!room) {
+      callback?.({ ok: false, error: "ROOM_NOT_FOUND" });
+      return;
+    }
+    callback?.({ ok: true, room: getPublicRoomState(room) });
+  });
+
   socket.on("room:leave", () => {
     const code = socket.data.roomCode;
     if (!code) return;
@@ -219,8 +228,8 @@ io.on("connection", (socket) => {
     });
   });
   
-  socket.on("game:start", async ({ packId }, callback) => {
-    console.log(`🎮 game:start solicitado por ${socket.id}, pack: ${packId}`);
+  socket.on("game:start", async ({ packId, hintForImpostors = true, discussionSeconds = 240, impostorCount }, callback) => {
+    console.log(`🎮 game:start solicitado por ${socket.id}, pack: ${packId}, hint: ${hintForImpostors}, duration: ${discussionSeconds}`);
     const code = socket.data.roomCode;
     const room = rooms.get(code);
     
@@ -248,18 +257,35 @@ io.on("connection", (socket) => {
       }
 
       const secretWord = pack.words[Math.floor(Math.random() * pack.words.length)];
+      const impostorHint = hintForImpostors ? (pack.name || 'Categoría secreta') : null;
+      
+      // Actualizar configuración de la sala
+      if (impostorCount) {
+        room.settings.impostorCount = Math.min(Math.max(1, impostorCount), room.players.length - 1);
+      } else {
+        room.settings.impostorCount = Math.min(room.settings.impostorCount || 1, room.players.length - 1);
+      }
+      room.settings.discussionSeconds = discussionSeconds;
       
       // Inicializar el juego
-      const gameState = initializeGame(room, secretWord);
+      const gameState = initializeGame(room, secretWord, impostorHint);
       games.set(code, gameState);
 
-      console.log(`✅ Juego iniciado en sala ${code}, palabra: ${secretWord}, jugadores: ${gameState.players.length}`);
+      console.log(`✅ Juego iniciado en sala ${code}, palabra: ${secretWord}, jugadores: ${gameState.players.length}, impostores: ${gameState.impostorCount}`);
 
       // Notificar a todos que el juego comenzó (primero para que naveguen)
       io.to(code).emit("game:started", {
         playerCount: gameState.players.length,
         impostorCount: gameState.impostorCount,
+        players: gameState.players.map(p => ({ id: p.id, name: p.name })),
       });
+      
+      // Enviar lista de jugadores a todos
+      io.to(code).emit("game:players-update", gameState.players.map(p => ({
+        id: p.id,
+        name: p.name,
+        role: p.role,
+      })));
 
       // Esperar un momento para que todos naveguen a /game/CODIGO
       setTimeout(() => {
