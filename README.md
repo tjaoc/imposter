@@ -1,9 +1,9 @@
-# Imposter - PWA Clone
+# Imposter - Who is the Spy?
 
 **Versión:** 1.0.0-beta  
 **Estado:** ✅ Funcional y listo para pruebas beta
 
-PWA de alto rendimiento clon del juego "Imposter (Who is the Spy?)" con todas las funcionalidades VIP.
+PWA de alto rendimiento del juego "Imposter (Who is the Spy?)" con todas las funcionalidades VIP.
 
 ## 🚀 Características
 

@@ -7,7 +7,7 @@
 
 ## 🎯 Resumen de la Versión
 
-Esta es la **primera versión beta completa** del juego Imposter, un clon de alta calidad del popular juego "Who is the Spy?" (Imposter).
+Esta es la **primera versión beta completa** del juego Imposter, una versión de alta calidad del popular juego "Who is the Spy?"
 
 ### ✨ Características Principales
 
@@ -25,6 +25,7 @@ Esta es la **primera versión beta completa** del juego Imposter, un clon de alt
 ## 🎮 Cómo Funciona
 
 ### Sistema de Juego
+
 1. **Mínimo 3 jugadores** - Máximo 12
 2. **1-2 impostores** - El resto son civiles
 3. **Palabra secreta** - Solo los civiles la conocen
@@ -33,6 +34,7 @@ Esta es la **primera versión beta completa** del juego Imposter, un clon de alt
 6. **Múltiples rondas** - Hasta que haya un ganador
 
 ### Condiciones de Victoria
+
 - **Civiles ganan:** Eliminan a todos los impostores
 - **Impostores ganan:** Eliminan a suficientes civiles (≥ número de impostores)
 
@@ -41,6 +43,7 @@ Esta es la **primera versión beta completa** del juego Imposter, un clon de alt
 ## 📊 Especificaciones Técnicas
 
 ### Rendimiento
+
 - ✅ Tiempo de respuesta backend: <50ms
 - ✅ Tiempo de carga frontend: <100ms
 - ✅ Socket.io latencia: <30ms
@@ -49,12 +52,14 @@ Esta es la **primera versión beta completa** del juego Imposter, un clon de alt
 - ✅ Memoria MongoDB: ~75MB
 
 ### Escalabilidad
+
 - ✅ Soporte para múltiples salas simultáneas
 - ✅ Múltiples juegos concurrentes
 - ✅ Sistema de salas aisladas
 - ✅ Manejo de desconexiones
 
 ### Seguridad
+
 - ✅ CORS configurado
 - ✅ Validación de datos
 - ✅ Sanitización de inputs
@@ -65,17 +70,21 @@ Esta es la **primera versión beta completa** del juego Imposter, un clon de alt
 ## 🐳 Docker
 
 ### Desarrollo Local
+
 ```bash
 docker-compose up -d
 ```
+
 - Frontend: http://localhost:3000
 - Backend: http://localhost:4000
 - MongoDB: localhost:27017
 
 ### Producción
+
 ```bash
 docker-compose -f docker-compose.prod.yml up -d
 ```
+
 - Frontend optimizado con Nginx
 - Backend con usuario no-root
 - MongoDB con persistencia
@@ -85,6 +94,7 @@ docker-compose -f docker-compose.prod.yml up -d
 ## 📦 Paquetes y Dependencias
 
 ### Últimas Versiones (Enero 2026)
+
 - React: 19.2.4
 - Express: 5.2.1
 - Socket.io: 4.8.3
@@ -98,11 +108,13 @@ docker-compose -f docker-compose.prod.yml up -d
 ## ✅ Testing
 
 **Pruebas Automatizadas:**
+
 - 6 pruebas de backend (100% pasadas)
 - 8 pruebas de frontend (100% pasadas)
 - Scripts disponibles en `/scripts/`
 
 **Pruebas Manuales:**
+
 - ✅ Crear sala
 - ✅ Unirse a sala
 - ✅ Seleccionar pack
@@ -120,6 +132,7 @@ docker-compose -f docker-compose.prod.yml up -d
 ### Variables de Entorno
 
 **Backend (.env):**
+
 ```env
 PORT=4000
 MONGODB_URI=mongodb://localhost:27017/imposter-premium
@@ -127,6 +140,7 @@ NODE_ENV=development
 ```
 
 **Frontend (.env):**
+
 ```env
 VITE_SOCKET_URL=http://localhost:4000
 ```
@@ -136,6 +150,7 @@ VITE_SOCKET_URL=http://localhost:4000
 ## 📝 Notas de la Beta
 
 ### Lo que funciona perfectamente ✅
+
 - Creación y gestión de salas
 - Sistema de Socket.io en tiempo real
 - Todas las fases del juego
@@ -144,6 +159,7 @@ VITE_SOCKET_URL=http://localhost:4000
 - Diseño y animaciones
 
 ### Mejoras futuras 🚀
+
 - Configuración de juego desde UI (actualmente en código)
 - Chat en tiempo real
 - Sonidos
@@ -155,6 +171,7 @@ VITE_SOCKET_URL=http://localhost:4000
 ## 🎯 Para Usuarios Beta
 
 ### Cómo Probar
+
 1. Ejecuta: `docker-compose up -d`
 2. Abre: http://localhost:3000
 3. Crea una sala con 3+ jugadores
@@ -162,7 +179,9 @@ VITE_SOCKET_URL=http://localhost:4000
 5. ¡Juega!
 
 ### Reportar Bugs
+
 Si encuentras algún bug, incluye:
+
 - Pasos para reproducir
 - Navegador y versión
 - Logs de la consola (F12)
