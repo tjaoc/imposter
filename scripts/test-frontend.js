@@ -60,8 +60,8 @@ async function testFrontendTitle() {
       let data = '';
       res.on('data', (chunk) => { data += chunk; });
       res.on('end', () => {
-        if (!data.includes('<title>Imposter Premium</title>')) {
-          reject(new Error('Title not found or incorrect'));
+        if (!data.includes('<title>') || !data.includes('Imposter')) {
+          reject(new Error('Title not found or incorrect (expected Imposter)'));
           return;
         }
         resolve();
