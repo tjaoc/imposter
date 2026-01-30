@@ -1,5 +1,14 @@
 # 📝 Changelog - Imposter
 
+## [1.1.8] - 2026-01-30
+
+### 📱 Footer móvil (online)
+
+- ✅ App: `min-h-dvh` para que el contenedor llene la altura visible en móvil.
+- ✅ Footer: `mt-auto` para pegarlo al fondo; `pb-[max(1.25rem,env(safe-area-inset-bottom))]` para más espacio inferior.
+
+---
+
 ## [1.1.7] - 2026-01-30
 
 ### 🐛 index.html
