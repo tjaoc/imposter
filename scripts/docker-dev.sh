@@ -12,9 +12,14 @@ if ! docker info > /dev/null 2>&1; then
     exit 1
 fi
 
-# Construir y levantar servicios
+# Construir y levantar servicios (--no-cache para reconstrucción completa)
+BUILD_OPTS=""
+if [ "$1" = "--no-cache" ] || [ "$1" = "--rebuild" ]; then
+    echo "🔄 Reconstrucción completa (sin caché)..."
+    BUILD_OPTS="--no-cache"
+fi
 echo "📦 Construyendo imágenes..."
-docker-compose build
+docker-compose build $BUILD_OPTS
 
 echo "🔧 Iniciando servicios..."
 docker-compose up -d

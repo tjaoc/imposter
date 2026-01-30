@@ -13,17 +13,16 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 1
 fi
 
-echo "🛑 Deteniendo y eliminando contenedores..."
+echo "🛑 Deteniendo y eliminando contenedores y volúmenes del proyecto..."
 docker-compose down -v 2>/dev/null || true
 docker-compose -f docker-compose.prod.yml down -v 2>/dev/null || true
 
-echo "🗑️  Eliminando imágenes..."
+echo "🗑️  Eliminando imágenes del proyecto..."
+docker rmi bso-backend-dev bso-frontend-dev 2>/dev/null || true
+docker rmi bso-backend-prod bso-frontend-prod 2>/dev/null || true
+# Nombres alternativos por nombre de contenedor/imagen
 docker rmi imposter-backend-dev imposter-frontend-dev 2>/dev/null || true
 docker rmi imposter-backend-prod imposter-frontend-prod 2>/dev/null || true
-
-echo "💾 Eliminando volúmenes..."
-docker volume rm spy_mongodb_data spy_mongodb_config 2>/dev/null || true
-docker volume rm spy_mongodb_data_prod spy_mongodb_config_prod 2>/dev/null || true
 
 echo "🧹 Limpiando sistema Docker (opcional)..."
 read -p "¿Deseas ejecutar 'docker system prune'? Esto limpiará recursos no utilizados del sistema. (y/N): " -n 1 -r

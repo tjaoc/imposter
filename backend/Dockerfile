@@ -32,7 +32,7 @@ RUN addgroup -g 1001 -S nodejs && \
 COPY package*.json ./
 
 # Instalar solo dependencias de producción
-RUN npm ci --only=production && \
+RUN npm ci --omit=dev && \
   npm cache clean --force
 
 # Copiar código fuente
