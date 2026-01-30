@@ -56,14 +56,14 @@ projects:
             startCommand: npm start
             healthCheckPath: /health
             domains:
-              - dev.apiimp.netic.app
+              - apiimp.netic.dev
             envVars:
               - key: NODE_ENV
                 value: development
               - key: MONGODB_URI
                 sync: false
               - key: CORS_ORIGIN
-                value: https://dev.impostor.netic.app
+                value: https://impostor.netic.dev
 
           - type: web
             runtime: static
@@ -79,6 +79,6 @@ projects:
                 destination: /index.html
             envVars:
               - key: VITE_API_URL
-                value: https://dev.apiimp.netic.app
+                value: https://apiimp.netic.dev
               - key: VITE_SOCKET_URL
-                value: https://dev.apiimp.netic.app
+                value: https://apiimp.netic.dev
