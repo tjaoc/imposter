@@ -259,19 +259,13 @@ function Local() {
             <>
               {/* Impostores */}
               <div className="glass-effect rounded-2xl p-4 sm:p-6 mb-4">
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="text-2xl">🕵️</div>
-                    <div>
-                      <div className="text-white font-semibold">
-                        {t('room.impostors')}
-                      </div>
-                      <div className="text-sm text-gray-400">
-                        {t('room.impostorsDesc')}
-                      </div>
-                    </div>
+                <div className="flex flex-row items-center justify-between gap-3 flex-wrap">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <span className="text-2xl flex-shrink-0">🕵️</span>
+                    <span className="text-white font-semibold whitespace-nowrap">{t('room.impostors')}</span>
+                    <span className="text-sm text-gray-400 hidden sm:inline truncate">{t('room.impostorsDesc')}</span>
                   </div>
-                  <div className="flex items-center justify-center gap-3">
+                  <div className="flex items-center gap-3 flex-shrink-0">
                     <button
                       type="button"
                       onClick={() =>
@@ -316,19 +310,13 @@ function Local() {
                 transition={{ delay: 0.2 }}
                 className="glass-effect rounded-2xl p-4 sm:p-6 mb-4"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="text-2xl">🔍</div>
-                    <div>
-                      <div className="text-white font-semibold">
-                        {t('room.hintForImpostors')}
-                      </div>
-                      <div className="text-sm text-gray-400">
-                        {t('room.hintForImpostorsDesc')}
-                      </div>
-                    </div>
+                <div className="flex flex-row items-center justify-between gap-3 flex-wrap">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <span className="text-2xl flex-shrink-0">🔍</span>
+                    <span className="text-white font-semibold whitespace-nowrap">{t('room.hintForImpostors')}</span>
+                    <span className="text-sm text-gray-400 hidden sm:inline truncate">{t('room.hintForImpostorsDesc')}</span>
                   </div>
-                  <div className="flex items-center justify-end sm:justify-end min-h-[48px]">
+                  <div className="flex items-center flex-shrink-0 min-h-[48px]">
                     <button
                       type="button"
                       role="switch"
