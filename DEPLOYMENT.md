@@ -6,6 +6,73 @@ Guía para desplegar Imposter. **Recomendado:** usar **Render** para frontend y 
 
 ---
 
+## Conectar GitHub en Render y desplegar con render.yaml (Blueprint)
+
+Sigue estos pasos para que Render importe el repo, lea el `render.yaml` y cree todos los servicios automáticamente.
+
+### 1. Conectar GitHub a Render
+
+1. Entra en **[Render](https://render.com)** e inicia sesión (o regístrate).
+2. Si es la primera vez, haz clic en **Connect account** o **Connect GitHub** y autoriza a Render para acceder a tu cuenta de GitHub.
+3. Render podrá ver tus repositorios. Asegúrate de que el repo **imposter** (o el nombre que tenga tu proyecto) esté en GitHub y que el archivo **`render.yaml`** esté en la **raíz** del repo.
+
+### 2. Crear el Blueprint desde el repo
+
+1. En el **Dashboard** de Render, haz clic en **New +** (botón azul).
+2. Elige **Blueprint**.
+3. Conecta el repositorio:
+   - Si ya conectaste GitHub, verás la lista de repos. Selecciona **imposter** (o tu repo).
+   - Si no aparece, haz clic en **Configure account** y vuelve a autorizar el acceso a ese repo/organización.
+4. Render detecta el archivo **`render.yaml`** en la raíz y te muestra un resumen del proyecto y los servicios que va a crear (proyecto **imposter**, entornos **production** y **development**, 4 servicios: imposter-api-prod, imposter-app-prod, imposter-api-dev, imposter-app-dev).
+5. Revisa la configuración y haz clic en **Apply** (o **Create Blueprint**).
+
+### 3. Configurar variables con `sync: false` (MONGODB_URI)
+
+Durante el flujo de creación (o justo después), Render te pedirá valores para las variables marcadas como **sync: false** en el `render.yaml`:
+
+- **imposter-api-prod** y **imposter-api-dev**: variable **MONGODB_URI**.
+  - Producción: `mongodb+srv://impostoradm:TU_PASSWORD@impostor.tnqoasv.mongodb.net/production?retryWrites=true&w=majority`
+  - Desarrollo: `mongodb+srv://impostoradm:TU_PASSWORD@impostor.tnqoasv.mongodb.net/develop?retryWrites=true&w=majority`
+  - Sustituye `TU_PASSWORD` por la contraseña real del usuario de Atlas.
+
+Si no las rellenaste en ese momento, puedes hacerlo después:
+
+1. En el Dashboard, entra en el **proyecto imposter**.
+2. Elige el entorno (**Production** o **Development**).
+3. Entra en el servicio **imposter-api-prod** (o **imposter-api-dev**).
+4. Ve a **Environment** → **Environment Variables** → **Add variable**.
+5. Añade **MONGODB_URI** con el valor correspondiente (con `/production` o `/develop` y la contraseña correcta).
+6. Guarda; Render hará un **redeploy** automático del servicio.
+
+### 4. Primer deploy
+
+1. Tras aplicar el Blueprint, Render empieza a crear los 4 servicios y hace el **primer deploy** de cada uno (build + start).
+2. Puedes seguir el progreso en el Dashboard: cada servicio tiene su pestaña **Logs** y **Events**.
+3. Cuando terminen, tendrás:
+   - **Production**: imposter-api-prod e imposter-app-prod (con dominios .onrender.com; los custom impostor.netic.app y apiimp.netic.app los configuras después).
+   - **Development**: imposter-api-dev e imposter-app-dev (igual con .onrender.com y luego dev.impostor.netic.app, dev.apiimp.netic.app).
+
+### 5. Añadir tus dominios (opcional)
+
+1. En cada servicio, ve a **Settings** → **Custom Domains**.
+2. Añade el dominio (ej. `impostor.netic.app`, `apiimp.netic.app`, `dev.impostor.netic.app`, `dev.apiimp.netic.app`).
+3. Render te mostrará el **CNAME** al que debes apuntar en tu DNS (ej. tu servicio .onrender.com).
+4. En el panel de tu dominio (netic.app), crea los registros **CNAME** que indica Render. Cuando propaguen, Render activará el SSL.
+
+### Resumen rápido
+
+| Paso | Dónde | Acción |
+|------|--------|--------|
+| 1 | Render → Connect account | Conectar GitHub |
+| 2 | New + → Blueprint | Elegir repo imposter |
+| 3 | Aplicar Blueprint | Rellenar MONGODB_URI (prod y dev) si lo pide |
+| 4 | Dashboard | Esperar a que terminen los 4 deploys |
+| 5 | Settings → Custom Domains (cada servicio) | Añadir impostor.netic.app, apiimp.netic.app, dev.* |
+
+Si algo falla, revisa **Logs** del servicio que falle (build o runtime) y **RENDER_ENVS.md** para comprobar que las variables y dominios son los correctos.
+
+---
+
 ## Por qué Render para todo
 
 - **Vercel** es ideal para frontend (SPA/estático) pero es **serverless**: no mantiene conexiones largas. El backend usa **Socket.io** (WebSockets), que necesita un servidor siempre activo, así que el backend no encaja en Vercel.

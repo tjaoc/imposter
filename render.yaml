@@ -30,7 +30,6 @@ projects:
             runtime: static
             name: imposter-app-prod
             rootDir: frontend
-            plan: free
             buildCommand: npm install && npm run build
             staticPublishPath: dist
             domains:
@@ -70,7 +69,6 @@ projects:
             runtime: static
             name: imposter-app-dev
             rootDir: frontend
-            plan: free
             buildCommand: npm install && npm run build
             staticPublishPath: dist
             domains:
