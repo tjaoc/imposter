@@ -1,5 +1,22 @@
 # 📝 Changelog - Imposter
 
+## [1.1.0] - 2026-01-30
+
+### ✨ Juego online: fase de pistas y bots
+
+#### Nuevas funcionalidades
+
+- ✅ **Fase de pistas**: Tras revelar el rol, 3 rondas de 30 s en las que cada jugador escribe su pista (palabra o frase); todos ven las pistas. Después pasa a discusión y votación.
+- ✅ **Bots automáticos**: Al crear sala (Home) se puede elegir 0–5 bots. Los bots reciben rol, escriben pistas (palabra del pack) y votan solos (pistas a los 3 s, votos a los 12 s de abrir votación).
+- ✅ **Jugar solo online**: Con 1 humano + 2 bots (o más) se puede iniciar partida sin más jugadores.
+
+#### Cambios técnicos
+
+- Backend: `gameLogic` con `clueRound`, `maxClueRounds`, `clueRoundSeconds`, `cluesByRound`; eventos `game:clue-round-started`, `game:submit-clue`, `game:clue-received`, `game:clue-round-complete`; `submitBotClues`, `assignBotVotes`, `tryProcessVoting`; `room:create` acepta `settings.botCount`.
+- Frontend: fase `clues` en Game (timer 30 s, input pista, lista de pistas); Home con selector "Jugar con bots"; traducciones ES/PT para pistas y bots.
+
+---
+
 ## [1.0.4] - 2026-01-30
 
 ### ✨ Mejoras y correcciones de iconos/PWA

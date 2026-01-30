@@ -34,6 +34,8 @@ function assignRoles (players, secretWord, impostorCount = 1, hintWord = null) {
       role: isImpostor ? 'impostor' : 'civilian',
       // Los civiles ven la palabra secreta, el impostor ve solo una pista/categoría
       word: isImpostor ? hintWord : secretWord,
+      // Los bots no envían reveal-complete; marcar como vistos para pasar a pistas
+      hasSeenRole: !!player.isBot,
     };
   });
 }
@@ -55,7 +57,7 @@ function initializeGame (room, secretWord, hintWord = null) {
 
   return {
     code: room.code,
-    status: 'revealing', // revealing -> discussion -> voting -> results
+    status: 'revealing', // revealing -> clues -> discussion -> voting -> results
     players: playersWithRoles,
     secretWord,
     impostorCount: room.settings.impostorCount,
@@ -65,6 +67,12 @@ function initializeGame (room, secretWord, hintWord = null) {
     round: 1,
     eliminatedPlayers: [],
     winner: null,
+    // Fase de pistas: 3 rondas, 30 s cada una
+    clueRound: 1,
+    maxClueRounds: 3,
+    clueRoundSeconds: 30,
+    cluesByRound: { 1: {}, 2: {}, 3: {} },
+    clueRoundEndsAt: null,
   };
 }
 

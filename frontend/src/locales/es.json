@@ -32,7 +32,11 @@
     "installAndroid": "Para instalar la app: menú (⋮) → «Instalar app» o «Añadir a la pantalla de inicio».",
     "playLocal": "Un solo dispositivo",
     "playLocalDesc": "Jugar en persona con un móvil",
-    "playOnline": "Jugar en línea"
+    "playOnline": "Jugar en línea",
+    "playWithBots": "Jugar con bots",
+    "noBots": "Sin bots (solo humanos)",
+    "botCount": "{count} bot(s)",
+    "playWithBotsHint": "Si no tienes con quien jugar, añade bots. Ellos pondrán pistas y votarán solos."
   },
   "local": {
     "discussionReminder": "Cada jugador ya conoce su rol. Hablad sin revelar la palabra ni vuestro papel.",
@@ -129,7 +133,15 @@
     "everyoneConfirm": "Todos deben confirmar su rol antes de continuar",
     "yourRole": "Tu rol",
     "onlyHostStartsVoting": "Solo el host puede iniciar la votación",
-    "impostorsCannotVote": "Los impostores no pueden votar"
+    "impostorsCannotVote": "Los impostores no pueden votar",
+    "cluesPhase": "Ronda de pistas",
+    "clueRoundOf": "Ronda {current} de {total}",
+    "clueYourHint": "Tu pista (palabra o frase que ayude sin revelar la palabra secreta)",
+    "clueImpostorHint": "Tu pista (intenta parecer civil sin revelar que no conoces la palabra)",
+    "cluePlaceholder": "Escribe tu pista...",
+    "clueSubmitted": "Pista enviada. Todos la verán.",
+    "cluesSoFar": "Pistas de esta ronda",
+    "noCluesYet": "Aún no hay pistas. Escribe la tuya arriba."
   },
   "customWords": {
     "title": "Palabras Personalizadas",

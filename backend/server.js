@@ -32,6 +32,8 @@ connectDb().then(() => {
 
 const rooms = new Map();
 const games = new Map(); // Almacena el estado de los juegos activos
+const roomClueTimers = new Map(); // timeouts de ronda de pistas por sala
+const roomVotingTimers = new Map(); // timeouts de votación de bots por sala
 
 const generateRoomCode = () => {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -55,6 +57,221 @@ const getPublicRoomState = (room) => ({
   settings: room.settings,
 });
 
+/** Genera y envía pistas para todos los bots en la ronda actual */
+function submitBotClues(io, code, games, roomClueTimers) {
+  const gameState = games.get(code);
+  if (!gameState || gameState.status !== 'clues') return;
+
+  const round = gameState.clueRound;
+  const words = gameState.packWords || [];
+  const secretWord = gameState.secretWord;
+
+  gameState.players.forEach((p) => {
+    if (!p.isBot) return;
+    if (gameState.cluesByRound[round]?.[p.id] !== undefined) return;
+
+    let clue;
+    if (p.role === 'civilian') {
+      const others = words.filter((w) => w !== secretWord);
+      clue = others.length > 0 ? others[Math.floor(Math.random() * others.length)] : secretWord;
+    } else {
+      clue = words.length > 0 ? words[Math.floor(Math.random() * words.length)] : (gameState.secretWord || '?');
+    }
+    if (!gameState.cluesByRound[round]) gameState.cluesByRound[round] = {};
+    gameState.cluesByRound[round][p.id] = clue;
+    io.to(code).emit('game:clue-received', { playerId: p.id, playerName: p.name, clue, round });
+  });
+
+  const allSubmitted = gameState.players.every((pl) => gameState.cluesByRound[round]?.[pl.id] !== undefined);
+  if (allSubmitted) {
+    const t = roomClueTimers.get(code);
+    if (t) {
+      clearTimeout(t);
+      roomClueTimers.delete(code);
+    }
+    endClueRoundAndMaybeNext(io, code, games, roomClueTimers);
+  }
+}
+
+/** Cierra la ronda de pistas actual, emite las pistas y pasa a la siguiente ronda o a discusión */
+function endClueRoundAndMaybeNext(io, code, games, roomClueTimers) {
+  const gameState = games.get(code);
+  if (!gameState || gameState.status !== 'clues') return;
+
+  const round = gameState.clueRound;
+  const cluesThisRound = gameState.cluesByRound[round] || {};
+  const cluesWithNames = {};
+  gameState.players.forEach((p) => {
+    if (cluesThisRound[p.id] !== undefined) {
+      cluesWithNames[p.id] = { name: p.name, clue: cluesThisRound[p.id] };
+    }
+  });
+
+  io.to(code).emit("game:clue-round-complete", { round, maxRounds: gameState.maxClueRounds, clues: cluesWithNames });
+
+  if (round < gameState.maxClueRounds) {
+    gameState.clueRound = round + 1;
+    gameState.clueRoundEndsAt = Date.now() + (gameState.clueRoundSeconds * 1000);
+    const clueRoundData = {
+      round: gameState.clueRound,
+      maxRounds: gameState.maxClueRounds,
+      endsAt: gameState.clueRoundEndsAt,
+      duration: gameState.clueRoundSeconds,
+    };
+    io.to(code).emit("game:clue-round-started", clueRoundData);
+
+    const timer = setTimeout(() => {
+      roomClueTimers.delete(code);
+      endClueRoundAndMaybeNext(io, code, games, roomClueTimers);
+    }, gameState.clueRoundSeconds * 1000);
+    roomClueTimers.set(code, timer);
+
+    if (gameState.players.some((p) => p.isBot)) {
+      setTimeout(() => submitBotClues(io, code, games, roomClueTimers), 3000);
+    }
+  } else {
+    gameState.status = 'discussion';
+    gameState.discussionEndsAt = Date.now() + (gameState.discussionSeconds * 1000);
+    const discussionData = {
+      endsAt: gameState.discussionEndsAt,
+      duration: gameState.discussionSeconds,
+    };
+    io.to(code).emit("game:discussion-started", discussionData);
+  }
+}
+
+/** Asigna votos aleatorios a los bots que aún no han votado */
+function assignBotVotes(io, code, games) {
+  const gameState = games.get(code);
+  if (!gameState || gameState.status !== 'voting') return;
+
+  const activePlayers = gameState.players.filter(
+    (p) => !gameState.eliminatedPlayers.includes(p.id)
+  );
+
+  gameState.players.forEach((p) => {
+    if (!p.isBot || gameState.votes[p.id] !== undefined) return;
+    const others = activePlayers.filter((o) => o.id !== p.id);
+    if (others.length === 0) return;
+    gameState.votes[p.id] = others[Math.floor(Math.random() * others.length)].id;
+  });
+}
+
+/** Procesa la votación si todos los civiles han votado; emite resultados o fin de partida */
+function tryProcessVoting(io, code, games, rooms) {
+  const gameState = games.get(code);
+  if (!gameState || gameState.status !== 'voting') return;
+
+  const currentActiveCivilians = gameState.players.filter(
+    (p) => !gameState.eliminatedPlayers.includes(p.id) && p.role !== 'impostor'
+  );
+  const currentCivilianVoteIds = currentActiveCivilians.map((c) => c.id);
+  const currentCivilianVotesCount = Object.keys(gameState.votes).filter((voterId) =>
+    currentCivilianVoteIds.includes(voterId)
+  ).length;
+  if (currentCivilianVotesCount !== currentActiveCivilians.length || currentActiveCivilians.length === 0) {
+    return;
+  }
+
+  const impostor = gameState.players.find((p) => p.role === 'impostor');
+  const correctVoters = [];
+  const incorrectVoters = [];
+
+  currentActiveCivilians.forEach((civilian) => {
+    const vote = gameState.votes[civilian.id];
+    if (vote === impostor?.id) correctVoters.push(civilian.id);
+    else if (vote) incorrectVoters.push(civilian.id);
+  });
+
+  const allCiviliansVotedForImpostor =
+    !!impostor &&
+    currentActiveCivilians.length > 0 &&
+    currentActiveCivilians.every((civilian) => gameState.votes[civilian.id] === impostor.id);
+
+  const impostorDiscovered = allCiviliansVotedForImpostor;
+
+  const votesWithNames = {};
+  gameState.players.forEach((player) => {
+    const voteInfo = gameState.votes[player.id];
+    if (voteInfo) {
+      const voted = gameState.players.find((p) => p.id === voteInfo);
+      if (voted) {
+        votesWithNames[player.id] = {
+          voterName: player.name,
+          voterRole: player.role,
+          votedId: voteInfo,
+          votedName: voted.name,
+        };
+      }
+    } else {
+      votesWithNames[player.id] = {
+        voterName: player.name,
+        voterRole: player.role,
+        votedId: null,
+        votedName: null,
+      };
+    }
+  });
+
+  const voteCounts = {};
+  currentActiveCivilians.forEach((civilian) => {
+    const vote = gameState.votes[civilian.id];
+    if (vote) voteCounts[vote] = (voteCounts[vote] || 0) + 1;
+  });
+
+  const endCheck = checkGameEnd(gameState);
+  const room = rooms.get(code);
+
+  if (endCheck.finished) {
+    gameState.status = 'finished';
+    gameState.winner = endCheck.winner;
+    gameState.finishedData = {
+      eliminated: impostorDiscovered ? impostor : null,
+      votes: voteCounts,
+      votesWithNames,
+      impostorDiscovered,
+      correctVoters,
+      incorrectVoters,
+    };
+    const finishedData = {
+      winner: endCheck.winner,
+      secretWord: gameState.secretWord,
+      players: gameState.players.map((p) => ({ id: p.id, name: p.name, role: p.role, word: p.word })),
+      impostor: impostor ? { id: impostor.id, name: impostor.name } : null,
+      eliminated: impostorDiscovered ? impostor : null,
+      votes: voteCounts,
+      votesWithNames,
+      impostorDiscovered,
+      correctVoters,
+      incorrectVoters,
+    };
+    io.to(code).emit("game:finished", finishedData);
+    gameState.players.forEach((player) => {
+      io.to(player.id).emit("game:finished", finishedData);
+    });
+  } else {
+    gameState.status = 'vote-results';
+    const voteResultData = {
+      eliminated: impostorDiscovered ? impostor : null,
+      votes: voteCounts,
+      isTie: false,
+      votesWithNames,
+      players: gameState.players.map((p) => ({ id: p.id, name: p.name, role: p.role, word: p.word })),
+      impostor: impostor ? { id: impostor.id, name: impostor.name } : null,
+      secretWord: gameState.secretWord,
+      hostId: room?.hostId || null,
+      originalHostId: room?.originalHostId || null,
+      impostorDiscovered,
+      correctVoters,
+      incorrectVoters,
+    };
+    io.to(code).emit("game:vote-result", voteResultData);
+    gameState.players.forEach((player) => {
+      io.to(player.id).emit("game:vote-result", voteResultData);
+    });
+  }
+}
+
 io.on("connection", (socket) => {
   socket.on("room:create", ({ name, settings }, callback) => {
     if (!name) {
@@ -67,16 +284,23 @@ io.on("connection", (socket) => {
       code = generateRoomCode();
     }
 
+    const botCount = Math.max(0, Math.min(10, Number(settings?.botCount) || 0));
+    const players = [{ id: socket.id, name }];
+    for (let i = 1; i <= botCount; i++) {
+      players.push({ id: `bot-${code}-${i}`, name: `Bot ${i}`, isBot: true });
+    }
+
     const room = {
       code,
       hostId: socket.id,
       originalHostId: socket.id, // ID del creador original de la sala (nunca cambia)
-      players: [{ id: socket.id, name }],
+      players,
       createdAt: new Date().toISOString(),
       settings: {
         maxPlayers: settings?.maxPlayers ?? 12,
         impostorCount: settings?.impostorCount ?? 1,
         discussionSeconds: settings?.discussionSeconds ?? 120,
+        botCount,
       },
     };
 
@@ -220,6 +444,15 @@ io.on("connection", (socket) => {
       }
     };
 
+    // Incluir datos de fase de pistas
+    if (gameState.status === 'clues') {
+      response.gameState.clueRound = gameState.clueRound;
+      response.gameState.maxClueRounds = gameState.maxClueRounds;
+      response.gameState.clueRoundEndsAt = gameState.clueRoundEndsAt;
+      response.gameState.clueRoundSeconds = gameState.clueRoundSeconds;
+      response.gameState.cluesByRound = gameState.cluesByRound;
+    }
+
     // Incluir discussionEndsAt si el juego está en fase de discusión
     if (gameState.status === 'discussion' && gameState.discussionEndsAt) {
       response.gameState.discussionEndsAt = gameState.discussionEndsAt;
@@ -322,8 +555,9 @@ io.on("connection", (socket) => {
         room.settings.locale = requestedLocale;
       }
 
-      // Inicializar el juego
+      // Inicializar el juego (incluye bots si los hay)
       const gameState = initializeGame(room, secretWord, impostorHint);
+      gameState.packWords = pack.words || []; // Para que los bots generen pistas
       games.set(code, gameState);
       // Notificar a todos que el juego comenzó (primero para que naveguen)
       io.to(code).emit("game:started", {
@@ -377,27 +611,76 @@ io.on("connection", (socket) => {
       player.hasSeenRole = true;
     }
 
-    // Verificar si todos han visto su rol
-    const allRevealed = gameState.players.every(p => p.hasSeenRole);
+    // Verificar si todos (humanos) han visto su rol; bots no envían reveal-complete
+    const humanPlayers = gameState.players.filter(p => !p.isBot);
+    const allRevealed = humanPlayers.length > 0 && humanPlayers.every(p => p.hasSeenRole);
     if (allRevealed) {
-      // Iniciar fase de discusión
-      gameState.status = 'discussion';
-      gameState.discussionEndsAt = Date.now() + (gameState.discussionSeconds * 1000);
+      // Iniciar fase de pistas (3 rondas de 30 s), luego discusión
+      gameState.status = 'clues';
+      gameState.clueRound = 1;
+      gameState.clueRoundEndsAt = Date.now() + (gameState.clueRoundSeconds * 1000);
 
-      const discussionData = {
-        endsAt: gameState.discussionEndsAt,
-        duration: gameState.discussionSeconds,
+      const clueRoundData = {
+        round: 1,
+        maxRounds: gameState.maxClueRounds,
+        endsAt: gameState.clueRoundEndsAt,
+        duration: gameState.clueRoundSeconds,
       };
-      // Enviar a TODA la sala (broadcast)
-      io.to(code).emit("game:discussion-started", discussionData);
+      io.to(code).emit("game:clue-round-started", clueRoundData);
 
-      // TAMBIÉN enviar a cada jugador individualmente para asegurar que lo reciben
-      gameState.players.forEach((player) => {
-        io.to(player.id).emit("game:discussion-started", discussionData);
-      });
+      const timer = setTimeout(() => {
+        roomClueTimers.delete(code);
+        endClueRoundAndMaybeNext(io, code, games, roomClueTimers);
+      }, gameState.clueRoundSeconds * 1000);
+      roomClueTimers.set(code, timer);
+
+      // Bots envían pista a los 3 s si hay bots
+      if (gameState.players.some((p) => p.isBot)) {
+        setTimeout(() => submitBotClues(io, code, games, roomClueTimers), 3000);
+      }
     }
 
     callback?.({ ok: true, allRevealed });
+  });
+
+  // Enviar pista en la ronda actual
+  socket.on("game:submit-clue", ({ code, clue }, callback) => {
+    if (!code) {
+      callback?.({ ok: false, error: "CODE_REQUIRED" });
+      return;
+    }
+    const gameState = games.get(code);
+    if (!gameState) {
+      callback?.({ ok: false, error: "GAME_NOT_FOUND" });
+      return;
+    }
+    if (gameState.status !== 'clues') {
+      callback?.({ ok: false, error: "NOT_CLUES_PHASE", currentStatus: gameState.status });
+      return;
+    }
+    const player = gameState.players.find(p => p.id === socket.id);
+    if (!player || player.isBot) {
+      callback?.({ ok: false, error: "PLAYER_NOT_FOUND" });
+      return;
+    }
+    const text = typeof clue === 'string' ? clue.trim().slice(0, 200) : '';
+    const round = gameState.clueRound;
+    if (!gameState.cluesByRound[round]) gameState.cluesByRound[round] = {};
+    gameState.cluesByRound[round][socket.id] = text;
+    io.to(code).emit("game:clue-received", {
+      playerId: socket.id,
+      playerName: player.name,
+      clue: text,
+      round,
+    });
+    callback?.({ ok: true });
+
+    // Si todos los humanos han enviado pista, generar pistas de bots y comprobar si cerrar ronda
+    const humans = gameState.players.filter(p => !p.isBot);
+    const humanSubmitted = humans.filter(h => gameState.cluesByRound[round][h.id] !== undefined);
+    if (humanSubmitted.length === humans.length) {
+      submitBotClues(io, code, games, roomClueTimers);
+    }
   });
 
   socket.on("game:vote", ({ code, votedPlayerId }, callback) => {
@@ -439,6 +722,19 @@ io.on("connection", (socket) => {
 
       io.to(code).emit("game:players-update", playersList);
       io.to(code).emit("game:voting-started", { players: playersList });
+
+      if (gameState.players.some((p) => p.isBot)) {
+        const prev = roomVotingTimers.get(code);
+        if (prev) clearTimeout(prev);
+        roomVotingTimers.set(
+          code,
+          setTimeout(() => {
+            roomVotingTimers.delete(code);
+            assignBotVotes(io, code, games);
+            tryProcessVoting(io, code, games, rooms);
+          }, 12000)
+        );
+      }
     }
 
     // Verificar si el jugador es impostor - los impostores no pueden votar
@@ -476,248 +772,14 @@ io.on("connection", (socket) => {
       callback?.({ ok: true });
     }
 
-    // Función auxiliar para procesar la votación
-    // IMPORTANTE: Capturar las variables necesarias para evitar problemas de scope
-    const processVoting = () => {
-      // Recalcular activeCivilians y civilianVoteIds dentro de la función para asegurar que están actualizados
-      const currentActiveCivilians = gameState.players.filter(
-        p => !gameState.eliminatedPlayers.includes(p.id) && p.role !== 'impostor'
-      );
-      const currentCivilianVoteIds = currentActiveCivilians.map(c => c.id);
-
-      // Verificar nuevamente que todos los civiles votaron
-      const currentCivilianVotesCount = Object.keys(gameState.votes).filter(voterId => currentCivilianVoteIds.includes(voterId)).length;
-      if (currentCivilianVotesCount !== currentActiveCivilians.length || currentActiveCivilians.length === 0) {
-        return;
-      }
-      // Filtrar solo los votos de los civiles para el procesamiento (excluir impostores)
-      const civilianVotes = {};
-      currentActiveCivilians.forEach((civilian) => {
-        if (gameState.votes[civilian.id]) {
-          civilianVotes[civilian.id] = gameState.votes[civilian.id];
-        }
-      });
-      // Identificar al impostor
-      const impostor = gameState.players.find(p => p.role === 'impostor');
-
-      // Verificar quién acertó (votó por el impostor)
-      const correctVoters = [];
-      const incorrectVoters = [];
-
-      currentActiveCivilians.forEach(civilian => {
-        const vote = gameState.votes[civilian.id];
-        if (vote === impostor?.id) {
-          correctVoters.push(civilian.id);
-        } else if (vote) {
-          incorrectVoters.push(civilian.id);
-        }
-      });
-
-      // Verificar si todos los civiles acertaron (solo votos de civiles; el voto del impostor no cuenta)
-      const allCiviliansVotedForImpostor = !!impostor &&
-        currentActiveCivilians.length > 0 &&
-        currentActiveCivilians.every(civilian => {
-          const vote = gameState.votes[civilian.id];
-          return vote === impostor.id;
-        });
-
-      const impostorDiscovered = allCiviliansVotedForImpostor;
-
-      if (impostorDiscovered) {
-      } else {
-      }
-
-      // NO eliminar a nadie - solo registrar resultados
-      // gameState.eliminatedPlayers NO se modifica
-
-      // Verificar si el juego terminó
-      const endCheck = checkGameEnd(gameState);
-      if (endCheck.finished) {
-        gameState.status = 'finished';
-        gameState.winner = endCheck.winner;
-        // Preparar información de votos con nombres de jugadores (incluyendo impostores)
-        const votesWithNames = {};
-        // Incluir todos los jugadores, incluso si no votaron
-        gameState.players.forEach((player) => {
-          const voteInfo = gameState.votes[player.id];
-          if (voteInfo) {
-            const voted = gameState.players.find(p => p.id === voteInfo);
-            if (voted) {
-              votesWithNames[player.id] = {
-                voterName: player.name,
-                voterRole: player.role,
-                votedId: voteInfo,
-                votedName: voted.name,
-              };
-            }
-          } else {
-            // Si no votó, incluir información para mostrar "No votó"
-            votesWithNames[player.id] = {
-              voterName: player.name,
-              voterRole: player.role,
-              votedId: null,
-              votedName: null,
-            };
-          }
-        });
-
-        // Contar votos para crear el objeto result
-        const voteCounts = {};
-        currentActiveCivilians.forEach(civilian => {
-          const vote = gameState.votes[civilian.id];
-          if (vote) {
-            voteCounts[vote] = (voteCounts[vote] || 0) + 1;
-          }
-        });
-
-        // Guardar información de resultados en gameState para game:get-state
-        gameState.finishedData = {
-          eliminated: impostorDiscovered ? impostor : null, // Solo mostrar impostor si fue descubierto
-          votes: voteCounts, // Usar voteCounts en lugar de result.votes
-          votesWithNames: votesWithNames,
-          impostorDiscovered: impostorDiscovered, // Indicar si el impostor fue descubierto
-          correctVoters: correctVoters, // IDs de jugadores que acertaron
-          incorrectVoters: incorrectVoters, // IDs de jugadores que no acertaron
-        };
-
-        const finishedData = {
-          winner: endCheck.winner,
-          secretWord: gameState.secretWord,
-          players: gameState.players.map(p => ({
-            id: p.id,
-            name: p.name,
-            role: p.role,
-            word: p.word,
-          })),
-          impostor: impostor ? { id: impostor.id, name: impostor.name } : null,
-          eliminated: impostorDiscovered ? impostor : null, // Solo mostrar impostor si fue descubierto
-          votes: voteCounts, // Solo votos de civiles
-          votesWithNames: votesWithNames, // Votos con información completa
-          impostorDiscovered: impostorDiscovered, // true solo si todos los civiles votaron por el impostor
-          correctVoters: correctVoters, // IDs de civiles que acertaron
-          incorrectVoters: incorrectVoters, // IDs de civiles que no acertaron
-        };
-
-        // Emitir a toda la sala
-        io.to(code).emit("game:finished", finishedData);
-
-        // También emitir individualmente para asegurar que todos lo reciben
-        gameState.players.forEach((player) => {
-          io.to(player.id).emit("game:finished", finishedData);
-        });
-      } else {
-        // Siguiente ronda - pero primero mostrar resultados de la votación
-        // Preparar información de votos con nombres de jugadores (incluyendo impostores)
-        const votesWithNames = {};
-        // Incluir todos los jugadores, incluso si no votaron
-        gameState.players.forEach((player) => {
-          const voteInfo = gameState.votes[player.id];
-          if (voteInfo) {
-            const voted = gameState.players.find(p => p.id === voteInfo);
-            if (voted) {
-              votesWithNames[player.id] = {
-                voterName: player.name,
-                voterRole: player.role,
-                votedId: voteInfo,
-                votedName: voted.name,
-              };
-            }
-          } else {
-            // Si no votó, incluir información para mostrar "No votó"
-            votesWithNames[player.id] = {
-              voterName: player.name,
-              voterRole: player.role,
-              votedId: null,
-              votedName: null,
-            };
-          }
-        });
-
-        // Identificar quién es el impostor para mostrar si acertaron
-        const impostor = gameState.players.find(p => p.role === 'impostor');
-
-        // Verificar quién acertó (votó por el impostor)
-        const activeCivilians = gameState.players.filter(
-          p => !gameState.eliminatedPlayers.includes(p.id) && p.role !== 'impostor'
-        );
-
-        const correctVoters = [];
-        const incorrectVoters = [];
-
-        // Contar votos para crear el objeto voteCounts
-        const voteCounts = {};
-        activeCivilians.forEach(civilian => {
-          const vote = gameState.votes[civilian.id];
-          if (vote) {
-            voteCounts[vote] = (voteCounts[vote] || 0) + 1;
-            if (vote === impostor?.id) {
-              correctVoters.push(civilian.id);
-            } else {
-              incorrectVoters.push(civilian.id);
-            }
-          }
-        });
-
-        // Verificar si todos los civiles acertaron (solo votos de civiles; el voto del impostor no cuenta)
-        const allCiviliansVotedForImpostor = !!impostor &&
-          activeCivilians.length > 0 &&
-          activeCivilians.every(civilian => {
-            const vote = gameState.votes[civilian.id];
-            return vote === impostor.id;
-          });
-
-        const impostorDiscovered = allCiviliansVotedForImpostor;
-
-        // Cambiar estado a 'vote-results' ANTES de emitir eventos
-        gameState.status = 'vote-results';
-        const room = rooms.get(code);
-
-        if (impostorDiscovered) {
-        } else {
-        }
-
-        const voteResultData = {
-          eliminated: impostorDiscovered ? impostor : null, // Solo mostrar impostor si fue descubierto
-          votes: voteCounts, // Usar voteCounts en lugar de result.votes
-          isTie: false, // No hay empates
-          votesWithNames: votesWithNames, // Incluir votos con nombres
-          players: gameState.players.map(p => ({
-            id: p.id,
-            name: p.name,
-            role: p.role,
-            word: p.word,
-          })),
-          impostor: impostor ? {
-            id: impostor.id,
-            name: impostor.name,
-          } : null,
-          secretWord: gameState.secretWord,
-          hostId: room?.hostId || null, // Incluir hostId para que el frontend sepa quién es el host
-          originalHostId: room?.originalHostId || null, // Incluir originalHostId para identificar al creador original
-          impostorDiscovered: impostorDiscovered, // Indicar si el impostor fue descubierto
-          correctVoters: correctVoters, // IDs de jugadores que acertaron
-          incorrectVoters: incorrectVoters, // IDs de jugadores que no acertaron
-        };
-
-        // Emitir a toda la sala
-        io.to(code).emit("game:vote-result", voteResultData);
-
-        // También emitir individualmente para asegurar que todos lo reciben
-        gameState.players.forEach((player) => {
-          io.to(player.id).emit("game:vote-result", voteResultData);
-        });
-        // NO continuar automáticamente - esperar a que el host inicie nueva partida o vuelva al inicio
-      }
-    };
-
     // Procesar votación si todos los civiles votaron (después de responder callback para no bloquear)
-    // IMPORTANTE: Procesar inmediatamente cuando todos los civiles votaron, sin esperar al impostor
     if (allCiviliansVoted) {
-      // Usar setImmediate para asegurar que el callback se envíe primero
-      setImmediate(() => {
-        processVoting();
-      });
-    } else {
+      const t = roomVotingTimers.get(code);
+      if (t) {
+        clearTimeout(t);
+        roomVotingTimers.delete(code);
+      }
+      setImmediate(() => tryProcessVoting(io, code, games, rooms));
     }
   });
 
@@ -766,6 +828,19 @@ io.on("connection", (socket) => {
 
     // También emitir a toda la sala
     io.to(code).emit("game:voting-started", { players: playersList });
+
+    if (gameState.players.some((p) => p.isBot)) {
+      const prev = roomVotingTimers.get(code);
+      if (prev) clearTimeout(prev);
+      roomVotingTimers.set(
+        code,
+        setTimeout(() => {
+          roomVotingTimers.delete(code);
+          assignBotVotes(io, code, games);
+          tryProcessVoting(io, code, games, rooms);
+        }, 12000)
+      );
+    }
 
     callback?.({ ok: true });
   });
@@ -859,9 +934,8 @@ io.on("connection", (socket) => {
       const secretWord = pack.words[Math.floor(Math.random() * pack.words.length)];
       const impostorHint = room.settings?.hintForImpostors !== false ? (pack.name || 'Categoría secreta') : null;
 
-      // Verificar que los jugadores tengan nombres correctos antes de inicializar
-      // Reiniciar el juego con nueva palabra
       const gameState = initializeGame(room, secretWord, impostorHint);
+      gameState.packWords = pack.words || []; // Para pistas de bots
       games.set(code, gameState);
       // Notificar a todos que el juego comenzó
       io.to(code).emit("game:started", {

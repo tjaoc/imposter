@@ -12,7 +12,7 @@ function Game() {
   const navigate = useNavigate();
   const { socket, isConnected } = useSocket();
 
-  const [gamePhase, setGamePhase] = useState('waiting'); // waiting, revealing, discussion, voting, results
+  const [gamePhase, setGamePhase] = useState('waiting'); // waiting, revealing, clues, discussion, voting, results
   const [myRole, setMyRole] = useState(null); // { role, word, isImpostor }
   const [hasSeenRole, setHasSeenRole] = useState(false);
   const [players, setPlayers] = useState([]);
@@ -24,6 +24,13 @@ function Game() {
   const [showCardBack, setShowCardBack] = useState(true); // Control del flip de carta
   const [room, setRoom] = useState(null); // Información de la sala
   const [voteResultsCountdown, setVoteResultsCountdown] = useState(null); // Timer para resultados de votación
+  // Fase de pistas (3 rondas, 30 s)
+  const [clueRound, setClueRound] = useState(1);
+  const [clueRoundEndsAt, setClueRoundEndsAt] = useState(null);
+  const [clueTimeLeft, setClueTimeLeft] = useState(null);
+  const [cluesForRound, setCluesForRound] = useState({}); // { playerId: { name, clue } }
+  const [myClueSubmitted, setMyClueSubmitted] = useState(false);
+  const [clueInput, setClueInput] = useState('');
 
   useEffect(() => {
     if (!socket || !isConnected) return;
@@ -52,6 +59,7 @@ function Game() {
         'vote-results',
         'results',
         'discussion',
+        'clues',
       ].includes(gamePhase);
       if (isPostGamePhase) {
         setGamePhase('revealing');
@@ -59,6 +67,12 @@ function Game() {
         setSelectedVote(null);
         setVoteResultsCountdown(null);
         setHasSeenRole(false);
+        setClueRound(1);
+        setClueRoundEndsAt(null);
+        setClueTimeLeft(null);
+        setCluesForRound({});
+        setMyClueSubmitted(false);
+        setClueInput('');
       }
       setPlayers(Array(data.playerCount).fill(null));
       if (data.players) {
@@ -96,6 +110,32 @@ function Game() {
     };
 
     socket.on('game:discussion-started', handleDiscussionStarted);
+
+    // Fase de pistas: nueva ronda
+    socket.on('game:clue-round-started', (data) => {
+      setGamePhase('clues');
+      setClueRound(data.round ?? 1);
+      setClueRoundEndsAt(data.endsAt ?? null);
+      setMyClueSubmitted(false);
+      setClueInput('');
+      setCluesForRound({});
+      const remaining = data.endsAt
+        ? Math.max(0, Math.floor((data.endsAt - Date.now()) / 1000))
+        : data.duration ?? 30;
+      setClueTimeLeft(remaining);
+    });
+
+    socket.on('game:clue-received', ({ playerId, playerName, clue, round }) => {
+      if (round !== clueRound) return;
+      setCluesForRound((prev) => ({
+        ...prev,
+        [playerId]: { name: playerName, clue },
+      }));
+    });
+
+    socket.on('game:clue-round-complete', ({ round, clues }) => {
+      setCluesForRound(clues || {});
+    });
 
     // Fase de votación
     socket.on('game:voting-started', (data) => {
@@ -257,6 +297,29 @@ function Game() {
               setGameResult(resultData);
             }
           }
+          else if (response.gameState.status === 'clues') {
+            setGamePhase('clues');
+            setClueRound(response.gameState.clueRound ?? 1);
+            setClueRoundEndsAt(response.gameState.clueRoundEndsAt ?? null);
+            const round = response.gameState.clueRound ?? 1;
+            const raw = response.gameState.cluesByRound?.[round];
+            const withNames = {};
+            if (raw && typeof raw === 'object') {
+              Object.keys(raw).forEach((playerId) => {
+                const p = response.gameState.players?.find((x) => x.id === playerId);
+                withNames[playerId] = { name: p?.name ?? playerId, clue: raw[playerId] };
+              });
+            }
+            setCluesForRound(withNames);
+            setMyClueSubmitted(!!(socket?.id && raw?.[socket.id] !== undefined));
+            if (response.gameState.clueRoundEndsAt) {
+              const remaining = Math.max(
+                0,
+                Math.floor((response.gameState.clueRoundEndsAt - Date.now()) / 1000)
+              );
+              setClueTimeLeft(remaining);
+            }
+          }
           // Si el juego ya está en discussion, actualizar
           else if (response.gameState.status === 'discussion') {
             setGamePhase('discussion');
@@ -300,6 +363,9 @@ function Game() {
         socket.off('game:role');
         socket.off('game:started');
         socket.off('game:discussion-started', handleDiscussionStarted);
+        socket.off('game:clue-round-started');
+        socket.off('game:clue-received');
+        socket.off('game:clue-round-complete');
         socket.off('game:voting-started');
         socket.off('game:vote-result');
         socket.off('game:finished');
@@ -403,6 +469,18 @@ function Game() {
       };
     }
   }, [gamePhase, selectedVote, socket, isConnected, code]);
+
+  // Temporizador de ronda de pistas
+  useEffect(() => {
+    if (gamePhase !== 'clues' || !clueRoundEndsAt) return;
+    const update = () => {
+      const remaining = Math.max(0, Math.floor((clueRoundEndsAt - Date.now()) / 1000));
+      setClueTimeLeft(remaining);
+    };
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [gamePhase, clueRoundEndsAt]);
 
   // Temporizador de discusión
   useEffect(() => {
@@ -681,7 +759,7 @@ function Game() {
           className="mb-6 text-center"
         >
           <h1 className="text-3xl font-extrabold tracking-wide text-red-400 drop-shadow-lg mb-2">
-            {isImposter
+            {isImpostor
               ? t('game.youAreImpostor').toUpperCase()
               : t('game.yourWord').toUpperCase()}
           </h1>
@@ -803,9 +881,112 @@ function Game() {
     );
   }
 
+  // ===== FASE: PISTAS (3 rondas, 30 s cada una) =====
+  if (gamePhase === 'clues') {
+    const clueMinutes = Math.floor((clueTimeLeft ?? 0) / 60);
+    const clueSeconds = (clueTimeLeft ?? 0) % 60;
+    const handleSubmitClue = () => {
+      const text = clueInput.trim();
+      if (!text || !socket || !code) return;
+      socket.emit('game:submit-clue', { code, clue: text }, (response) => {
+        if (response?.ok) {
+          setMyClueSubmitted(true);
+          setClueInput('');
+        }
+      });
+    };
+
+    return (
+      <div className="min-h-full p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
+        <PageNav showBack onBack={handleBackToRoom} onExit={handleBackToLobby} />
+        <div className="max-w-2xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-6"
+          >
+            <h1 className="text-4xl font-bold text-glow mb-2">
+              ✍️ {t('game.cluesPhase')}
+            </h1>
+            <p className="text-gray-400">
+              {t('game.clueRoundOf', { current: clueRound, total: 3 })}
+            </p>
+            <motion.div
+              animate={clueTimeLeft === 0 ? {} : { scale: [1, 1.02, 1] }}
+              transition={{ duration: 1, repeat: clueTimeLeft === 0 ? 0 : Infinity }}
+              className="text-5xl font-bold text-space-cyan mt-4"
+            >
+              {String(clueMinutes).padStart(2, '0')}:{String(clueSeconds).padStart(2, '0')}
+            </motion.div>
+          </motion.div>
+
+          {!myClueSubmitted ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="glass-effect rounded-2xl p-6 mb-6"
+            >
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                {myRole?.isImpostor ? t('game.clueImpostorHint') : t('game.clueYourHint')}
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={clueInput}
+                  onChange={(e) => setClueInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSubmitClue()}
+                  placeholder={t('game.cluePlaceholder')}
+                  className="flex-1 min-h-[48px] px-4 rounded-xl bg-slate-800/80 border border-slate-600 text-white placeholder-gray-500 focus:border-space-cyan focus:ring-1 focus:ring-space-cyan"
+                  maxLength={200}
+                />
+                <button
+                  type="button"
+                  onClick={handleSubmitClue}
+                  disabled={!clueInput.trim()}
+                  className="min-h-[48px] px-6 rounded-xl font-semibold bg-space-cyan text-black hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                >
+                  {t('common.next')}
+                </button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="glass-effect rounded-2xl p-4 mb-6 text-center text-emerald-400"
+            >
+              ✓ {t('game.clueSubmitted')}
+            </motion.div>
+          )}
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass-effect rounded-2xl p-6"
+          >
+            <h2 className="text-lg font-semibold text-white mb-4">{t('game.cluesSoFar')}</h2>
+            {Object.keys(cluesForRound).length === 0 ? (
+              <p className="text-gray-500 text-sm">{t('game.noCluesYet')}</p>
+            ) : (
+              <ul className="space-y-3">
+                {Object.entries(cluesForRound).map(([playerId, { name, clue }]) => (
+                  <li key={playerId} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 p-3 rounded-xl bg-slate-800/50">
+                    <span className="font-medium text-space-cyan shrink-0">{name}:</span>
+                    <span className="text-gray-200 break-words">{clue || '—'}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
   // ===== FASE: DISCUSIÓN =====
   if (gamePhase === 'discussion') {
     const minutes = Math.floor((timeLeft ?? 0) / 60);
+    const seconds = (timeLeft ?? 0) % 60;
     const seconds = (timeLeft ?? 0) % 60;
     // Verificar si es host - el backend verificará de todas formas
     const isHost = room?.hostId === socket?.id;

@@ -12,6 +12,7 @@ function Home() {
   const { t } = useTranslation();
   const [playerName, setPlayerName] = useState('');
   const [roomCode, setRoomCode] = useState('');
+  const [botCount, setBotCount] = useState(0);
   const [isCreating, setIsCreating] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ function Home() {
 
       activeSocket.emit(
         'room:create',
-        { name: playerName.trim() },
+        { name: playerName.trim(), settings: { botCount: Math.max(0, Math.min(10, botCount)) } },
         (response) => {
           setIsCreating(false);
           if (response && response.ok) {
@@ -157,6 +158,26 @@ function Home() {
               className="w-full px-4 py-3.5 sm:py-3 bg-space-blue border border-space-cyan/30 rounded-xl focus:outline-none focus:border-space-cyan focus:ring-2 focus:ring-space-cyan/50 text-white placeholder-gray-400 text-base"
               maxLength={20}
             />
+          </div>
+
+          <div>
+            <label className="block text-sm sm:text-base font-medium mb-2 text-space-cyan">
+              {t('home.playWithBots')}
+            </label>
+            <select
+              value={botCount}
+              onChange={(e) => setBotCount(Number(e.target.value))}
+              className="w-full px-4 py-3.5 sm:py-3 bg-space-blue border border-space-cyan/30 rounded-xl focus:outline-none focus:border-space-cyan focus:ring-2 focus:ring-space-cyan/50 text-white text-base"
+            >
+              {[0, 1, 2, 3, 4, 5].map((n) => (
+                <option key={n} value={n} className="bg-space-blue text-white">
+                  {n === 0 ? t('home.noBots') : t('home.botCount', { count: n })}
+                </option>
+              ))}
+            </select>
+            {botCount > 0 && (
+              <p className="text-xs text-gray-400 mt-1">{t('home.playWithBotsHint')}</p>
+            )}
           </div>
 
           <button

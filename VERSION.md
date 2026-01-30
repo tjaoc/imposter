@@ -1,4 +1,4 @@
-# 🎮 Imposter - Version 1.0.4
+# 🎮 Imposter - Version 1.1.0
 
 **Fecha de lanzamiento:** 30 de Enero, 2026  
 **Estado:** ✅ Estable
@@ -7,12 +7,13 @@
 
 ## 🎯 Resumen de la Versión
 
-Esta es la **primera versión beta completa** del juego Imposter, una versión de alta calidad del popular juego "Who is the Spy?"
+**v1.1.0** añade la **fase de pistas** (3 rondas de 30 s) antes de la discusión y la opción de **jugar con bots** en línea cuando no hay con quien jugar.
 
 ### ✨ Características Principales
 
+- ✅ **Fase de pistas (v1.1.0)** - 3 rondas de 30 s: cada jugador escribe su pista, todos la ven; luego discusión y votación
+- ✅ **Bots automáticos (v1.1.0)** - Al crear sala puedes añadir 0–5 bots; ponen pistas y votan solos
 - ✅ **10 packs de palabras desbloqueados** (370+ palabras)
-- ✅ **Modo personalizado** - Añade tus propias palabras
 - ✅ **Sin anuncios** - Experiencia premium sin interrupciones
 - ✅ **Multijugador en tiempo real** - Socket.io para sincronización perfecta
 - ✅ **Diseño dark mode elegante** - Estética espacial/misteriosa
@@ -25,14 +26,15 @@ Esta es la **primera versión beta completa** del juego Imposter, una versión d
 
 ## 🎮 Cómo Funciona
 
-### Sistema de Juego
+### Sistema de Juego (online)
 
-1. **Mínimo 3 jugadores** - Máximo 12
+1. **Mínimo 3 jugadores** - Humanos y/o bots (máximo 12)
 2. **1-2 impostores** - El resto son civiles
 3. **Palabra secreta** - Solo los civiles la conocen
-4. **Discusión de 2 minutos** - Descubre quién es el impostor
-5. **Votación** - Elimina a los sospechosos
-6. **Múltiples rondas** - Hasta que haya un ganador
+4. **3 rondas de pistas (30 s cada una)** - Cada uno escribe su pista; todos la ven
+5. **Discusión** - Descubre quién es el impostor
+6. **Votación** - Elimina a los sospechosos
+7. **Múltiples rondas** - Hasta que haya un ganador
 
 ### Condiciones de Victoria
 
@@ -196,6 +198,6 @@ ISC - Proyecto personal y educativo
 
 ---
 
-**¡Gracias por probar Imposter v1.0.4!** 🎉
+**¡Gracias por probar Imposter v1.1.0!** 🎉
 
 Desarrollado con ❤️ por Tiago Cruz
