@@ -1,5 +1,14 @@
 # 📝 Changelog - Imposter
 
+## [1.0.0] - 2026-01-30
+
+### 🎉 Versión estable 1.0.0
+
+- **Estado:** Estable. Incluye todas las funcionalidades de la beta3.
+- **Despliegue:** Blueprint Render con producción y desarrollo (impostor.netic.app, apiimp.netic.app, dev.*). Ver `RENDER_ENVS.md` y `DEPLOYMENT.md`.
+
+---
+
 ## [1.0.0-beta3] - 2026-01-30
 
 ### 🎯 Modo local, i18n, UX y correcciones
@@ -326,6 +335,5 @@ npm run dev
 
 ---
 
-**Versión:** 1.0.0-beta  
-**Estado:** ✅ Estable y funcional  
-**Listo para:** Pruebas beta con usuarios reales
+**Versión:** 1.0.0  
+**Estado:** ✅ Estable

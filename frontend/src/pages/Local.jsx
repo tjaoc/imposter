@@ -5,8 +5,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import { useLanguage } from '../context/LanguageContext';
 import { assignRoles } from '../utils/localGameLogic';
 import LanguageSelector from '../components/LanguageSelector';
-
-const API_BASE = '';
+import { API_BASE } from '../config/env';
 
 function Local() {
   const { t } = useTranslation();

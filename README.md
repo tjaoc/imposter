@@ -1,6 +1,6 @@
 # Imposter - Who is the Spy?
 
-**Versión:** 1.0.0-beta  
+**Versión:** 1.0.0  
 **Estado:** ✅ Funcional y listo para pruebas beta
 
 PWA de alto rendimiento del juego "Imposter (Who is the Spy?)" con todas las funcionalidades VIP.

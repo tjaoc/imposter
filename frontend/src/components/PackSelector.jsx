@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from '../hooks/useTranslation';
 import { useLanguage } from '../context/LanguageContext';
+import { API_BASE } from '../config/env';
 
 function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
   const { t } = useTranslation();
@@ -10,7 +11,7 @@ function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/packs?locale=${locale}`)
+    fetch(`${API_BASE}/api/packs?locale=${locale}`)
       .then(res => res.json())
       .then(data => {
         if (data.ok) {

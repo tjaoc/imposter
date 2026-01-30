@@ -1,0 +1,86 @@
+# Blueprint Render: Producción + Desarrollo (2 entornos, 4 servicios)
+# Conecta el repo en Render como Blueprint; crea el proyecto con los dos entornos.
+# Variables secretas: configurar en Dashboard (ver RENDER_ENVS.md).
+
+projects:
+  - name: imposter
+    environments:
+      # ——— Producción ———
+      - name: production
+        services:
+          - type: web
+            runtime: node
+            name: imposter-api-prod
+            rootDir: backend
+            plan: free
+            buildCommand: npm install
+            startCommand: npm start
+            healthCheckPath: /health
+            domains:
+              - apiimp.netic.app
+            envVars:
+              - key: NODE_ENV
+                value: production
+              - key: MONGODB_URI
+                sync: false
+              - key: CORS_ORIGIN
+                value: https://impostor.netic.app
+
+          - type: web
+            runtime: static
+            name: imposter-app-prod
+            rootDir: frontend
+            plan: free
+            buildCommand: npm install && npm run build
+            staticPublishPath: dist
+            domains:
+              - impostor.netic.app
+            routes:
+              - type: rewrite
+                source: /*
+                destination: /index.html
+            envVars:
+              - key: VITE_API_URL
+                value: https://apiimp.netic.app
+              - key: VITE_SOCKET_URL
+                value: https://apiimp.netic.app
+
+      # ——— Desarrollo ———
+      - name: development
+        services:
+          - type: web
+            runtime: node
+            name: imposter-api-dev
+            rootDir: backend
+            plan: free
+            buildCommand: npm install
+            startCommand: npm start
+            healthCheckPath: /health
+            domains:
+              - dev.apiimp.netic.app
+            envVars:
+              - key: NODE_ENV
+                value: development
+              - key: MONGODB_URI
+                sync: false
+              - key: CORS_ORIGIN
+                value: https://dev.impostor.netic.app
+
+          - type: web
+            runtime: static
+            name: imposter-app-dev
+            rootDir: frontend
+            plan: free
+            buildCommand: npm install && npm run build
+            staticPublishPath: dist
+            domains:
+              - dev.impostor.netic.app
+            routes:
+              - type: rewrite
+                source: /*
+                destination: /index.html
+            envVars:
+              - key: VITE_API_URL
+                value: https://dev.apiimp.netic.app
+              - key: VITE_SOCKET_URL
+                value: https://dev.apiimp.netic.app

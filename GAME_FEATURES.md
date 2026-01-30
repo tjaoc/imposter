@@ -1,4 +1,4 @@
-# 🎮 Funcionalidades del Juego - Imposter v1.0.0-beta
+# 🎮 Funcionalidades del Juego - Imposter v1.0.0
 
 **Fecha:** 28 de Enero, 2026  
 **Estado:** ✅ Completo y funcional

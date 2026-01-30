@@ -8,7 +8,7 @@ const pkg = require('./package.json');
 
 export default defineConfig({
   define: {
-    __APP_VERSION__: JSON.stringify(pkg.version || '1.0.0-beta3'),
+    __APP_VERSION__: JSON.stringify(pkg.version || '1.0.0'),
   },
   plugins: [
     react(),

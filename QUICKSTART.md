@@ -1,4 +1,4 @@
-# ⚡ Quick Start - Imposter v1.0.0-beta
+# ⚡ Quick Start - Imposter v1.0.0
 
 Guía rápida para empezar a jugar en 5 minutos.
 
@@ -172,6 +172,6 @@ La app está corriendo en:
 
 ---
 
-**Versión:** 1.0.0-beta  
+**Versión:** 1.0.0  
 **Desarrollado por:** Tiago Cruz  
 **Fecha:** 28 de Enero, 2026

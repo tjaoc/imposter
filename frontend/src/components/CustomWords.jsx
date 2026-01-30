@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from '../hooks/useTranslation';
 import { useLanguage } from '../context/LanguageContext';
+import { API_BASE } from '../config/env';
 
 function CustomWords({ onClose }) {
   const { t } = useTranslation();
@@ -15,7 +16,7 @@ function CustomWords({ onClose }) {
 
     setLoading(true);
     try {
-      const response = await fetch('/api/packs/custom', {
+      const response = await fetch(`${API_BASE}/api/packs/custom`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ word: word.trim(), locale }),

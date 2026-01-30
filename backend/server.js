@@ -12,7 +12,8 @@ const WordPack = require("./models/WordPack");
 const PORT = process.env.PORT || 4000;
 
 const app = express();
-app.use(cors());
+const corsOrigin = process.env.CORS_ORIGIN || process.env.FRONTEND_URL || "*";
+app.use(cors({ origin: corsOrigin, credentials: corsOrigin !== "*" }));
 app.use(express.json());
 
 // Rutas de API
@@ -21,7 +22,8 @@ app.use("/api/packs", wordPackRoutes);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: corsOrigin,
+    credentials: corsOrigin !== "*",
   },
 });
 
