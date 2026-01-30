@@ -330,9 +330,9 @@ function Room() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.1 }}
-                className="card"
+                className="card-tight"
               >
-                <div className="flex flex-row items-center justify-between gap-4 flex-wrap">
+                <div className="flex flex-row items-center justify-between gap-3 flex-wrap">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <span className="text-2xl flex-shrink-0">🔍</span>
                     <span className="text-white font-semibold whitespace-nowrap">{t('room.hintForImpostors')}</span>
@@ -351,7 +351,7 @@ function Room() {
                           hintForImpostors: !prev.hintForImpostors,
                         }));
                       }}
-                      className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-2xl border border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-space-cyan focus:ring-offset-2 focus:ring-offset-space-dark touch-manipulation select-none ${
+                      className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-space-cyan focus:ring-offset-2 focus:ring-offset-space-dark touch-manipulation select-none ${
                         settings.hintForImpostors
                           ? 'bg-emerald-500'
                           : 'bg-gray-600'

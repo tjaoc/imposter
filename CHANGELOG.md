@@ -1,5 +1,14 @@
 # 📝 Changelog - Imposter
 
+## [1.1.17] - 2026-01-30
+
+### 🐛 UI: switch Pista y selector de idioma
+
+- ✅ **Switch "Pista para Impostores"** (Room y Local): track en cápsula (`rounded-full`), card con `card-tight` y `gap-3` para aspecto compacto como ref.
+- ✅ **Selector de idioma**: un solo contenedor `rounded-2xl` con borde; opción no seleccionada sin fondo; seleccionada con fondo cyan (`bg-space-cyan`) y `rounded-xl`.
+
+---
+
 ## [1.1.16] - 2026-01-30
 
 ### 🐛 Switch "Pista para Impostores"
