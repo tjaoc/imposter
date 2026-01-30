@@ -1,5 +1,14 @@
 # 📝 Changelog - Imposter
 
+## [1.1.10] - 2026-01-30
+
+### 📱 iOS: footer y top
+
+- ✅ **Footer en iOS**: más compacto (texto 11px, leading-tight, pt-1, pb 0.5rem).
+- ✅ **Top**: pt-content-safe y top-content-safe reducidos ~0.5rem para subir contenido 1–2 pts.
+
+---
+
 ## [1.1.9] - 2026-01-30
 
 ### 📱 Móvil: switch, footer y card de pistas

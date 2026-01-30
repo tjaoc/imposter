@@ -17,11 +17,14 @@ function isAndroid() {
 function Footer() {
   const { t } = useTranslation();
   const [installHint, setInstallHint] = useState(null); // 'ios' | 'android' | null
+  const [isIOSDevice, setIsIOSDevice] = useState(false);
   const version =
     typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0';
 
   useEffect(() => {
-    if (isIOS() && !window.navigator.standalone) {
+    const ios = isIOS();
+    if (ios) setIsIOSDevice(true);
+    if (ios && !window.navigator.standalone) {
       setInstallHint('ios');
     } else if (
       isAndroid() &&
@@ -32,9 +35,15 @@ function Footer() {
   }, []);
 
   return (
-    <footer className="mt-auto flex-shrink-0 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-center text-gray-400 text-xs sm:text-sm bg-space-dark/95 backdrop-blur-sm border-t border-gray-800/50 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
+    <footer
+      className={`mt-auto flex-shrink-0 text-center text-gray-400 bg-space-dark/95 backdrop-blur-sm border-t border-gray-800/50 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] ${
+        isIOSDevice
+          ? 'pt-1 pb-[max(0.5rem,env(safe-area-inset-bottom))] text-[11px] leading-tight'
+          : 'pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-xs sm:text-sm'
+      }`}
+    >
       {installHint === 'ios' && (
-        <p className="text-amber-200/90 text-xs mb-1.5 px-2">
+        <p className="text-amber-200/90 text-[11px] mb-1 px-2">
           {t('home.installIos')}
         </p>
       )}
@@ -44,7 +53,7 @@ function Footer() {
         </p>
       )}
       <p>{t('home.footer')}</p>
-      <p className="text-gray-500 text-xs mt-0.5">
+      <p className={`text-gray-500 mt-0.5 ${isIOSDevice ? 'text-[11px]' : 'text-xs'}`}>
         {t('home.version')} {version}
       </p>
     </footer>
