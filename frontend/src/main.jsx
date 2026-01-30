@@ -8,11 +8,19 @@ import './index.css';
 import { registerSW } from 'virtual:pwa-register';
 
 const updateSW = registerSW({
+  immediate: true,
   onNeedRefresh() {
     window.dispatchEvent(new CustomEvent('pwa-update-available'));
   },
   onOfflineReady() {
     // Opcional: mensaje cuando la app está lista para offline
+  },
+  onRegisteredSW(swUrl, registration) {
+    if (registration) {
+      registration.update();
+    }
+    const done = () => window.dispatchEvent(new CustomEvent('pwa-update-check-done'));
+    setTimeout(done, 2500);
   },
 });
 if (typeof window !== 'undefined') {

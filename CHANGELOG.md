@@ -1,5 +1,15 @@
 # 📝 Changelog - Imposter
 
+## [1.1.13] - 2026-01-30
+
+### ✨ Splash y comprobación de actualizaciones PWA
+
+- ✅ **Splash al arranque**: comprobación de actualizaciones PWA inmediata (`registerSW` con `immediate: true` y `registration.update()` en `onRegisteredSW`).
+- ✅ El splash permanece visible hasta que termina la verificación (evento `pwa-update-check-done` a los ~2,5 s) o timeout máximo de 4 s.
+- ✅ El aviso de actualización puede aparecer en cuanto hay nueva versión, sin esperar 30+ segundos.
+
+---
+
 ## [1.1.12] - 2026-01-30
 
 ### 📱 Footer móvil/iPhone

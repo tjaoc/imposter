@@ -80,6 +80,22 @@
     -webkit-overflow-scrolling: touch;
     overflow-y: auto;
   }
+
+  /* Footer mínimo en iOS: forzar tamaño y padding reducidos (body.ios desde Footer useEffect) */
+  body.ios footer {
+    padding-top: 2px !important;
+    padding-bottom: max(4px, env(safe-area-inset-bottom, 0px)) !important;
+    font-size: 9px !important;
+    line-height: 1.15 !important;
+  }
+  body.ios footer p {
+    margin: 0 !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+  }
+  body.ios footer p + p {
+    margin-top: 2px !important;
+  }
 }
 
 @layer utilities {

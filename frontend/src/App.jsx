@@ -19,21 +19,25 @@ function App() {
     return () => window.removeEventListener('pwa-update-available', onUpdate);
   }, []);
 
-  // Ocultar splash cuando la app ha cargado (contenido + verificación de actualizaciones)
+  // Ocultar splash cuando la comprobación de actualizaciones ha terminado (o tiempo máx)
   useEffect(() => {
     const splash = document.getElementById('app-splash');
     if (!splash) return;
-    const hideAfter = 800;
-    const removeAfter = hideAfter + 450;
-    const t1 = setTimeout(() => {
+
+    const hideSplash = () => {
       splash.classList.add('splash-hidden');
-    }, hideAfter);
-    const t2 = setTimeout(() => {
-      splash.remove();
-    }, removeAfter);
+      setTimeout(() => splash.remove(), 450);
+    };
+
+    const onCheckDone = () => hideSplash();
+    const maxWait = 4000;
+
+    window.addEventListener('pwa-update-check-done', onCheckDone);
+    const fallback = setTimeout(hideSplash, maxWait);
+
     return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
+      window.removeEventListener('pwa-update-check-done', onCheckDone);
+      clearTimeout(fallback);
     };
   }, []);
 
