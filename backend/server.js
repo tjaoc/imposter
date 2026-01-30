@@ -4,7 +4,6 @@ const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
 const { connectDb } = require("./config/db");
-const { seedWordPacks } = require("./seeds/wordPacks");
 const wordPackRoutes = require("./routes/wordPacks");
 const { initializeGame, processVotes, checkGameEnd } = require("./utils/gameLogic");
 const WordPack = require("./models/WordPack");
@@ -28,8 +27,7 @@ const io = new Server(server, {
 });
 
 connectDb().then(() => {
-  // Seed de packs de palabras al iniciar
-  seedWordPacks().catch(console.error);
+  // El seed se ejecuta en npm start vía scripts/seed-standalone.js antes de arrancar el servidor
 });
 
 const rooms = new Map();
