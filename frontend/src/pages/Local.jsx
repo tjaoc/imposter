@@ -67,8 +67,15 @@ function Local() {
 
   const addPlayer = () => {
     const name = playerName.trim();
-    if (!name || players.some((p) => p.name.toLowerCase() === name.toLowerCase())) return;
-    setPlayers([...players, { id: crypto.randomUUID?.() ?? `p-${Date.now()}`, name }]);
+    if (
+      !name ||
+      players.some((p) => p.name.toLowerCase() === name.toLowerCase())
+    )
+      return;
+    setPlayers([
+      ...players,
+      { id: crypto.randomUUID?.() ?? `p-${Date.now()}`, name },
+    ]);
     setPlayerName('');
   };
 
@@ -78,13 +85,15 @@ function Local() {
 
   const startGameWithPack = () => {
     if (selectedPackIds.length === 0 || players.length < 3) return;
-    const randomPackId = selectedPackIds[Math.floor(Math.random() * selectedPackIds.length)];
+    const randomPackId =
+      selectedPackIds[Math.floor(Math.random() * selectedPackIds.length)];
     fetch(`${API_BASE}/api/packs/${randomPackId}`)
       .then((res) => res.json())
       .then((data) => {
         if (!data.ok || !data.pack?.words?.length) return;
         const pack = data.pack;
-        const secretWord = pack.words[Math.floor(Math.random() * pack.words.length)];
+        const secretWord =
+          pack.words[Math.floor(Math.random() * pack.words.length)];
         const hintWord = pack.name || null;
         const playersWithRoles = assignRoles(
           players.map((p) => ({ id: p.id, name: p.name })),
@@ -129,8 +138,12 @@ function Local() {
           className="max-w-md md:max-w-lg lg:max-w-xl mx-auto"
         >
           <div className="text-center mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-glow mb-2">{t('local.addPlayers')}</h1>
-            <p className="text-space-cyan/80 text-sm sm:text-base">{t('local.addPlayersDesc')}</p>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-glow mb-2">
+              {t('local.addPlayers')}
+            </h1>
+            <p className="text-space-cyan/80 text-sm sm:text-base">
+              {t('local.addPlayersDesc')}
+            </p>
           </div>
           <div className="glass-effect rounded-2xl p-4 sm:p-6 mb-4">
             <div className="flex flex-col sm:flex-row gap-2 mb-4">
@@ -207,14 +220,18 @@ function Local() {
           className="max-w-md mx-auto"
         >
           <div className="text-center mb-6">
-            <h1 className="text-3xl font-bold text-glow mb-2">{t('local.selectPack')}</h1>
+            <h1 className="text-3xl font-bold text-glow mb-2">
+              {t('local.selectPack')}
+            </h1>
             <p className="text-space-cyan/80">{t('local.selectPackDesc')}</p>
           </div>
           {loadingPacks && packs.length === 0 ? (
             <p className="text-center text-space-cyan">{t('common.loading')}</p>
           ) : packsError ? (
             <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-4 text-center space-y-3 mb-4">
-              <p className="text-amber-200 text-sm">{t('common.serverUnavailable')}</p>
+              <p className="text-amber-200 text-sm">
+                {t('common.serverUnavailable')}
+              </p>
               <button
                 type="button"
                 onClick={() => loadPacks()}
@@ -226,7 +243,9 @@ function Local() {
           ) : (
             <>
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm text-space-cyan">{t('room.selectPacksLabel')}</span>
+                <span className="text-sm text-space-cyan">
+                  {t('room.selectPacksLabel')}
+                </span>
                 <button
                   type="button"
                   onClick={() =>
@@ -266,10 +285,14 @@ function Local() {
                       }`}
                     >
                       {isSelected && (
-                        <div className="absolute top-2 right-2 text-space-cyan text-xl">✓</div>
+                        <div className="absolute top-2 right-2 text-space-cyan text-xl">
+                          ✓
+                        </div>
                       )}
                       <span className="font-semibold text-white">
-                        {(t('packs.' + pack.slug) || '').startsWith('packs.') ? pack.name : t('packs.' + pack.slug)}
+                        {(t('packs.' + pack.slug) || '').startsWith('packs.')
+                          ? pack.name
+                          : t('packs.' + pack.slug)}
                       </span>
                       {pack.isAdult && <span className="ml-2 text-xs">🔞</span>}
                     </motion.button>
@@ -325,7 +348,9 @@ function Local() {
                 {t('local.passPhoneTo')}{' '}
                 <span className="text-glow">{currentPlayer.name}</span>
               </h2>
-              <p className="text-gray-400 text-sm mb-8">{t('local.hideRoleDesc')}</p>
+              <p className="text-gray-400 text-sm mb-8">
+                {t('local.hideRoleDesc')}
+              </p>
               <motion.button
                 type="button"
                 onClick={() => setRoleRevealed(true)}
@@ -348,18 +373,26 @@ function Local() {
                 <div className="text-6xl mb-4">{isImpostor ? '🕵️' : '🎯'}</div>
                 {isImpostor ? (
                   <>
-                    <p className="text-red-400 font-bold text-xl mb-2">{t('game.youAreImpostor')}</p>
+                    <p className="text-red-400 font-bold text-xl mb-2">
+                      {t('game.youAreImpostor')}
+                    </p>
                     {displayWord && (
                       <p className="text-sm text-emerald-300">
                         {t('game.hintCategory')}: {capitalizeWord(displayWord)}
                       </p>
                     )}
-                    <p className="text-gray-400 text-sm mt-4">{t('game.impostorHint')}</p>
+                    <p className="text-gray-400 text-sm mt-4">
+                      {t('game.impostorHint')}
+                    </p>
                   </>
                 ) : (
                   <>
-                    <p className="text-gray-400 text-sm mb-2">{t('game.yourSecretWord')}</p>
-                    <p className="text-3xl font-bold text-emerald-400">{capitalizeWord(displayWord)}</p>
+                    <p className="text-gray-400 text-sm mb-2">
+                      {t('game.yourSecretWord')}
+                    </p>
+                    <p className="text-3xl font-bold text-emerald-400">
+                      {capitalizeWord(displayWord)}
+                    </p>
                     <p className="text-gray-400 text-sm mt-4">
                       {t('game.describeWithoutSaying', { count: 1 })}
                     </p>

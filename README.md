@@ -119,7 +119,7 @@ VITE_SOCKET_URL=http://localhost:4000
 ### Con Docker
 
 1. Ejecuta `./scripts/docker-dev.sh` o `docker-compose up -d`
-2. Abre http://localhost:3000 en tu navegador
+2. Abre <http://localhost:3000> en tu navegador
 3. Crea o únete a una sala con un código
 4. ¡Disfruta del juego!
 
@@ -127,7 +127,7 @@ VITE_SOCKET_URL=http://localhost:4000
 
 1. Inicia el servidor backend: `cd backend && npm run dev`
 2. Inicia el frontend: `cd frontend && npm run dev`
-3. Abre http://localhost:3000 en tu navegador
+3. Abre <http://localhost:3000> en tu navegador
 4. Crea o únete a una sala con un código
 5. ¡Disfruta del juego!
 

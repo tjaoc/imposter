@@ -6,6 +6,7 @@
 ## 📊 Estado de Servicios
 
 ### ✅ Backend (imposter-backend-dev)
+
 - **Estado:** ✅ Running
 - **Puerto:** 4000
 - **CPU:** 0.24%
@@ -17,6 +18,7 @@
   - ✅ Nodemon funcionando con hot reload
 
 ### ⚠️ Frontend (imposter-frontend-dev)
+
 - **Estado:** ✅ Running
 - **Puerto:** 3000
 - **CPU:** 0.40%
@@ -28,6 +30,7 @@
   - ✅ HMR update funcionando (8:07:10 AM)
 
 ### ✅ MongoDB (imposter-mongodb-dev)
+
 - **Estado:** ✅ Running (healthy)
 - **Puerto:** 27017
 - **CPU:** 0.08%
@@ -43,6 +46,7 @@
 ### Error Detectado (Ya Corregido)
 
 **Frontend - Error CSS `border-border`**
+
 - **Hora:** 8:06:53 AM
 - **Tipo:** PostCSS/Tailwind error
 - **Mensaje:** `The 'border-border' class does not exist`
@@ -57,11 +61,11 @@
 
 ## 📈 Métricas de Rendimiento
 
-| Servicio | CPU | Memoria | Estado |
-|----------|-----|---------|--------|
-| Backend | 0.24% | 57.5 MiB | ✅ OK |
-| Frontend | 0.40% | 75.86 MiB | ✅ OK |
-| MongoDB | 0.08% | 75.05 MiB | ✅ OK |
+| Servicio | CPU   | Memoria   | Estado |
+| -------- | ----- | --------- | ------ |
+| Backend  | 0.24% | 57.5 MiB  | ✅ OK  |
+| Frontend | 0.40% | 75.86 MiB | ✅ OK  |
+| MongoDB  | 0.08% | 75.05 MiB | ✅ OK  |
 
 **Total:** ~208 MiB de memoria utilizada
 

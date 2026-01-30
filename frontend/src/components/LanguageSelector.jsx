@@ -1,7 +1,7 @@
 import { useLanguage } from '../context/LanguageContext';
 import { motion } from 'framer-motion';
 
-const LOCALE_LABELS = { es: 'ES', pt: 'Português (PT)' };
+const LOCALE_LABELS = { es: 'ES', pt: 'PT' };
 
 export default function LanguageSelector() {
   const { locale, setLocale, supportedLocales } = useLanguage();

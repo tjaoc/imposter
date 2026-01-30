@@ -10,7 +10,7 @@
  * @param {number} impostorCount - Número de impostores
  * @returns {Array} Jugadores con roles asignados
  */
-function assignRoles(players, secretWord, impostorCount = 1, hintWord = null) {
+function assignRoles (players, secretWord, impostorCount = 1, hintWord = null) {
   if (players.length < 3) {
     throw new Error('Se necesitan al menos 3 jugadores');
   }
@@ -21,7 +21,7 @@ function assignRoles(players, secretWord, impostorCount = 1, hintWord = null) {
 
   // Copiar array para no mutar el original
   const shuffled = [...players].sort(() => Math.random() - 0.5);
-  
+
   // Los primeros N jugadores son impostores
   const impostors = shuffled.slice(0, impostorCount);
   const civilians = shuffled.slice(impostorCount);
@@ -45,7 +45,7 @@ function assignRoles(players, secretWord, impostorCount = 1, hintWord = null) {
  * @param {string} [hintWord] - Pista/categoría para el impostor
  * @returns {Object} Estado del juego
  */
-function initializeGame(room, secretWord, hintWord = null) {
+function initializeGame (room, secretWord, hintWord = null) {
   const playersWithRoles = assignRoles(
     room.players,
     secretWord,
@@ -74,7 +74,7 @@ function initializeGame(room, secretWord, hintWord = null) {
  * @param {Object} votes - Votos {playerId: votedPlayerId}
  * @returns {Object} Resultado de la votación
  */
-function processVotes(gameState, votes) {
+function processVotes (gameState, votes) {
   const voteCounts = {};
   const activePlayers = gameState.players.filter(
     (p) => !gameState.eliminatedPlayers.includes(p.id)
@@ -128,7 +128,7 @@ function processVotes(gameState, votes) {
  * @param {Object} gameState - Estado actual del juego
  * @returns {Object} {finished: boolean, winner: 'impostors'|'civilians'|null}
  */
-function checkGameEnd(gameState) {
+function checkGameEnd (gameState) {
   const activePlayers = gameState.players.filter(
     (p) => !gameState.eliminatedPlayers.includes(p.id)
   );

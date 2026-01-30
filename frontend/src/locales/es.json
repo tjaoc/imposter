@@ -14,8 +14,8 @@
     "retry": "Recargar"
   },
   "home": {
-    "title": "IMPOSTER",
-    "subtitle": "Who is the Spy?",
+    "title": "IMPOSTOR",
+    "subtitle": "¿Quién es el impostor?",
     "yourName": "Tu Nombre",
     "yourNamePlaceholder": "Ingresa tu nombre",
     "createRoom": "Crear Sala",

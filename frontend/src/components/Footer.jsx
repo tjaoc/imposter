@@ -3,8 +3,10 @@ import { useTranslation } from '../hooks/useTranslation';
 
 function isIOS() {
   if (typeof navigator === 'undefined') return false;
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  return (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  );
 }
 
 function isAndroid() {
@@ -15,12 +17,16 @@ function isAndroid() {
 function Footer() {
   const { t } = useTranslation();
   const [installHint, setInstallHint] = useState(null); // 'ios' | 'android' | null
-  const version = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0';
+  const version =
+    typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0';
 
   useEffect(() => {
     if (isIOS() && !window.navigator.standalone) {
       setInstallHint('ios');
-    } else if (isAndroid() && !window.matchMedia('(display-mode: standalone)').matches) {
+    } else if (
+      isAndroid() &&
+      !window.matchMedia('(display-mode: standalone)').matches
+    ) {
       setInstallHint('android');
     }
   }, []);

@@ -15,14 +15,14 @@ let testsPassed = 0;
 let testsFailed = 0;
 const results = [];
 
-function log(message, type = 'info') {
+function log (message, type = 'info') {
   const timestamp = new Date().toISOString();
   const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'info' ? 'ℹ️' : '⚠️';
   console.log(`${icon} [${timestamp}] ${message}`);
   results.push({ timestamp, type, message });
 }
 
-function test(name, fn) {
+function test (name, fn) {
   return new Promise(async (resolve) => {
     try {
       log(`🧪 Ejecutando: ${name}`, 'info');
@@ -39,7 +39,7 @@ function test(name, fn) {
 }
 
 // Test 1: Frontend HTTP Accesibilidad
-async function testFrontendHTTP() {
+async function testFrontendHTTP () {
   return new Promise((resolve, reject) => {
     http.get(FRONTEND_URL, (res) => {
       if (res.statusCode !== 200) {
@@ -54,7 +54,7 @@ async function testFrontendHTTP() {
 }
 
 // Test 2: Frontend - Título de la Página
-async function testFrontendTitle() {
+async function testFrontendTitle () {
   return new Promise((resolve, reject) => {
     http.get(FRONTEND_URL, (res) => {
       let data = '';
@@ -73,7 +73,7 @@ async function testFrontendTitle() {
 }
 
 // Test 3: Frontend - Meta Tags
-async function testFrontendMetaTags() {
+async function testFrontendMetaTags () {
   return new Promise((resolve, reject) => {
     http.get(FRONTEND_URL, (res) => {
       let data = '';
@@ -84,7 +84,7 @@ async function testFrontendMetaTags() {
           'description',
           'theme-color',
         ];
-        
+
         const missing = requiredTags.filter(tag => {
           return !data.includes(`name="${tag}"`) && !data.includes(`name='${tag}'`);
         });
@@ -102,7 +102,7 @@ async function testFrontendMetaTags() {
 }
 
 // Test 4: Frontend - React Scripts
-async function testFrontendReactScripts() {
+async function testFrontendReactScripts () {
   return new Promise((resolve, reject) => {
     http.get(FRONTEND_URL, (res) => {
       let data = '';
@@ -125,7 +125,7 @@ async function testFrontendReactScripts() {
 }
 
 // Test 5: Frontend - Vite Dev Server
-async function testViteDevServer() {
+async function testViteDevServer () {
   return new Promise((resolve, reject) => {
     http.get(`${FRONTEND_URL}/@vite/client`, (res) => {
       if (res.statusCode === 200 || res.statusCode === 404) {
@@ -150,7 +150,7 @@ async function testViteDevServer() {
 }
 
 // Test 6: Frontend - CSS Loading
-async function testFrontendCSS() {
+async function testFrontendCSS () {
   return new Promise((resolve, reject) => {
     http.get(FRONTEND_URL, (res) => {
       let data = '';
@@ -170,7 +170,7 @@ async function testFrontendCSS() {
 }
 
 // Test 7: Backend Accesible desde Frontend
-async function testBackendAccessible() {
+async function testBackendAccessible () {
   return new Promise((resolve, reject) => {
     http.get(`${BACKEND_URL}/health`, (res) => {
       if (res.statusCode !== 200) {
@@ -198,7 +198,7 @@ async function testBackendAccessible() {
 }
 
 // Test 8: Socket.io Client - Conexión
-async function testSocketClientConnection() {
+async function testSocketClientConnection () {
   return new Promise((resolve, reject) => {
     // Verificamos que el backend Socket.io esté accesible
     const socket = require('socket.io-client');
@@ -226,7 +226,7 @@ async function testSocketClientConnection() {
 }
 
 // Ejecutar todas las pruebas
-async function runAllTests() {
+async function runAllTests () {
   console.log('\n🚀 Iniciando pruebas del Frontend...\n');
   console.log(`📍 Frontend URL: ${FRONTEND_URL}`);
   console.log(`📍 Backend URL: ${BACKEND_URL}\n`);

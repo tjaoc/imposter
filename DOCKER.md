@@ -31,13 +31,13 @@ docker-compose logs -f
 docker-compose down
 ```
 
-### Servicios disponibles en desarrollo:
+### Servicios disponibles en desarrollo
 
-- **Frontend**: http://localhost:3000 (con hot reload)
-- **Backend**: http://localhost:4000 (con nodemon)
+- **Frontend**: <http://localhost:3000> (con hot reload)
+- **Backend**: <http://localhost:4000> (con nodemon)
 - **MongoDB**: localhost:27017
 
-### Características de desarrollo:
+### Características de desarrollo
 
 - ✅ Hot reload automático
 - ✅ Volúmenes montados para edición en tiempo real
@@ -68,7 +68,7 @@ docker-compose -f docker-compose.prod.yml logs -f
 docker-compose -f docker-compose.prod.yml down
 ```
 
-### Configuración de producción:
+### Configuración de producción
 
 1. **Crear archivo `.env.prod`** con tus variables de entorno:
 
@@ -79,15 +79,16 @@ MONGO_PASSWORD=tu_password_seguro
 MONGODB_URI=mongodb://admin:tu_password_seguro@mongodb:27017/imposter-premium?authSource=admin
 ```
 
-2. **Configurar MongoDB con autenticación** (recomendado):
+1. **Configurar MongoDB con autenticación** (recomendado):
+
    - Edita `docker-compose.prod.yml` y descomenta las variables de entorno de MongoDB
    - Añade las credenciales en `.env.prod`
 
-3. **Configurar dominio y SSL**:
+2. **Configurar dominio y SSL**:
    - Configura un reverse proxy (nginx/traefik) si es necesario
    - Configura certificados SSL para HTTPS
 
-### Características de producción:
+### Características de producción
 
 - ✅ Imágenes optimizadas (multi-stage build)
 - ✅ Usuario no-root en contenedores

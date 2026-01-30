@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useMemo,
+} from 'react';
 
 const STORAGE_KEY = 'imposter-locale';
 const DEFAULT_LOCALE = 'es';

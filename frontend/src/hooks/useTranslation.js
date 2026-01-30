@@ -5,7 +5,7 @@ import pt from '../locales/pt.json';
 
 const messagesByLocale = { es, pt };
 
-function getNested(obj, path) {
+function getNested (obj, path) {
   const keys = path.split('.');
   let current = obj;
   for (const key of keys) {
@@ -15,14 +15,14 @@ function getNested(obj, path) {
   return current;
 }
 
-function interpolate(str, vars = {}) {
+function interpolate (str, vars = {}) {
   if (typeof str !== 'string') return str;
   return str.replace(/\{(\w+)\}/g, (_, key) =>
     vars[key] != null ? String(vars[key]) : `{${key}}`
   );
 }
 
-export function useTranslation() {
+export function useTranslation () {
   const { locale } = useLanguage();
   const dict = useMemo(
     () => messagesByLocale[locale] || messagesByLocale.es,

@@ -11,8 +11,9 @@ const rootElement = document.getElementById('root');
 const originalError = console.error;
 console.error = (...args) => {
   if (
-    typeof args[0] === 'string' && 
-    (args[0].includes('HydrateFallback') || args[0].includes('initial hydration'))
+    typeof args[0] === 'string' &&
+    (args[0].includes('HydrateFallback') ||
+      args[0].includes('initial hydration'))
   ) {
     return;
   }

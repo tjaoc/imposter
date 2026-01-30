@@ -31,20 +31,19 @@ function Home() {
     if (activeSocket && activeSocket.connected) {
       // Guardar el nombre en localStorage para uso futuro
       localStorage.setItem('playerName', playerName.trim());
-      
+
       activeSocket.emit(
         'room:create',
         { name: playerName.trim() },
         (response) => {
           setIsCreating(false);
           if (response && response.ok) {
-            console.log('✅ Sala creada:', response.room.code);
             navigate(`/room/${response.room.code}`);
           } else {
             console.error('❌ Error creando sala:', response?.error);
             alert(t('errors.createRoom'));
           }
-        },
+        }
       );
     } else {
       setIsCreating(false);
@@ -53,43 +52,28 @@ function Home() {
   };
 
   const handleJoinRoom = async () => {
-    console.log('🔵 handleJoinRoom llamado', { playerName, roomCode });
-
-    if (!playerName.trim() || !roomCode.trim()) {
-      console.log('❌ Nombre o código vacío');
-      return;
-    }
+    if (!playerName.trim() || !roomCode.trim()) return;
 
     setIsJoining(true);
-    console.log('🔄 Verificando conexión del socket...');
 
     // Asegurar que el socket está conectado
     let activeSocket = socket;
     if (!socket || !socket.connected) {
-      console.log('🔌 Socket no conectado, conectando...');
       activeSocket = await connectSocket();
     }
-
-    console.log('📡 Socket estado:', {
-      exists: !!activeSocket,
-      connected: activeSocket?.connected,
-    });
 
     if (activeSocket && activeSocket.connected) {
       // Guardar el nombre en localStorage para uso futuro
       localStorage.setItem('playerName', playerName.trim());
-      
+
       const joinData = {
         code: roomCode.trim().toUpperCase(),
         name: playerName.trim(),
       };
-      console.log('📤 Emitiendo room:join con:', joinData);
 
       activeSocket.emit('room:join', joinData, (response) => {
-        console.log('📥 Respuesta de room:join:', response);
         setIsJoining(false);
         if (response && response.ok) {
-          console.log('✅ Unido a sala:', response.room.code);
           navigate(`/room/${response.room.code}`);
         } else {
           console.error('❌ Error al unirse:', response?.error);
@@ -125,8 +109,12 @@ function Home() {
             alt="Imposter"
             className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-3 sm:mb-4"
           />
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-glow mb-3 sm:mb-4">{t('home.title')}</h1>
-          <p className="text-space-cyan text-base sm:text-lg md:text-xl">{t('home.subtitle')}</p>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-glow mb-3 sm:mb-4">
+            {t('home.title')}
+          </h1>
+          <p className="text-space-cyan text-base sm:text-lg md:text-xl">
+            {t('home.subtitle')}
+          </p>
         </motion.div>
 
         <motion.div
@@ -143,7 +131,9 @@ function Home() {
             <span className="text-2xl">📱</span>
             <div className="text-left flex-1 min-w-0">
               <div className="text-base sm:text-lg">{t('home.playLocal')}</div>
-              <div className="text-xs sm:text-sm font-normal text-gray-400">{t('home.playLocalDesc')}</div>
+              <div className="text-xs sm:text-sm font-normal text-gray-400">
+                {t('home.playLocalDesc')}
+              </div>
             </div>
           </button>
           <div className="relative my-4">
@@ -151,10 +141,14 @@ function Home() {
               <div className="w-full border-t border-space-cyan/30" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-space-blue text-gray-400">{t('common.or')}</span>
+              <span className="px-4 bg-space-blue text-gray-400">
+                {t('common.or')}
+              </span>
             </div>
           </div>
-          <div className="text-center text-gray-400 text-xs sm:text-sm mb-4">{t('home.playOnlineDesc')}</div>
+          <div className="text-center text-gray-400 text-xs sm:text-sm mb-4">
+            {t('home.playOnlineDesc')}
+          </div>
         </motion.div>
 
         <motion.div
@@ -191,7 +185,9 @@ function Home() {
                 <div className="w-full border-t border-space-cyan/30"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-space-blue text-gray-400">{t('common.or')}</span>
+                <span className="px-4 bg-space-blue text-gray-400">
+                  {t('common.or')}
+                </span>
               </div>
             </div>
 

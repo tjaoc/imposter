@@ -27,7 +27,7 @@ const UPDATES_PT = path.join(DATA_DIR, 'updates-pt.json');
 // Cargar .env del backend
 require('dotenv').config({ path: path.join(BACKEND_ROOT, '.env') });
 
-function loadJson(filePath, defaultValue = {}) {
+function loadJson (filePath, defaultValue = {}) {
   try {
     if (fs.existsSync(filePath)) {
       return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -38,11 +38,11 @@ function loadJson(filePath, defaultValue = {}) {
   return typeof defaultValue === 'object' ? { ...defaultValue } : defaultValue;
 }
 
-function saveJson(filePath, data) {
+function saveJson (filePath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
 }
 
-function mergeWordsBySlug(current, fetched) {
+function mergeWordsBySlug (current, fetched) {
   const result = { ...current };
   if (!fetched || typeof fetched !== 'object') return result;
   for (const [slug, words] of Object.entries(fetched)) {
@@ -58,13 +58,13 @@ function mergeWordsBySlug(current, fetched) {
   return result;
 }
 
-async function fetchUrl(url) {
+async function fetchUrl (url) {
   const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
   if (!res.ok) throw new Error(`HTTP ${res.status}: ${url}`);
   return res.json();
 }
 
-async function fetchUpdates() {
+async function fetchUpdates () {
   let changed = false;
   const esUrl = process.env.WORDS_ES_ES_UPDATE_URL;
   const ptUrl = process.env.WORDS_PT_PT_UPDATE_URL;
@@ -114,7 +114,7 @@ async function fetchUpdates() {
   return changed;
 }
 
-function runSeed() {
+function runSeed () {
   console.log('🌱 Ejecutando seed en la base de datos...');
   const r = spawnSync('node', ['scripts/seed-standalone.js'], {
     cwd: BACKEND_ROOT,
@@ -126,7 +126,7 @@ function runSeed() {
   }
 }
 
-function gitCommitAndPush() {
+function gitCommitAndPush () {
   const toAdd = [UPDATES_ES, UPDATES_PT].filter((p) => fs.existsSync(p));
   if (toAdd.length === 0) return;
 
@@ -163,7 +163,7 @@ function gitCommitAndPush() {
   console.log('✅ Commit y push realizados');
 }
 
-async function main() {
+async function main () {
   console.log('📅 Ejecutando actualización mensual de palabras...\n');
 
   const updatesChanged = await fetchUpdates();

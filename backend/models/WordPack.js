@@ -12,7 +12,7 @@ const WordPackSchema = new mongoose.Schema(
       type: [String],
       default: [],
       validate: {
-        validator: function(value) {
+        validator: function (value) {
           // Permitir array vacío solo para packs personalizados
           if (this.slug === 'personalizado') {
             return Array.isArray(value);

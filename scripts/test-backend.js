@@ -15,14 +15,14 @@ let testsPassed = 0;
 let testsFailed = 0;
 const results = [];
 
-function log(message, type = 'info') {
+function log (message, type = 'info') {
   const timestamp = new Date().toISOString();
   const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'info' ? 'ℹ️' : '⚠️';
   console.log(`${icon} [${timestamp}] ${message}`);
   results.push({ timestamp, type, message });
 }
 
-function test(name, fn) {
+function test (name, fn) {
   return new Promise(async (resolve) => {
     try {
       log(`🧪 Ejecutando: ${name}`, 'info');
@@ -39,7 +39,7 @@ function test(name, fn) {
 }
 
 // Test 1: Health Check HTTP
-async function testHealthCheck() {
+async function testHealthCheck () {
   return new Promise((resolve, reject) => {
     http.get(`${BACKEND_URL}/health`, (res) => {
       let data = '';
@@ -71,7 +71,7 @@ async function testHealthCheck() {
 }
 
 // Test 2: MongoDB Connection (desde backend)
-async function testMongoDB() {
+async function testMongoDB () {
   return new Promise((resolve, reject) => {
     // Verificamos que el backend esté conectado a MongoDB
     // Si el servidor está corriendo, MongoDB está conectado
@@ -88,7 +88,7 @@ async function testMongoDB() {
 }
 
 // Test 3: Socket.io - Crear Sala
-async function testSocketCreateRoom() {
+async function testSocketCreateRoom () {
   return new Promise((resolve, reject) => {
     const socket = io(BACKEND_URL, {
       transports: ['websocket', 'polling'],
@@ -128,7 +128,7 @@ async function testSocketCreateRoom() {
 }
 
 // Test 4: Socket.io - Unirse a Sala
-async function testSocketJoinRoom(roomCode) {
+async function testSocketJoinRoom (roomCode) {
   return new Promise((resolve, reject) => {
     const socket = io(BACKEND_URL, {
       transports: ['websocket', 'polling'],
@@ -166,7 +166,7 @@ async function testSocketJoinRoom(roomCode) {
 }
 
 // Test 5: Socket.io - Actualización de Sala
-async function testSocketRoomUpdate(roomCode) {
+async function testSocketRoomUpdate (roomCode) {
   return new Promise((resolve, reject) => {
     const socket = io(BACKEND_URL, {
       transports: ['websocket', 'polling'],
@@ -238,7 +238,7 @@ async function testSocketRoomUpdate(roomCode) {
 }
 
 // Test 6: Socket.io - Desconexión
-async function testSocketDisconnect() {
+async function testSocketDisconnect () {
   return new Promise((resolve, reject) => {
     const socket = io(BACKEND_URL, {
       transports: ['websocket', 'polling'],
@@ -277,7 +277,7 @@ async function testSocketDisconnect() {
 }
 
 // Ejecutar todas las pruebas
-async function runAllTests() {
+async function runAllTests () {
   console.log('\n🚀 Iniciando pruebas del Backend...\n');
   console.log(`📍 Backend URL: ${BACKEND_URL}\n`);
 
@@ -313,7 +313,7 @@ async function runAllTests() {
 
   // Test 6: Socket.io - Desconexión
   await test('Socket.io - Desconexión', testSocketDisconnect);
-  
+
   // Limpiar socket de prueba si existe
   if (global.testSocket) {
     global.testSocket.disconnect();

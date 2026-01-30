@@ -1,11 +1,27 @@
 # 📝 Changelog - Imposter
 
+## [1.0.1] - 2026-01-30
+
+### 🔧 Producción y móvil
+
+#### ✨ Mejoras
+
+- ✅ **Adaptación móvil (iPhone / Android)**: Safe areas para notch, Dynamic Island y home indicator; utilidades `pt-content-safe` y `top-content-safe`; footer posicionado sobre el home indicator; contenedores scrollables en resultados/votación (`scroll-touch`, `max-h-[85dvh]`); touch targets mínimos 48px; inputs 16px en móvil para evitar zoom en iOS; viewport y `format-detection` en `index.html`.
+- ✅ **Sin logs en producción**: Eliminados todos los `console.log` del frontend (Game, Home, CustomWords) y del backend en ejecución (server.js, config/db.js, seeds/wordPacks.js). Se mantienen `console.error` y `console.warn` para depuración de fallos. Los scripts manuales (update-words-monthly, tests, seed-standalone) conservan su salida por consola.
+
+#### 📋 Notas
+
+- **Seed**: Al arrancar, el backend borra todos los WordPacks y vuelve a ejecutar el seed (es-ES + pt-PT). Opción `npm run seed` en backend para ejecutar solo el seed.
+- **Actualización mensual**: Script `scripts/update-words-monthly.js` para el día 1 (cron externo o GitHub Actions). Ver `DEPLOYMENT.md`.
+
+---
+
 ## [1.0.0] - 2026-01-30
 
 ### 🎉 Versión estable 1.0.0
 
 - **Estado:** Estable. Incluye todas las funcionalidades de la beta3.
-- **Despliegue:** Blueprint Render con producción y desarrollo (impostor.netic.app, apiimp.netic.app, dev.*). Ver `RENDER_ENVS.md` y `DEPLOYMENT.md`.
+- **Despliegue:** Blueprint Render con producción y desarrollo (impostor.netic.app, apiimp.netic.app, dev.\*). Ver `RENDER_ENVS.md` y `DEPLOYMENT.md`.
 
 ---
 
@@ -73,7 +89,7 @@
 
 - ✅ **Sin eliminaciones**: El juego ya no elimina jugadores, solo muestra resultados
 - ✅ **Sin empates**: Se eliminó la lógica de empates, solo se muestran resultados de votación
-- ✅ **Resultados mejorados**: 
+- ✅ **Resultados mejorados**:
   - Si todos los civiles acertan: Muestra "🎯 El Impostor fue descubierto: [nombre]"
   - Si no todos acertan: Solo muestra en verde a los jugadores que acertaron
   - El impostor siempre muestra "🕵️ IMPOSTOR" en los resultados

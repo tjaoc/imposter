@@ -75,8 +75,8 @@ Esta es la **primera versión beta completa** del juego Imposter, una versión d
 docker-compose up -d
 ```
 
-- Frontend: http://localhost:3000
-- Backend: http://localhost:4000
+- Frontend: <http://localhost:3000>
+- Backend: <http://localhost:4000>
 - MongoDB: localhost:27017
 
 ### Producción
@@ -173,7 +173,7 @@ VITE_SOCKET_URL=http://localhost:4000
 ### Cómo Probar
 
 1. Ejecuta: `docker-compose up -d`
-2. Abre: http://localhost:3000
+2. Abre: <http://localhost:3000>
 3. Crea una sala con 3+ jugadores
 4. Selecciona un pack
 5. ¡Juega!

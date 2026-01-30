@@ -323,15 +323,18 @@ settings: {
 
 ### Opción 1: Multiples Ventanas del Navegador
 
-1. **Ventana 1:** http://localhost:3000
+1. **Ventana 1:** <http://localhost:3000>
+
    - Crea una sala como "Jugador1"
    - Selecciona un pack (ej: "Cine y Series")
    - Espera a que se unan más jugadores
 
-2. **Ventana 2 (incógnito):** http://localhost:3000
+2. **Ventana 2 (incógnito):** <http://localhost:3000>
+
    - Únete con el código de la sala como "Jugador2"
 
-3. **Ventana 3 (otro navegador):** http://localhost:3000
+3. **Ventana 3 (otro navegador):** <http://localhost:3000>
+
    - Únete con el código de la sala como "Jugador3"
 
 4. **En Ventana 1:** Haz clic en "Iniciar Juego"

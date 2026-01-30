@@ -2,7 +2,7 @@
  * Lógica del juego local (un dispositivo) - espejo de backend/utils/gameLogic.js
  */
 
-export function assignRoles(players, secretWord, impostorCount = 1, hintWord = null) {
+export function assignRoles (players, secretWord, impostorCount = 1, hintWord = null) {
   if (players.length < 3) {
     throw new Error('Se necesitan al menos 3 jugadores');
   }
@@ -24,7 +24,7 @@ export function assignRoles(players, secretWord, impostorCount = 1, hintWord = n
   });
 }
 
-export function processVotes(gameState, votes) {
+export function processVotes (gameState, votes) {
   const voteCounts = {};
   const activePlayers = gameState.players.filter(
     (p) => !gameState.eliminatedPlayers.includes(p.id)
@@ -62,7 +62,7 @@ export function processVotes(gameState, votes) {
   return { eliminated: eliminatedPlayer, votes: voteCounts, isTie: false };
 }
 
-export function checkGameEnd(gameState) {
+export function checkGameEnd (gameState) {
   const activePlayers = gameState.players.filter(
     (p) => !gameState.eliminatedPlayers.includes(p.id)
   );

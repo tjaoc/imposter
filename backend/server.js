@@ -58,10 +58,7 @@ const getPublicRoomState = (room) => ({
 });
 
 io.on("connection", (socket) => {
-  console.log(`🔌 Cliente conectado: ${socket.id}`);
-
   socket.on("room:create", ({ name, settings }, callback) => {
-    console.log(`📝 room:create solicitado por ${socket.id}, nombre: ${name}`);
     if (!name) {
       callback?.({ ok: false, error: "NAME_REQUIRED" });
       return;
@@ -89,17 +86,13 @@ io.on("connection", (socket) => {
     socket.join(code);
     socket.data.roomCode = code;
     socket.data.playerName = name;
-
-    console.log(`✅ Sala creada: ${code}, host: ${socket.id}, salas activas: ${rooms.size}`);
     callback?.({ ok: true, room: getPublicRoomState(room) });
     io.to(code).emit("room:updated", getPublicRoomState(room));
   });
 
   socket.on("room:join", ({ code, name }, callback) => {
-    console.log(`🚪 room:join solicitado por ${socket.id}, sala: ${code}, nombre: ${name}`);
     const room = rooms.get(code);
     if (!room) {
-      console.log(`❌ Sala ${code} no encontrada. Salas activas: ${rooms.size}, códigos: ${Array.from(rooms.keys()).join(', ')}`);
       callback?.({ ok: false, error: "ROOM_NOT_FOUND" });
       return;
     }
@@ -120,14 +113,11 @@ io.on("connection", (socket) => {
     } else {
       // Si el jugador ya existe, mantener su nombre original (no actualizar)
       // Esto preserva los nombres cuando se crea una nueva partida
-      console.log(`   ℹ️ Jugador ${socket.id} ya existe en la sala con nombre: ${existing.name}, manteniendo nombre original`);
     }
 
     socket.join(code);
     socket.data.roomCode = code;
     socket.data.playerName = name;
-
-    console.log(`✅ Jugador ${socket.id} unido a sala ${code}, jugadores en sala: ${room.players.length}`);
     callback?.({ ok: true, room: getPublicRoomState(room) });
     io.to(code).emit("room:updated", getPublicRoomState(room));
   });
@@ -165,25 +155,19 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log(`🔴 Cliente desconectado: ${socket.id}`);
     const code = socket.data.roomCode;
     if (!code) {
-      console.log(`   No estaba en ninguna sala`);
       return;
     }
 
     const room = rooms.get(code);
     if (!room) {
-      console.log(`   Sala ${code} ya no existe`);
       return;
     }
 
     room.players = room.players.filter((player) => player.id !== socket.id);
-    console.log(`   Removido de sala ${code}, jugadores restantes: ${room.players.length}`);
-
     if (room.players.length === 0) {
       rooms.delete(code);
-      console.log(`   ⚠️  Sala ${code} eliminada (vacía). Salas activas: ${rooms.size}`);
       return;
     }
 
@@ -198,8 +182,6 @@ io.on("connection", (socket) => {
 
   // Obtener estado del juego y rol del jugador
   socket.on("game:get-state", ({ code }, callback) => {
-    console.log(`🎲 game:get-state solicitado por ${socket.id} para sala ${code}`);
-
     if (!code) {
       callback?.({ ok: false, error: "CODE_REQUIRED" });
       return;
@@ -208,20 +190,15 @@ io.on("connection", (socket) => {
     const gameState = games.get(code);
 
     if (!gameState) {
-      console.log(`❌ Juego no encontrado para sala ${code}. Juegos activos: ${games.size}, códigos: ${Array.from(games.keys()).join(', ')}`);
       callback?.({ ok: false, error: "GAME_NOT_FOUND" });
       return;
     }
 
     const player = gameState.players.find(p => p.id === socket.id);
     if (!player) {
-      console.log(`❌ Jugador ${socket.id} no está en el juego ${code}`);
       callback?.({ ok: false, error: "PLAYER_NOT_IN_GAME" });
       return;
     }
-
-    console.log(`✅ Estado del juego enviado a ${socket.id}: ${player.role}`);
-
     // Obtener información de la sala para incluir hostId
     const room = rooms.get(code);
 
@@ -281,7 +258,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("game:start", async ({ packId, selectedPacks, hintForImpostors = true, discussionSeconds = 240, impostorCount, locale: clientLocale }, callback) => {
-    console.log(`🎮 game:start solicitado por ${socket.id}, pack: ${packId}, hint: ${hintForImpostors}, duration: ${discussionSeconds}, locale: ${clientLocale}`);
     const code = socket.data.roomCode;
     const room = rooms.get(code);
 
@@ -336,9 +312,6 @@ io.on("connection", (socket) => {
       // Inicializar el juego
       const gameState = initializeGame(room, secretWord, impostorHint);
       games.set(code, gameState);
-
-      console.log(`✅ Juego iniciado en sala ${code}, palabra: ${secretWord}, jugadores: ${gameState.players.length}, impostores: ${gameState.impostorCount}`);
-
       // Notificar a todos que el juego comenzó (primero para que naveguen)
       io.to(code).emit("game:started", {
         playerCount: gameState.players.length,
@@ -357,7 +330,6 @@ io.on("connection", (socket) => {
       setTimeout(() => {
         // Enviar a cada jugador su rol individual
         gameState.players.forEach((player) => {
-          console.log(`🎭 Enviando rol a ${player.id}: ${player.role}`);
           io.to(player.id).emit("game:role", {
             role: player.role,
             word: player.word,
@@ -374,8 +346,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("game:reveal-complete", ({ code }, callback) => {
-    console.log(`✅ game:reveal-complete de ${socket.id} para sala ${code}`);
-
     if (!code) {
       callback?.({ ok: false, error: "CODE_REQUIRED" });
       return;
@@ -384,7 +354,6 @@ io.on("connection", (socket) => {
     const gameState = games.get(code);
 
     if (!gameState) {
-      console.log(`❌ Juego no encontrado para sala ${code}. Juegos activos: ${games.size}`);
       callback?.({ ok: false, error: "GAME_NOT_FOUND" });
       return;
     }
@@ -397,10 +366,7 @@ io.on("connection", (socket) => {
 
     // Verificar si todos han visto su rol
     const allRevealed = gameState.players.every(p => p.hasSeenRole);
-    console.log(`📊 Jugadores que vieron su rol: ${gameState.players.filter(p => p.hasSeenRole).length}/${gameState.players.length}, allRevealed: ${allRevealed}`);
-
     if (allRevealed) {
-      console.log(`🚀 Todos confirmaron! Iniciando fase de discusión en sala ${code}`);
       // Iniciar fase de discusión
       gameState.status = 'discussion';
       gameState.discussionEndsAt = Date.now() + (gameState.discussionSeconds * 1000);
@@ -409,15 +375,11 @@ io.on("connection", (socket) => {
         endsAt: gameState.discussionEndsAt,
         duration: gameState.discussionSeconds,
       };
-
-      console.log(`💬 Emitiendo game:discussion-started para sala ${code}`);
-
       // Enviar a TODA la sala (broadcast)
       io.to(code).emit("game:discussion-started", discussionData);
 
       // TAMBIÉN enviar a cada jugador individualmente para asegurar que lo reciben
       gameState.players.forEach((player) => {
-        console.log(`  📤 Enviando discussion-started a ${player.id}`);
         io.to(player.id).emit("game:discussion-started", discussionData);
       });
     }
@@ -426,8 +388,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("game:vote", ({ code, votedPlayerId }, callback) => {
-    console.log(`🗳️ Voto de ${socket.id} para ${votedPlayerId} en sala ${code}`);
-
     if (!code) {
       callback?.({ ok: false, error: "CODE_REQUIRED" });
       return;
@@ -436,18 +396,11 @@ io.on("connection", (socket) => {
     const gameState = games.get(code);
 
     if (!gameState) {
-      console.log(`❌ Juego no encontrado para sala ${code}`);
       callback?.({ ok: false, error: "GAME_NOT_FOUND" });
       return;
     }
-
-    console.log(`📊 Estado del juego: ${gameState.status}, esperado: 'voting'`);
-    console.log(`   Código de sala: ${code}`);
-    console.log(`   Jugadores en juego: ${gameState.players.length}`);
-
     // No permitir votar si el juego ya terminó
     if (gameState.status === 'finished') {
-      console.log(`❌ El juego ya terminó. No se pueden registrar más votos.`);
       callback?.({ ok: false, error: "GAME_FINISHED", currentStatus: gameState.status });
       return;
     }
@@ -455,14 +408,12 @@ io.on("connection", (socket) => {
     // Permitir votar solo si el estado es 'voting' o 'discussion'
     // NO permitir votar si está en 'vote-results', 'finished', o cualquier otro estado
     if (gameState.status !== 'voting' && gameState.status !== 'discussion') {
-      console.log(`❌ El juego no está en fase de votación. Estado actual: ${gameState.status}`);
       callback?.({ ok: false, error: "NOT_VOTING_PHASE", currentStatus: gameState.status });
       return;
     }
 
     // Si está en 'discussion', cambiar a 'voting' automáticamente y notificar
     if (gameState.status === 'discussion') {
-      console.log(`⚠️ El juego está en 'discussion', cambiando a 'voting' automáticamente`);
       gameState.status = 'voting';
       gameState.votes = {};
 
@@ -480,13 +431,9 @@ io.on("connection", (socket) => {
     // Verificar si el jugador es impostor - los impostores no pueden votar
     const player = gameState.players.find(p => p.id === socket.id);
     if (!player) {
-      console.log(`❌ Jugador ${socket.id} no encontrado en el juego`);
       callback?.({ ok: false, error: "PLAYER_NOT_FOUND" });
       return;
     }
-
-    console.log(`👤 Jugador encontrado: ${player.name}, rol: ${player.role}`);
-
     // Registrar voto (también para impostores, pero no se contará en el procesamiento)
     gameState.votes[socket.id] = votedPlayerId;
 
@@ -498,38 +445,20 @@ io.on("connection", (socket) => {
     // Contar solo los votos de los civiles (excluir impostores)
     const civilianVoteIds = activeCivilians.map(c => c.id);
     const civilianVotesCount = Object.keys(gameState.votes).filter(voterId => civilianVoteIds.includes(voterId)).length;
-
-    console.log(`📊 ===== VERIFICACIÓN DE VOTOS =====`);
-    console.log(`   Votación: ${civilianVotesCount}/${activeCivilians.length} civiles han votado`);
-    console.log(`   Votos registrados (todos):`, Object.keys(gameState.votes));
-    console.log(`   Votos de civiles:`, Object.keys(gameState.votes).filter(voterId => civilianVoteIds.includes(voterId)));
-    console.log(`   Civiles activos (${activeCivilians.length}):`, activeCivilians.map(p => `${p.name} (${p.id})`));
-    console.log(`   IDs de civiles activos:`, civilianVoteIds);
-
     // Verificar si todos los civiles han votado (solo contar votos de civiles)
     const allCiviliansVoted = civilianVotesCount === activeCivilians.length && activeCivilians.length > 0;
-    console.log(`   ¿Todos los civiles votaron? ${allCiviliansVoted} (${civilianVotesCount}/${activeCivilians.length})`);
-    console.log(`   Condición: ${civilianVotesCount} === ${activeCivilians.length} && ${activeCivilians.length} > 0`);
-    console.log(`   ====================================`);
-
     // Si es impostor, registrar el voto pero no contarlo en el procesamiento
     if (player.role === 'impostor') {
-      console.log(`🎭 Impostor ${socket.id} (${player.name}) "fingió" votar por ${votedPlayerId} (voto registrado pero no contado)`);
       callback?.({ ok: true, isImpostorVote: true });
 
       // Si todos los civiles ya votaron, procesar la votación inmediatamente (no esperar más)
       if (allCiviliansVoted) {
-        console.log(`🎯 Todos los civiles ya votaron! Procesando votación inmediatamente (el impostor votó después)...`);
         // Continuar con el procesamiento (no hacer return aquí)
       } else {
         // Si no todos los civiles votaron, no procesar aún
         return;
       }
     } else {
-      console.log(`✅ Voto registrado de ${player.name} (${socket.id}) para ${votedPlayerId}`);
-      console.log(`   Total votos registrados (incluyendo impostores): ${Object.keys(gameState.votes).length}`);
-      console.log(`   Este es un CIVIL votando. Verificando si todos los civiles votaron...`);
-      console.log(`   allCiviliansVoted = ${allCiviliansVoted}`);
       // Responder al callback primero
       callback?.({ ok: true });
     }
@@ -545,16 +474,9 @@ io.on("connection", (socket) => {
 
       // Verificar nuevamente que todos los civiles votaron
       const currentCivilianVotesCount = Object.keys(gameState.votes).filter(voterId => currentCivilianVoteIds.includes(voterId)).length;
-      console.log(`🔍 Re-verificando en processVoting: ${currentCivilianVotesCount}/${currentActiveCivilians.length} civiles votaron`);
-
       if (currentCivilianVotesCount !== currentActiveCivilians.length || currentActiveCivilians.length === 0) {
-        console.log(`⚠️ El conteo cambió o no hay civiles. No procesando aún. ${currentCivilianVotesCount}/${currentActiveCivilians.length}`);
         return;
       }
-
-      console.log(`🎯 ===== TODOS LOS CIVILES VOTARON! Procesando votación INMEDIATAMENTE =====`);
-      console.log(`   No esperando al impostor - procesando ahora con ${currentCivilianVotesCount} votos de civiles`);
-
       // Filtrar solo los votos de los civiles para el procesamiento (excluir impostores)
       const civilianVotes = {};
       currentActiveCivilians.forEach((civilian) => {
@@ -562,10 +484,6 @@ io.on("connection", (socket) => {
           civilianVotes[civilian.id] = gameState.votes[civilian.id];
         }
       });
-      console.log(`📊 Votos de civiles para procesar:`, civilianVotes);
-      console.log(`   IDs de civiles que votaron:`, Object.keys(civilianVotes));
-      console.log(`   IDs de civiles activos:`, currentActiveCivilians.map(c => c.id));
-
       // Identificar al impostor
       const impostor = gameState.players.find(p => p.role === 'impostor');
 
@@ -593,9 +511,7 @@ io.on("connection", (socket) => {
       const impostorDiscovered = allCiviliansVotedForImpostor;
 
       if (impostorDiscovered) {
-        console.log(`🎯 ¡El impostor fue descubierto! Todos los civiles acertaron.`);
       } else {
-        console.log(`📊 Resultados: ${correctVoters.length} acertaron, ${incorrectVoters.length} no acertaron`);
       }
 
       // NO eliminar a nadie - solo registrar resultados
@@ -603,15 +519,9 @@ io.on("connection", (socket) => {
 
       // Verificar si el juego terminó
       const endCheck = checkGameEnd(gameState);
-      console.log(`🔍 Verificación de fin de juego:`, endCheck);
-
       if (endCheck.finished) {
         gameState.status = 'finished';
         gameState.winner = endCheck.winner;
-
-        console.log(`🏁 Juego terminado. Ganador: ${endCheck.winner}`);
-        console.log(`📤 Emitiendo game:finished a sala ${code}`);
-
         // Preparar información de votos con nombres de jugadores (incluyendo impostores)
         const votesWithNames = {};
         // Incluir todos los jugadores, incluso si no votaron
@@ -676,19 +586,14 @@ io.on("connection", (socket) => {
         };
 
         // Emitir a toda la sala
-        console.log(`📤 Emitiendo game:finished a toda la sala ${code} (${gameState.players.length} jugadores)`);
         io.to(code).emit("game:finished", finishedData);
 
         // También emitir individualmente para asegurar que todos lo reciben
         gameState.players.forEach((player) => {
-          console.log(`  📤 Enviando game:finished individualmente a ${player.id} (${player.name})`);
           io.to(player.id).emit("game:finished", finishedData);
         });
-        console.log(`✅ Todos los eventos game:finished enviados`);
       } else {
         // Siguiente ronda - pero primero mostrar resultados de la votación
-        console.log(`🔄 Iniciando siguiente ronda...`);
-
         // Preparar información de votos con nombres de jugadores (incluyendo impostores)
         const votesWithNames = {};
         // Incluir todos los jugadores, incluso si no votaron
@@ -722,10 +627,10 @@ io.on("connection", (socket) => {
         const activeCivilians = gameState.players.filter(
           p => !gameState.eliminatedPlayers.includes(p.id) && p.role !== 'impostor'
         );
-        
+
         const correctVoters = [];
         const incorrectVoters = [];
-        
+
         // Contar votos para crear el objeto voteCounts
         const voteCounts = {};
         activeCivilians.forEach(civilian => {
@@ -739,7 +644,7 @@ io.on("connection", (socket) => {
             }
           }
         });
-        
+
         // Verificar si todos los civiles acertaron (solo votos de civiles; el voto del impostor no cuenta)
         const allCiviliansVotedForImpostor = !!impostor &&
           activeCivilians.length > 0 &&
@@ -747,19 +652,15 @@ io.on("connection", (socket) => {
             const vote = gameState.votes[civilian.id];
             return vote === impostor.id;
           });
-        
+
         const impostorDiscovered = allCiviliansVotedForImpostor;
 
         // Cambiar estado a 'vote-results' ANTES de emitir eventos
         gameState.status = 'vote-results';
-
-        console.log(`📤 Emitiendo game:vote-result a sala ${code} (${gameState.players.length} jugadores)`);
         const room = rooms.get(code);
-        
+
         if (impostorDiscovered) {
-          console.log(`🎯 ¡El impostor fue descubierto en esta ronda! Todos los civiles acertaron.`);
         } else {
-          console.log(`📊 Resultados: ${correctVoters.length} acertaron, ${incorrectVoters.length} no acertaron`);
         }
 
         const voteResultData = {
@@ -790,11 +691,8 @@ io.on("connection", (socket) => {
 
         // También emitir individualmente para asegurar que todos lo reciben
         gameState.players.forEach((player) => {
-          console.log(`  📤 Enviando game:vote-result individualmente a ${player.id} (${player.name})`);
           io.to(player.id).emit("game:vote-result", voteResultData);
         });
-        console.log(`✅ Todos los eventos game:vote-result enviados`);
-
         // NO continuar automáticamente - esperar a que el host inicie nueva partida o vuelva al inicio
       }
     };
@@ -802,33 +700,22 @@ io.on("connection", (socket) => {
     // Procesar votación si todos los civiles votaron (después de responder callback para no bloquear)
     // IMPORTANTE: Procesar inmediatamente cuando todos los civiles votaron, sin esperar al impostor
     if (allCiviliansVoted) {
-      console.log(`✅ Condición cumplida: allCiviliansVoted = ${allCiviliansVoted}`);
-      console.log(`   Programando processVoting con setImmediate...`);
       // Usar setImmediate para asegurar que el callback se envíe primero
       setImmediate(() => {
-        console.log(`⏰ setImmediate ejecutado, llamando processVoting...`);
         processVoting();
       });
     } else {
-      console.log(`⏸️ No se procesa aún: allCiviliansVoted = ${allCiviliansVoted}, esperando más votos...`);
     }
   });
 
   socket.on("game:start-voting", ({ code }, callback) => {
-    console.log(`🗳️ game:start-voting solicitado para sala ${code} por ${socket.id}`);
-
     if (!code) {
       callback?.({ ok: false, error: "CODE_REQUIRED" });
       return;
     }
 
     const gameState = games.get(code);
-
-    console.log(`🔍 Verificando juego - Juego existe: ${!!gameState}, Juegos activos: ${games.size}`);
-
     if (!gameState) {
-      console.log(`❌ Juego no encontrado - Código: ${code}`);
-      console.log(`   Juegos disponibles: ${Array.from(games.keys()).join(', ')}`);
       callback?.({ ok: false, error: "GAME_NOT_FOUND" });
       return;
     }
@@ -841,9 +728,7 @@ io.on("connection", (socket) => {
     }
 
     // Cualquier jugador puede iniciar la votación (no solo el host)
-    console.log(`📊 Estado actual del juego: ${gameState.status}, esperado: 'discussion'`);
     if (gameState.status !== 'discussion') {
-      console.log(`❌ No se puede iniciar votación - el juego está en fase: ${gameState.status}`);
       callback?.({ ok: false, error: "NOT_DISCUSSION_PHASE", currentStatus: gameState.status });
       return;
     }
@@ -851,11 +736,6 @@ io.on("connection", (socket) => {
     // Cambiar estado ANTES de emitir eventos para evitar problemas de sincronización
     gameState.status = 'voting';
     gameState.votes = {};
-
-    console.log(`✅ Votación iniciada por ${socket.id} en sala ${code}`);
-    console.log(`📊 Estado del juego actualizado a: ${gameState.status}`);
-    console.log(`📤 Emitiendo game:voting-started a sala ${code} (${gameState.players.length} jugadores)`);
-
     // Preparar lista de jugadores para votación
     const playersList = gameState.players.map(p => ({
       id: p.id,
@@ -868,7 +748,6 @@ io.on("connection", (socket) => {
 
     // Enviar evento de votación inmediatamente (el estado ya está actualizado)
     gameState.players.forEach((player) => {
-      console.log(`  📤 Enviando voting-started a ${player.id}`);
       io.to(player.id).emit("game:voting-started", { players: playersList });
     });
 
@@ -882,14 +761,7 @@ io.on("connection", (socket) => {
   socket.on("game:new-game", async ({ code: providedCode }, callback) => {
     // Usar socket.data.roomCode como fuente principal, con fallback al código proporcionado
     let code = socket.data.roomCode || providedCode;
-    console.log(`🎮 game:new-game solicitado por ${socket.id}`);
-    console.log(`   📋 socket.data.roomCode: ${socket.data.roomCode}`);
-    console.log(`   📋 providedCode: ${providedCode}`);
-    console.log(`   📋 code inicial: ${code}`);
-    console.log(`   📋 Salas activas: ${rooms.size}, códigos: ${Array.from(rooms.keys()).join(', ')}`);
-
     if (!code) {
-      console.log(`   ❌ No se pudo determinar el código de la sala`);
       callback?.({ ok: false, error: "CODE_REQUIRED" });
       return;
     }
@@ -898,15 +770,12 @@ io.on("connection", (socket) => {
 
     // Si la sala no existe, no podemos continuar
     if (!room) {
-      console.log(`   ❌ Sala ${code} no encontrada`);
-      console.log(`   💡 Sugerencia: La sala puede haberse eliminado. Los jugadores deben volver a crear o unirse a una sala.`);
       callback?.({ ok: false, error: "ROOM_NOT_FOUND", message: "La sala ya no existe. Por favor, vuelve a crear o unirte a una sala desde el inicio." });
       return;
     }
 
     // SIEMPRE asegurarse de que el socket esté unido a la sala y tenga roomCode establecido
     if (!socket.data.roomCode || socket.data.roomCode !== code) {
-      console.log(`   🔧 Estableciendo socket.data.roomCode a ${code} y uniendo a la sala`);
       socket.data.roomCode = code;
       socket.join(code);
     }
@@ -918,7 +787,6 @@ io.on("connection", (socket) => {
       // Esto puede pasar si se desconectó y se reconectó
       // En ese caso, intentar usar el nombre del socket.data o buscar en la lista de jugadores
       const playerName = socket.data.playerName || 'Jugador';
-      console.log(`   🔧 Agregando jugador ${socket.id} a la sala (puede haber sido desconectado) con nombre: ${playerName}`);
       room.players.push({
         id: socket.id,
         name: playerName
@@ -928,15 +796,10 @@ io.on("connection", (socket) => {
       // Si el jugador ya existe, asegurarse de que socket.data.playerName esté actualizado
       if (existingPlayer.name && existingPlayer.name !== 'Jugador') {
         socket.data.playerName = existingPlayer.name;
-        console.log(`   🔧 Actualizando socket.data.playerName a: ${existingPlayer.name}`);
       }
     }
-
-    console.log(`   ✅ Sala encontrada: ${code}, hostId: ${room.hostId}, originalHostId: ${room.originalHostId}, solicitante: ${socket.id}`);
-
     // Solo el creador original de la sala puede iniciar una nueva partida
     if (room.originalHostId !== socket.id) {
-      console.log(`   ❌ El solicitante ${socket.id} no es el creador original ${room.originalHostId}`);
       callback?.({ ok: false, error: "NOT_ORIGINAL_HOST" });
       return;
     }
@@ -984,15 +847,9 @@ io.on("connection", (socket) => {
       const impostorHint = room.settings?.hintForImpostors !== false ? (pack.name || 'Categoría secreta') : null;
 
       // Verificar que los jugadores tengan nombres correctos antes de inicializar
-      console.log(`📋 Jugadores en sala antes de nueva partida:`, room.players.map(p => ({ id: p.id, name: p.name })));
-
       // Reiniciar el juego con nueva palabra
       const gameState = initializeGame(room, secretWord, impostorHint);
       games.set(code, gameState);
-
-      console.log(`✅ Nueva partida iniciada en sala ${code}, palabra: ${secretWord}, jugadores: ${gameState.players.length}, impostores: ${gameState.impostorCount}`);
-      console.log(`📋 Jugadores en nueva partida:`, gameState.players.map(p => ({ id: p.id, name: p.name, role: p.role })));
-
       // Notificar a todos que el juego comenzó
       io.to(code).emit("game:started", {
         playerCount: gameState.players.length,
@@ -1011,7 +868,6 @@ io.on("connection", (socket) => {
       setTimeout(() => {
         // Enviar a cada jugador su rol individual
         gameState.players.forEach((player) => {
-          console.log(`🎭 Enviando rol a ${player.id}: ${player.role}`);
           io.to(player.id).emit("game:role", {
             role: player.role,
             word: player.word,
@@ -1034,5 +890,4 @@ app.get("/health", (req, res) => {
 
 server.listen(PORT, () => {
   // eslint-disable-next-line no-console
-  console.log(`Server listening on port ${PORT}`);
 });

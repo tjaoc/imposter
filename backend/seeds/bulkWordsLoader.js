@@ -9,7 +9,7 @@ const CATEGORIES_WITH_BULK = 18; // Todas excepto "personalizado"
 const MIN_LENGTH = 4;
 const MAX_LENGTH = 16;
 
-function shuffle(array) {
+function shuffle (array) {
   const a = [...array];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -18,7 +18,7 @@ function shuffle(array) {
   return a;
 }
 
-function capitalizeSpanish(word) {
+function capitalizeSpanish (word) {
   if (!word || typeof word !== 'string') return word;
   const trimmed = word.trim();
   if (!trimmed) return trimmed;
@@ -30,7 +30,7 @@ function capitalizeSpanish(word) {
  * mezcla y reparte en CATEGORIES_WITH_BULK arrays.
  * @returns {string[][]} Array de 18 arrays de palabras (capitalizadas)
  */
-function getBulkWordsDistributed() {
+function getBulkWordsDistributed () {
   let allWords;
   try {
     allWords = require('an-array-of-spanish-words');

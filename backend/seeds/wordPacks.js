@@ -10,7 +10,7 @@ const TARGET_TOTAL_WORDS = 50000;
 const MIN_WORD_LENGTH = 4;
 const MAX_WORD_LENGTH = 22;
 
-function loadBulkSpanishWords() {
+function loadBulkSpanishWords () {
   try {
     return require('an-array-of-spanish-words');
   } catch (e) {
@@ -19,7 +19,7 @@ function loadBulkSpanishWords() {
   }
 }
 
-function buildWordPacksWithBulk(curatedPacks) {
+function buildWordPacksWithBulk (curatedPacks) {
   const bulk = loadBulkSpanishWords();
   const packsWithWords = curatedPacks.filter((p) => p.words && p.words.length >= 0 && p.slug !== 'personalizado');
   const numPacks = packsWithWords.length;
@@ -548,7 +548,7 @@ const curatedWordPacks = [
 
 const wordPacks = buildWordPacksWithBulk(curatedWordPacks);
 
-function loadUpdatesByLocale() {
+function loadUpdatesByLocale () {
   const fs = require('fs');
   const path = require('path');
   const dataDir = path.join(__dirname, 'data');
@@ -572,7 +572,7 @@ function loadUpdatesByLocale() {
   return out;
 }
 
-function mergeUpdatesIntoPacks(packs, updatesByLocale) {
+function mergeUpdatesIntoPacks (packs, updatesByLocale) {
   return packs.map((pack) => {
     const updates = updatesByLocale[pack.locale] && updatesByLocale[pack.locale][pack.slug];
     if (!updates || !Array.isArray(updates) || updates.length === 0) return pack;
@@ -586,40 +586,22 @@ function mergeUpdatesIntoPacks(packs, updatesByLocale) {
   });
 }
 
-async function seedWordPacks() {
+async function seedWordPacks () {
   try {
-    console.log('🌱 Iniciando seed de packs de palabras...');
-
-    // Limpiar toda la base de datos de palabras (todos los WordPacks)
     const deleted = await WordPack.deleteMany({});
-    if (deleted.deletedCount > 0) {
-      console.log(`🗑️  Eliminados ${deleted.deletedCount} packs de palabras`);
-    }
-
     const updatesByLocale = loadUpdatesByLocale();
     const wordPacksWithUpdates = mergeUpdatesIntoPacks(wordPacks, updatesByLocale);
     const ptWithUpdates = mergeUpdatesIntoPacks(curatedWordPacksPtPT, updatesByLocale);
 
     const allPacks = [...wordPacksWithUpdates, ...ptWithUpdates];
-    const totalWords = allPacks.reduce((acc, p) => acc + (p.words ? p.words.length : 0), 0);
-    console.log(`📚 Packs a cargar: ${wordPacks.length} (es-ES) + ${curatedWordPacksPtPT.length} (pt-PT) | ~${totalWords.toLocaleString()} palabras`);
     for (const packData of allPacks) {
       const exists = await WordPack.findOne({ slug: packData.slug, locale: packData.locale });
-
       if (exists) {
-        console.log(`⏭️  Pack "${packData.name}" (${packData.locale}) ya existe, actualizando...`);
         await WordPack.updateOne({ slug: packData.slug, locale: packData.locale }, packData);
       } else {
-        console.log(`➕ Creando pack "${packData.name}" (${packData.locale})...`);
         await WordPack.create(packData);
       }
     }
-
-    console.log(`✅ Seed completado! ${allPacks.length} packs creados/actualizados`);
-    const total = await WordPack.countDocuments();
-    const agg = await WordPack.aggregate([{ $project: { n: { $size: '$words' } } }, { $group: { _id: null, total: { $sum: '$n' } } }]);
-    const totalWordsInDb = agg[0]?.total ?? 0;
-    console.log(`📊 Total de packs en DB: ${total}, palabras: ${totalWordsInDb.toLocaleString()}`);
   } catch (error) {
     console.error('❌ Error en seed:', error);
     throw error;

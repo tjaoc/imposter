@@ -7,7 +7,7 @@ const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:4000';
 let globalSocket = null;
 let listeners = new Set();
 
-function getGlobalSocket() {
+function getGlobalSocket () {
   if (!globalSocket) {
     globalSocket = io(SOCKET_URL, {
       // Importante: empezar en polling y luego hacer upgrade a websocket.
@@ -34,11 +34,11 @@ function getGlobalSocket() {
   return globalSocket;
 }
 
-function notifyListeners(isConnected) {
+function notifyListeners (isConnected) {
   listeners.forEach(listener => listener(isConnected));
 }
 
-export function useSocket() {
+export function useSocket () {
   const [socket, setSocket] = useState(() => getGlobalSocket());
   const [isConnected, setIsConnected] = useState(() => globalSocket?.connected || false);
 

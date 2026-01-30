@@ -23,11 +23,10 @@ function CustomWords({ onClose }) {
       });
 
       const data = await response.json();
-      
+
       if (data.ok) {
         setCustomWords([...customWords, word.trim()]);
         setWord('');
-        console.log('✅ Palabra añadida:', word.trim());
       } else {
         alert(`${t('common.error')}: ${data.error}`);
       }

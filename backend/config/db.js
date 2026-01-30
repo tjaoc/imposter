@@ -8,8 +8,6 @@ const connectDb = async () => {
     await mongoose.connect(uri, {
       autoIndex: true,
     });
-    // eslint-disable-next-line no-console
-    console.log("✅ MongoDB conectado correctamente:", uri.replace(/\/\/.*@/, "//***@"));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("❌ MongoDB connection error:", error);

@@ -39,24 +39,31 @@ function Room() {
     socket.on('room:updated', handleRoomUpdate);
 
     // Unirse a la sala
-    socket.emit('room:join', { code, name: localStorage.getItem('playerName') || t('common.playerDefault') }, (response) => {
-      if (response && response.ok) {
-        setRoom(response.room);
-        setIsHost(socket.id === response.room.hostId);
-        setError(null);
-      } else {
-        const errorMsg = response?.error || 'ERROR_UNKNOWN';
-        console.error('Error joining room:', errorMsg);
-        setError(errorMsg);
-        
-        // Redirigir al home después de 3 segundos si la sala no existe
-        if (errorMsg === 'ROOM_NOT_FOUND') {
-          setTimeout(() => {
-            navigate('/');
-          }, 3000);
+    socket.emit(
+      'room:join',
+      {
+        code,
+        name: localStorage.getItem('playerName') || t('common.playerDefault'),
+      },
+      (response) => {
+        if (response && response.ok) {
+          setRoom(response.room);
+          setIsHost(socket.id === response.room.hostId);
+          setError(null);
+        } else {
+          const errorMsg = response?.error || 'ERROR_UNKNOWN';
+          console.error('Error joining room:', errorMsg);
+          setError(errorMsg);
+
+          // Redirigir al home después de 3 segundos si la sala no existe
+          if (errorMsg === 'ROOM_NOT_FOUND') {
+            setTimeout(() => {
+              navigate('/');
+            }, 3000);
+          }
         }
       }
-    });
+    );
 
     // Cleanup
     return () => {
@@ -66,30 +73,42 @@ function Room() {
   }, [code, socket, isConnected]);
 
   const handleStartGame = () => {
-    if (!isHost || !room || room.players.length < 3 || selectedPacks.length === 0) {
+    if (
+      !isHost ||
+      !room ||
+      room.players.length < 3 ||
+      selectedPacks.length === 0
+    ) {
       return;
     }
 
     setIsStarting(true);
-    
+
     // Si hay múltiples packs, seleccionar uno aleatorio
-    const randomPackId = selectedPacks[Math.floor(Math.random() * selectedPacks.length)];
-    
-    socket.emit('game:start', { 
-      packId: randomPackId,
-      selectedPacks: selectedPacks, // Enviar todos los packs seleccionados para guardarlos
-      hintForImpostors: settings.hintForImpostors,
-      discussionSeconds: settings.discussionSeconds,
-      impostorCount: settings.impostorCount,
-      locale, // idioma seleccionado para que las palabras/categoría sean en ese idioma
-    }, (response) => {
-      setIsStarting(false);
-      if (response && response.ok) {
-        // La navegación se hará cuando recibamos el evento game:started
-      } else {
-        alert(`${t('common.error')}: ${response?.error || t('errors.startGame')}`);
+    const randomPackId =
+      selectedPacks[Math.floor(Math.random() * selectedPacks.length)];
+
+    socket.emit(
+      'game:start',
+      {
+        packId: randomPackId,
+        selectedPacks: selectedPacks, // Enviar todos los packs seleccionados para guardarlos
+        hintForImpostors: settings.hintForImpostors,
+        discussionSeconds: settings.discussionSeconds,
+        impostorCount: settings.impostorCount,
+        locale, // idioma seleccionado para que las palabras/categoría sean en ese idioma
+      },
+      (response) => {
+        setIsStarting(false);
+        if (response && response.ok) {
+          // La navegación se hará cuando recibamos el evento game:started
+        } else {
+          alert(
+            `${t('common.error')}: ${response?.error || t('errors.startGame')}`
+          );
+        }
       }
-    });
+    );
   };
 
   // Escuchar cuando el juego inicia
@@ -118,10 +137,13 @@ function Room() {
         >
           <div className="text-5xl sm:text-6xl mb-4">❌</div>
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">
-            {error === 'ROOM_NOT_FOUND' ? t('room.roomNotFound') :
-             error === 'ROOM_FULL' ? t('room.roomFull') :
-             error === 'NAME_REQUIRED' ? t('room.nameRequired') :
-             t('common.error')}
+            {error === 'ROOM_NOT_FOUND'
+              ? t('room.roomNotFound')
+              : error === 'ROOM_FULL'
+              ? t('room.roomFull')
+              : error === 'NAME_REQUIRED'
+              ? t('room.nameRequired')
+              : t('common.error')}
           </h2>
           <p className="text-gray-400 mb-6">
             {error === 'ROOM_NOT_FOUND'
@@ -170,8 +192,12 @@ function Room() {
         className="max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-3xl mx-auto"
       >
         <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-glow mb-2">{t('room.title')} {room.code}</h1>
-          <p className="text-space-cyan text-sm sm:text-base">{t('room.waitingPlayers')}</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-glow mb-2">
+            {t('room.title')} {room.code}
+          </h1>
+          <p className="text-space-cyan text-sm sm:text-base">
+            {t('room.waitingPlayers')}
+          </p>
         </div>
 
         <motion.div
@@ -180,9 +206,14 @@ function Room() {
           className="glass-effect rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6"
         >
           <div className="flex justify-between items-center mb-4">
-            <span className="text-gray-400">{t('room.players')} ({room.players.length}/{room.settings.maxPlayers})</span>
+            <span className="text-gray-400">
+              {t('room.players')} ({room.players.length}/
+              {room.settings.maxPlayers})
+            </span>
             {isHost && (
-              <span className="text-xs bg-space-purple px-3 py-1 rounded-full">{t('room.host')}</span>
+              <span className="text-xs bg-space-purple px-3 py-1 rounded-full">
+                {t('room.host')}
+              </span>
             )}
           </div>
 
@@ -238,17 +269,23 @@ function Room() {
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">🕵️</div>
                     <div>
-                      <div className="text-white font-semibold">{t('room.impostors')}</div>
-                      <div className="text-xs text-gray-400">{t('room.impostorsDesc')}</div>
+                      <div className="text-white font-semibold">
+                        {t('room.impostors')}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {t('room.impostorsDesc')}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
-                      onClick={() => setSettings(prev => ({
-                        ...prev,
-                        impostorCount: Math.max(1, prev.impostorCount - 1)
-                      }))}
+                      onClick={() =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          impostorCount: Math.max(1, prev.impostorCount - 1),
+                        }))
+                      }
                       disabled={settings.impostorCount <= 1}
                       className="min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xl flex items-center justify-center active:scale-95"
                     >
@@ -259,11 +296,18 @@ function Room() {
                     </span>
                     <button
                       type="button"
-                      onClick={() => setSettings(prev => ({
-                        ...prev,
-                        impostorCount: Math.min(room.players.length - 1, prev.impostorCount + 1)
-                      }))}
-                      disabled={settings.impostorCount >= room.players.length - 1}
+                      onClick={() =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          impostorCount: Math.min(
+                            room.players.length - 1,
+                            prev.impostorCount + 1
+                          ),
+                        }))
+                      }
+                      disabled={
+                        settings.impostorCount >= room.players.length - 1
+                      }
                       className="min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xl flex items-center justify-center active:scale-95"
                     >
                       +
@@ -283,18 +327,26 @@ function Room() {
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">🔍</div>
                     <div>
-                      <div className="text-white font-semibold">{t('room.hintForImpostors')}</div>
-                      <div className="text-xs text-gray-400">{t('room.hintForImpostorsDesc')}</div>
+                      <div className="text-white font-semibold">
+                        {t('room.hintForImpostors')}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {t('room.hintForImpostorsDesc')}
+                      </div>
                     </div>
                   </div>
                   <button
                     type="button"
-                    onClick={() => setSettings(prev => ({
-                      ...prev,
-                      hintForImpostors: !prev.hintForImpostors
-                    }))}
+                    onClick={() =>
+                      setSettings((prev) => ({
+                        ...prev,
+                        hintForImpostors: !prev.hintForImpostors,
+                      }))
+                    }
                     className={`relative w-14 h-9 min-h-[44px] rounded-full transition-colors flex-shrink-0 ${
-                      settings.hintForImpostors ? 'bg-emerald-500' : 'bg-gray-600'
+                      settings.hintForImpostors
+                        ? 'bg-emerald-500'
+                        : 'bg-gray-600'
                     }`}
                   >
                     <motion.div
@@ -316,8 +368,12 @@ function Room() {
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">⏱️</div>
                     <div>
-                      <div className="text-white font-semibold">{t('room.duration')}</div>
-                      <div className="text-xs text-gray-400">{t('room.durationDesc')}</div>
+                      <div className="text-white font-semibold">
+                        {t('room.duration')}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {t('room.durationDesc')}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
@@ -325,10 +381,12 @@ function Room() {
                       <button
                         type="button"
                         key={seconds}
-                        onClick={() => setSettings(prev => ({
-                          ...prev,
-                          discussionSeconds: seconds
-                        }))}
+                        onClick={() =>
+                          setSettings((prev) => ({
+                            ...prev,
+                            discussionSeconds: seconds,
+                          }))
+                        }
                         className={`min-h-[44px] px-4 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
                           settings.discussionSeconds === seconds
                             ? 'bg-space-cyan text-black'
@@ -351,13 +409,20 @@ function Room() {
               transition={{ delay: 0.4 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleStartGame}
-              disabled={room.players.length < 3 || selectedPacks.length === 0 || isStarting}
+              disabled={
+                room.players.length < 3 ||
+                selectedPacks.length === 0 ||
+                isStarting
+              }
               className="w-full min-h-[52px] py-4 sm:py-5 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-2xl font-bold text-white text-base sm:text-lg shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
             >
-              {isStarting ? `⏳ ${t('room.starting')}` :
-               room.players.length < 3 ? `⏸️ ${t('room.waitingMore')} (${room.players.length}/3)` :
-               selectedPacks.length === 0 ? `📦 ${t('room.selectPacks')}` :
-               `🚀 ${t('room.startGame')}`}
+              {isStarting
+                ? `⏳ ${t('room.starting')}`
+                : room.players.length < 3
+                ? `⏸️ ${t('room.waitingMore')} (${room.players.length}/3)`
+                : selectedPacks.length === 0
+                ? `📦 ${t('room.selectPacks')}`
+                : `🚀 ${t('room.startGame')}`}
             </motion.button>
           </>
         )}

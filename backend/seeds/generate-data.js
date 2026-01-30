@@ -11,13 +11,13 @@ const { getBulkWordsDistributed } = require('./bulkWordsLoader');
 const SEEDS_DIR = path.join(__dirname);
 const DATA_DIR = path.join(SEEDS_DIR, 'data');
 
-function ensureDir(dir) {
+function ensureDir (dir) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
 }
 
-function run() {
+function run () {
   ensureDir(DATA_DIR);
   const packsWithWords = wordPacks.filter((p) => p.slug !== 'personalizado');
   const bulk = getBulkWordsDistributed();

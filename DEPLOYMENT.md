@@ -2,7 +2,7 @@
 
 Guía para desplegar Imposter. **Recomendado:** usar **Render** para frontend y backend (todo en un solo sitio, plan gratuito). Base de datos en **MongoDB Atlas** (también gratis).
 
-**El proyecto ya está preparado para los 2 entornos de Render (producción + desarrollo):** hay un `render.yaml` (Blueprint) en la raíz que define un proyecto con dos entornos, cada uno con API + App. Ver **RENDER_ENVS.md** para URLs (impostor.netic.app, apiimp.netic.app, dev.*), bases de datos (production / develop) y variables a configurar en el Dashboard.
+**El proyecto ya está preparado para los 2 entornos de Render (producción + desarrollo):** hay un `render.yaml` (Blueprint) en la raíz que define un proyecto con dos entornos, cada uno con API + App. Ver **RENDER_ENVS.md** para URLs (impostor.netic.app, apiimp.netic.app, dev.\*), bases de datos (production / develop) y variables a configurar en el Dashboard.
 
 ---
 
@@ -61,13 +61,13 @@ Si no las rellenaste en ese momento, puedes hacerlo después:
 
 ### Resumen rápido
 
-| Paso | Dónde | Acción |
-|------|--------|--------|
-| 1 | Render → Connect account | Conectar GitHub |
-| 2 | New + → Blueprint | Elegir repo imposter |
-| 3 | Aplicar Blueprint | Rellenar MONGODB_URI (prod y dev) si lo pide |
-| 4 | Dashboard | Esperar a que terminen los 4 deploys |
-| 5 | Settings → Custom Domains (cada servicio) | Añadir impostor.netic.app, apiimp.netic.app, dev.* |
+| Paso | Dónde                                     | Acción                                              |
+| ---- | ----------------------------------------- | --------------------------------------------------- |
+| 1    | Render → Connect account                  | Conectar GitHub                                     |
+| 2    | New + → Blueprint                         | Elegir repo imposter                                |
+| 3    | Aplicar Blueprint                         | Rellenar MONGODB_URI (prod y dev) si lo pide        |
+| 4    | Dashboard                                 | Esperar a que terminen los 4 deploys                |
+| 5    | Settings → Custom Domains (cada servicio) | Añadir impostor.netic.app, apiimp.netic.app, dev.\* |
 
 Si algo falla, revisa **Logs** del servicio que falle (build o runtime) y **RENDER_ENVS.md** para comprobar que las variables y dominios son los correctos.
 
@@ -102,9 +102,11 @@ Si Render te pide **método de pago** al usar el Blueprint:
 3. **Network Access** → Add IP Address → "Allow Access from Anywhere" (`0.0.0.0/0`) para que Render pueda conectar.
 4. **Database Access** → Create Database User (usuario y contraseña).
 5. **Connect** → Drivers → copia la **connection string**. Ejemplo:
+
    ```txt
    mongodb+srv://usuario:password@cluster0.xxxxx.mongodb.net/imposter?retryWrites=true&w=majority
    ```
+
 6. Sustituye `<password>` por la contraseña real. Esta URL será tu `MONGODB_URI` en el backend.
 
 ---
@@ -140,7 +142,7 @@ Si Render te pide **método de pago** al usar el Blueprint:
 3. **Environment** (Environment Variables):
    - `VITE_API_URL` = URL del backend en Render (ej. `https://imposter-api.onrender.com`)
    - `VITE_SOCKET_URL` = la misma URL (ej. `https://imposter-api.onrender.com`)
-   (Sustituye por la URL real que te dio Render en el paso 2.)
+     (Sustituye por la URL real que te dio Render en el paso 2.)
 4. **Create Static Site**. Te darán una URL tipo `https://imposter-app.onrender.com`.
 5. Vuelve al **backend** (paso 2) y en **Environment** pon `CORS_ORIGIN` = esta URL del frontend (ej. `https://imposter-app.onrender.com`).
 6. (Opcional) **Settings** → **Custom Domain** → añade `app.tudominio.com` y en tu DNS crea **CNAME** `app` → la URL que indique Render para el static site.
@@ -151,10 +153,10 @@ Si Render te pide **método de pago** al usar el Blueprint:
 
 Si usas tu propio dominio:
 
-| Tipo  | Nombre | Apuntar a                          |
-|-------|--------|-------------------------------------|
-| CNAME | `app`  | URL que Render da al Static Site    |
-| CNAME | `api`  | URL que Render da al Web Service    |
+| Tipo  | Nombre | Apuntar a                        |
+| ----- | ------ | -------------------------------- |
+| CNAME | `app`  | URL que Render da al Static Site |
+| CNAME | `api`  | URL que Render da al Web Service |
 
 - **app.tudominio.com** → Frontend (Static Site en Render)
 - **api.tudominio.com** → Backend (Web Service en Render)
@@ -167,18 +169,18 @@ Después de añadir el dominio en Render, te dirá exactamente a qué CNAME apun
 
 ### Backend (Web Service en Render)
 
-| Variable      | Ejemplo / Descripción                          |
-|---------------|-------------------------------------------------|
-| `MONGODB_URI` | `mongodb+srv://user:pass@cluster.../imposter`  |
-| `NODE_ENV`    | `production`                                   |
+| Variable      | Ejemplo / Descripción                                  |
+| ------------- | ------------------------------------------------------ |
+| `MONGODB_URI` | `mongodb+srv://user:pass@cluster.../imposter`          |
+| `NODE_ENV`    | `production`                                           |
 | `CORS_ORIGIN` | `https://imposter-app.onrender.com` (URL del frontend) |
 
 ### Frontend (Static Site en Render)
 
-| Variable          | Ejemplo / Descripción                    |
-|-------------------|------------------------------------------|
-| `VITE_API_URL`    | `https://imposter-api.onrender.com`      |
-| `VITE_SOCKET_URL` | `https://imposter-api.onrender.com`      |
+| Variable          | Ejemplo / Descripción               |
+| ----------------- | ----------------------------------- |
+| `VITE_API_URL`    | `https://imposter-api.onrender.com` |
+| `VITE_SOCKET_URL` | `https://imposter-api.onrender.com` |
 
 ---
 
@@ -203,9 +205,11 @@ Después de añadir el dominio en Render, te dirá exactamente a qué CNAME apun
 
 - Al arrancar, el backend **borra todos los WordPacks** y vuelve a ejecutar el seed (es-ES + pt-PT).
 - Para ejecutar solo el seed sin levantar el servidor (por ejemplo desde un cron o tras cambiar datos):
+
   ```bash
   cd backend && npm run seed
   ```
+
   Requiere `MONGODB_URI` en `backend/.env`.
 
 ---
