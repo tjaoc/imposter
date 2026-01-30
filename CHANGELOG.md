@@ -1,5 +1,14 @@
 # 📝 Changelog - Imposter
 
+## [1.1.19] - 2026-01-30
+
+### 🐛 UI: Duración (Room y Local)
+
+- ✅ **Descripción eliminada**: ya no se muestra "Tiempo de discusión" / "Tempo de discussão" (durationDesc).
+- ✅ **Misma línea**: etiqueta "Duración" y el select de minutos en una sola fila (`flex-row items-center justify-between`).
+
+---
+
 ## [1.1.18] - 2026-01-30
 
 ### 🧹 CSS

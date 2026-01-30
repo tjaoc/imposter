@@ -376,17 +376,10 @@ function Room() {
                 transition={{ delay: 0.2 }}
                 className="card"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="text-2xl">⏱️</div>
-                    <div>
-                      <div className="text-white font-semibold">
-                        {t('room.duration')}
-                      </div>
-                      <div className="text-sm text-gray-400">
-                        {t('room.durationDesc')}
-                      </div>
-                    </div>
+                <div className="flex flex-row items-center justify-between gap-3 flex-wrap">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-2xl flex-shrink-0">⏱️</span>
+                    <span className="text-white font-semibold whitespace-nowrap">{t('room.duration')}</span>
                   </div>
                   <select
                     value={settings.discussionSeconds}
