@@ -42,15 +42,6 @@
     flex-direction: column;
   }
 
-  /* Touch targets mínimos: iOS 44px, Android 48dp (solo altura para no romper layouts) */
-  @media (pointer: coarse) {
-    button:not(.touch-ignore),
-    a:not(.touch-ignore),
-    [role='button']:not(.touch-ignore) {
-      min-height: 48px;
-    }
-  }
-
   /* Inputs 16px+ en móvil para evitar zoom automático en iOS */
   input,
   select,

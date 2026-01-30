@@ -1,5 +1,13 @@
 # 📝 Changelog - Imposter
 
+## [1.1.18] - 2026-01-30
+
+### 🧹 CSS
+
+- ✅ **Touch targets**: eliminada regla `min-height: 48px` para `button`, `a` y `[role='button']` en `@media (pointer: coarse)` (index.css).
+
+---
+
 ## [1.1.17] - 2026-01-30
 
 ### 🐛 UI: switch Pista y selector de idioma

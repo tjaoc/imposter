@@ -1,4 +1,4 @@
-# 🎮 Imposter - Version 1.1.17
+# 🎮 Imposter - Version 1.1.18
 
 **Fecha de lanzamiento:** 30 de Enero, 2026  
 **Estado:** ✅ Estable
@@ -7,6 +7,7 @@
 
 ## 🎯 Resumen de la Versión
 
+**v1.1.18** – CSS: eliminada regla de touch targets (min-height: 48px en botones/enlaces en pointer: coarse).  
 **v1.1.17** – Switch Pista como ref.: track en cápsula (rounded-full), card-tight; selector de idioma: un contenedor, opción seleccionada con fondo cyan redondeado.  
 **v1.1.16** – Switch "Pista para Impostores" (Room y Local): track con forma rectangular y curvas en los 4 lados (rounded-2xl).  
 **v1.1.15** – Switch "Pista para Impostores" (Room y Local): tamaño reducido (track h-7 w-12, thumb h-5 w-5) para que no domine la fila.  
@@ -213,6 +214,6 @@ ISC - Proyecto personal y educativo
 
 ---
 
-**¡Gracias por probar Imposter v1.1.17!** 🎉
+**¡Gracias por probar Imposter v1.1.18!** 🎉
 
 Desarrollado con ❤️ por Tiago Cruz
