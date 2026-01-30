@@ -1,5 +1,14 @@
 # 📝 Changelog - Imposter
 
+## [1.1.6] - 2026-01-30
+
+### 📌 Versión automática en commit/push
+
+- ✅ Regla Cursor: al pedir "commit y push" **sin indicar versión**, subir patch automáticamente (ej. 1.1.5 → 1.1.6) y actualizar VERSION.md, package.json (front/back), CHANGELOG.md antes del commit.
+- ✅ Si el usuario indica versión (ej. "commit push v1.1.7"), usar esa versión en todos los archivos.
+
+---
+
 ## [1.1.5] - 2026-01-30
 
 ### 📌 Sincronización de versión

@@ -1,30 +1,31 @@
 ---
-description: Al pedir commit/push con versión, actualizar la versión en todo el proyecto antes de hacer commit
+description: Al pedir commit/push, actualizar versión en todo el proyecto (auto-bump si no indica versión) y luego commit y push
 alwaysApply: true
 ---
 
 # Commit y push con versión
 
-Cuando el usuario pida hacer **commit** y **push** e indique una **versión** (ej. "commit push v1.1.5", "haz commit v1.1.6 y push"), **primero** actualiza el número de versión en **todos** estos archivos al valor que diga el usuario (ej. 1.1.5, 1.1.6), y **después** haz commit y push.
+Cuando el usuario pida hacer **commit** y **push**:
 
-## Archivos a actualizar
+1. **Si indica una versión** (ej. "commit push v1.1.7", "haz commit v1.2.0 y push"): usar esa versión (X.Y.Z) en todos los archivos listados abajo.
+2. **Si NO indica versión** (ej. "commit y push", "haz commit y push"): leer la versión actual de `frontend/package.json` (ej. 1.1.6) y **subir el patch en 1** (1.1.6 → 1.1.7). Usar esa nueva versión en todos los archivos.
+
+Después de actualizar la versión, hacer `git add` de los archivos de versión y de los demás cambios, `git commit -m "vX.Y.Z - ..."` (incluir resumen de cambios si hay otros), `git push`.
+
+## Archivos a actualizar con la versión (X.Y.Z)
 
 1. **VERSION.md**
-   - Título: `# 🎮 Imposter - Version X.Y.Z` → usar la versión indicada.
-   - En "Resumen de la Versión": la primera línea debe ser `**vX.Y.Z** –` (descripción actual o genérica).
+   - Título: `# 🎮 Imposter - Version X.Y.Z`
+   - En "Resumen de la Versión": primera línea `**vX.Y.Z** –` (descripción breve o genérica).
    - Pie: `**¡Gracias por probar Imposter vX.Y.Z!**`
 
-2. **frontend/package.json**  
-   - `"version": "X.Y.Z"`
+2. **frontend/package.json** → `"version": "X.Y.Z"`
 
-3. **backend/package.json**  
-   - `"version": "X.Y.Z"`
+3. **backend/package.json** → `"version": "X.Y.Z"`
 
-4. **CHANGELOG.md**  
-   - Añadir al inicio (después de `# 📝 Changelog - Imposter`) una nueva sección:
-     - `## [X.Y.Z] - AAAA-MM-DD` (usar fecha de hoy).
-     - Opcional: una o dos líneas de cambios si el usuario no da detalle.
+4. **CHANGELOG.md**
+   - Añadir al inicio (después de `# 📝 Changelog - Imposter`) una sección:
+     - `## [X.Y.Z] - AAAA-MM-DD` (fecha de hoy).
+     - Una o dos líneas de cambios (si el usuario no da detalle, poner algo genérico como "Mejoras y correcciones" o resumir los archivos modificados).
 
-Luego: `git add` de los archivos modificados, `git commit -m "vX.Y.Z - ..."` (o mensaje que indique el usuario), `git push`.
-
-No toques `package-lock.json` ni otras dependencias; solo la versión del **proyecto** en los archivos listados.
+No modificar `package-lock.json` ni versiones de dependencias; solo la versión del **proyecto** en los archivos listados.
