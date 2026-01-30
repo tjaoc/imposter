@@ -967,7 +967,6 @@ function Game() {
             🏠 {t('game.backToHome')}
           </motion.button>
         </div>
-        </div>
       </div>
     );
   }
