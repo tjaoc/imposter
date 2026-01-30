@@ -6,6 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { assignRoles } from '../utils/localGameLogic';
 import LanguageSelector from '../components/LanguageSelector';
 import { API_BASE } from '../config/env';
+import { capitalizeWord } from '../utils/formatWord';
 
 function Local() {
   const { t } = useTranslation();
@@ -118,34 +119,35 @@ function Local() {
 
   if (step === 'players') {
     return (
-      <div className="min-h-screen p-4 bg-gradient-to-b from-black via-slate-950 to-black">
-        <div className="absolute top-4 right-4">
+      <div className="min-h-screen p-4 sm:p-6 md:p-8 pt-14 sm:pt-16 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
+        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 md:top-8 md:right-8 pt-safe-top">
           <LanguageSelector />
         </div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-md mx-auto"
+          className="max-w-md md:max-w-lg lg:max-w-xl mx-auto"
         >
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-glow mb-2">{t('local.addPlayers')}</h1>
-            <p className="text-space-cyan/80">{t('local.addPlayersDesc')}</p>
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-glow mb-2">{t('local.addPlayers')}</h1>
+            <p className="text-space-cyan/80 text-sm sm:text-base">{t('local.addPlayersDesc')}</p>
           </div>
-          <div className="glass-effect rounded-2xl p-6 mb-4">
-            <div className="flex gap-2 mb-4">
+          <div className="glass-effect rounded-2xl p-4 sm:p-6 mb-4">
+            <div className="flex flex-col sm:flex-row gap-2 mb-4">
               <input
                 type="text"
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
                 placeholder={t('local.playerNamePlaceholder')}
-                className="flex-1 px-4 py-3 bg-space-blue border border-space-cyan/30 rounded-lg focus:outline-none focus:border-space-cyan text-white placeholder-gray-400"
+                className="flex-1 px-4 py-3.5 sm:py-3 bg-space-blue border border-space-cyan/30 rounded-xl focus:outline-none focus:border-space-cyan text-white placeholder-gray-400 text-base min-h-[48px]"
                 maxLength={20}
               />
               <button
+                type="button"
                 onClick={addPlayer}
                 disabled={!playerName.trim()}
-                className="px-5 py-3 bg-gradient-to-r from-space-purple to-space-pink rounded-lg font-semibold text-white disabled:opacity-50"
+                className="min-h-[48px] px-5 py-3.5 bg-gradient-to-r from-space-purple to-space-pink rounded-xl font-semibold text-white disabled:opacity-50 active:scale-[0.98]"
               >
                 {t('local.addPlayer')}
               </button>
@@ -158,13 +160,13 @@ function Local() {
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     exit={{ x: 20, opacity: 0 }}
-                    className="flex items-center justify-between p-3 bg-space-blue rounded-lg"
+                    className="flex items-center justify-between p-3 sm:p-4 min-h-[48px] bg-space-blue rounded-xl"
                   >
-                    <span className="text-white">{p.name}</span>
+                    <span className="text-white truncate pr-2">{p.name}</span>
                     <button
                       type="button"
                       onClick={() => removePlayer(p.id)}
-                      className="text-red-400 hover:text-red-300 text-sm"
+                      className="min-h-[44px] min-w-[44px] flex items-center justify-center text-red-400 hover:text-red-300 text-sm flex-shrink-0"
                     >
                       {t('common.close')}
                     </button>
@@ -174,15 +176,17 @@ function Local() {
             </ul>
           </div>
           <button
+            type="button"
             onClick={() => setStep('pack')}
             disabled={players.length < 3}
-            className="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl font-bold text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full min-h-[52px] py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl font-bold text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
           >
             {players.length < 3 ? t('local.minPlayers') : t('local.selectPack')}
           </button>
           <button
+            type="button"
             onClick={() => navigate('/')}
-            className="w-full mt-4 py-3 text-gray-400 hover:text-white"
+            className="w-full mt-4 min-h-[48px] py-3.5 text-gray-400 hover:text-white active:scale-[0.98]"
           >
             {t('common.back')}
           </button>
@@ -239,7 +243,7 @@ function Local() {
                     : t('room.selectAll')}
                 </button>
               </div>
-              <div className="grid grid-cols-2 gap-3 mb-2">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-2">
                 {packs.map((pack) => {
                   const isSelected = selectedPackIds.includes(pack._id);
                   return (
@@ -255,7 +259,7 @@ function Local() {
                       }
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`p-4 rounded-xl border-2 text-left transition-all relative ${
+                      className={`min-h-[52px] p-4 rounded-xl border-2 text-left transition-all relative active:scale-[0.98] ${
                         isSelected
                           ? 'border-space-cyan bg-space-cyan/20'
                           : 'border-space-blue bg-space-blue/50 hover:border-space-cyan/50'
@@ -280,15 +284,17 @@ function Local() {
             </>
           )}
           <button
+            type="button"
             onClick={startGameWithPack}
             disabled={selectedPackIds.length === 0 || loadingPacks}
-            className="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl font-bold text-white disabled:opacity-50"
+            className="w-full min-h-[52px] py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl font-bold text-white disabled:opacity-50 active:scale-[0.98]"
           >
             {t('local.startGame')}
           </button>
           <button
+            type="button"
             onClick={() => setStep('players')}
-            className="w-full mt-4 py-3 text-gray-400 hover:text-white"
+            className="w-full mt-4 min-h-[48px] py-3.5 text-gray-400 hover:text-white active:scale-[0.98]"
           >
             {t('common.back')}
           </button>
@@ -345,7 +351,7 @@ function Local() {
                     <p className="text-red-400 font-bold text-xl mb-2">{t('game.youAreImpostor')}</p>
                     {displayWord && (
                       <p className="text-sm text-emerald-300">
-                        {t('game.hintCategory')}: {displayWord}
+                        {t('game.hintCategory')}: {capitalizeWord(displayWord)}
                       </p>
                     )}
                     <p className="text-gray-400 text-sm mt-4">{t('game.impostorHint')}</p>
@@ -353,7 +359,7 @@ function Local() {
                 ) : (
                   <>
                     <p className="text-gray-400 text-sm mb-2">{t('game.yourSecretWord')}</p>
-                    <p className="text-3xl font-bold text-emerald-400">{displayWord}</p>
+                    <p className="text-3xl font-bold text-emerald-400">{capitalizeWord(displayWord)}</p>
                     <p className="text-gray-400 text-sm mt-4">
                       {t('game.describeWithoutSaying', { count: 1 })}
                     </p>
@@ -363,9 +369,8 @@ function Local() {
               <motion.button
                 type="button"
                 onClick={handleCloseRole}
-                whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full py-4 rounded-full bg-space-blue border-2 border-space-cyan font-semibold text-space-cyan hover:bg-space-cyan hover:text-space-dark transition-colors"
+                className="w-full min-h-[52px] py-4 rounded-full bg-space-blue border-2 border-space-cyan font-semibold text-space-cyan hover:bg-space-cyan hover:text-space-dark transition-colors active:scale-[0.98]"
               >
                 {t('local.hideRole')}
               </motion.button>

@@ -110,14 +110,14 @@ function Room() {
   // Mostrar error si la sala no existe
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 pt-14 md:pt-20">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="glass-effect rounded-2xl p-8 max-w-md w-full text-center"
+          className="glass-effect rounded-2xl p-6 sm:p-8 max-w-md w-full text-center"
         >
-          <div className="text-6xl mb-4">❌</div>
-          <h2 className="text-2xl font-bold text-white mb-4">
+          <div className="text-5xl sm:text-6xl mb-4">❌</div>
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">
             {error === 'ROOM_NOT_FOUND' ? t('room.roomNotFound') :
              error === 'ROOM_FULL' ? t('room.roomFull') :
              error === 'NAME_REQUIRED' ? t('room.nameRequired') :
@@ -130,7 +130,7 @@ function Room() {
           </p>
           <button
             onClick={() => navigate('/')}
-            className="w-full py-3 bg-gradient-to-r from-space-purple to-space-pink rounded-lg font-semibold text-white hover:opacity-90 transition-opacity"
+            className="w-full min-h-[48px] py-3.5 bg-gradient-to-r from-space-purple to-space-pink rounded-xl font-semibold text-white hover:opacity-90 active:scale-[0.98] transition-all"
           >
             {t('room.backToHome')}
           </button>
@@ -163,21 +163,21 @@ function Room() {
   }
 
   return (
-    <div className="min-h-screen p-4">
+    <div className="min-h-screen p-4 sm:p-6 md:p-8 pt-14 sm:pt-16 md:pt-20">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="max-w-2xl mx-auto"
+        className="max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-3xl mx-auto"
       >
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-glow mb-2">{t('room.title')} {room.code}</h1>
-          <p className="text-space-cyan">{t('room.waitingPlayers')}</p>
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-glow mb-2">{t('room.title')} {room.code}</h1>
+          <p className="text-space-cyan text-sm sm:text-base">{t('room.waitingPlayers')}</p>
         </div>
 
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="glass-effect rounded-2xl p-6 mb-6"
+          className="glass-effect rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6"
         >
           <div className="flex justify-between items-center mb-4">
             <span className="text-gray-400">{t('room.players')} ({room.players.length}/{room.settings.maxPlayers})</span>
@@ -195,7 +195,7 @@ function Room() {
                   animate={{ x: 0, opacity: 1 }}
                   exit={{ x: 20, opacity: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-center justify-between p-3 bg-space-blue rounded-lg"
+                  className="flex items-center justify-between p-3 sm:p-4 min-h-[48px] bg-space-blue rounded-xl"
                 >
                   <span className="text-white">{player.name}</span>
                   {player.isHost && (
@@ -219,7 +219,7 @@ function Room() {
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="glass-effect rounded-2xl p-6"
+                className="glass-effect rounded-2xl p-4 sm:p-6"
               >
                 <PackSelector
                   onSelectPacks={setSelectedPacks}
@@ -232,9 +232,9 @@ function Room() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.1 }}
-                className="glass-effect rounded-2xl p-6"
+                className="glass-effect rounded-2xl p-4 sm:p-6"
               >
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">🕵️</div>
                     <div>
@@ -244,25 +244,27 @@ function Room() {
                   </div>
                   <div className="flex items-center gap-3">
                     <button
+                      type="button"
                       onClick={() => setSettings(prev => ({
                         ...prev,
                         impostorCount: Math.max(1, prev.impostorCount - 1)
                       }))}
                       disabled={settings.impostorCount <= 1}
-                      className="w-10 h-10 rounded-lg bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xl flex items-center justify-center"
+                      className="min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xl flex items-center justify-center active:scale-95"
                     >
                       −
                     </button>
-                    <span className="text-2xl font-bold text-white w-12 text-center">
+                    <span className="text-xl sm:text-2xl font-bold text-white w-12 text-center">
                       {settings.impostorCount}
                     </span>
                     <button
+                      type="button"
                       onClick={() => setSettings(prev => ({
                         ...prev,
                         impostorCount: Math.min(room.players.length - 1, prev.impostorCount + 1)
                       }))}
                       disabled={settings.impostorCount >= room.players.length - 1}
-                      className="w-10 h-10 rounded-lg bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xl flex items-center justify-center"
+                      className="min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xl flex items-center justify-center active:scale-95"
                     >
                       +
                     </button>
@@ -275,9 +277,9 @@ function Room() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="glass-effect rounded-2xl p-6"
+                className="glass-effect rounded-2xl p-4 sm:p-6"
               >
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">🔍</div>
                     <div>
@@ -286,11 +288,12 @@ function Room() {
                     </div>
                   </div>
                   <button
+                    type="button"
                     onClick={() => setSettings(prev => ({
                       ...prev,
                       hintForImpostors: !prev.hintForImpostors
                     }))}
-                    className={`relative w-14 h-8 rounded-full transition-colors ${
+                    className={`relative w-14 h-9 min-h-[44px] rounded-full transition-colors flex-shrink-0 ${
                       settings.hintForImpostors ? 'bg-emerald-500' : 'bg-gray-600'
                     }`}
                   >
@@ -307,9 +310,9 @@ function Room() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="glass-effect rounded-2xl p-6"
+                className="glass-effect rounded-2xl p-4 sm:p-6"
               >
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">⏱️</div>
                     <div>
@@ -320,12 +323,13 @@ function Room() {
                   <div className="flex items-center gap-2 flex-wrap">
                     {[60, 120, 180, 240, 300].map((seconds) => (
                       <button
+                        type="button"
                         key={seconds}
                         onClick={() => setSettings(prev => ({
                           ...prev,
                           discussionSeconds: seconds
                         }))}
-                        className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all ${
+                        className={`min-h-[44px] px-4 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
                           settings.discussionSeconds === seconds
                             ? 'bg-space-cyan text-black'
                             : 'bg-gray-700 text-white hover:bg-gray-600'
@@ -341,14 +345,14 @@ function Room() {
 
             {/* Botón Iniciar Juego - Estilo del video */}
             <motion.button
+              type="button"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.4 }}
-              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleStartGame}
               disabled={room.players.length < 3 || selectedPacks.length === 0 || isStarting}
-              className="w-full py-5 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-2xl font-bold text-white text-lg shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="w-full min-h-[52px] py-4 sm:py-5 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-2xl font-bold text-white text-base sm:text-lg shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
             >
               {isStarting ? `⏳ ${t('room.starting')}` :
                room.players.length < 3 ? `⏸️ ${t('room.waitingMore')} (${room.players.length}/3)` :

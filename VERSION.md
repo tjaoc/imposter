@@ -1,4 +1,4 @@
-# 🎮 Imposter - Version 1.0.0
+# 🎮 Imposter - Version 1.0.1
 
 **Fecha de lanzamiento:** 30 de Enero, 2026  
 **Estado:** ✅ Estable

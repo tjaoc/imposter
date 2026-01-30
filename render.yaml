@@ -41,6 +41,20 @@ projects:
               - key: VITE_SOCKET_URL
                 value: https://apiimp.netic.app
 
+          # Actualización mensual de palabras (día 1, 00:00 UTC). Requiere plan de pago (cron no está en free).
+          # En Dashboard: MONGODB_URI (producción) y opcionalmente GITHUB_TOKEN para commit+push.
+          - type: cron
+            name: imposter-words-monthly
+            runtime: node
+            schedule: "0 0 1 * *"
+            buildCommand: cd backend && npm install
+            startCommand: node scripts/update-words-monthly.js
+            envVars:
+              - key: MONGODB_URI
+                sync: false
+              - key: GITHUB_TOKEN
+                sync: false
+
       - name: development
         services:
           - type: web

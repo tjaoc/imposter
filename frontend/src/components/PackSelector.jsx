@@ -64,7 +64,7 @@ function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
         <button
           type="button"
           onClick={() => loadPacks()}
-          className="px-4 py-2 rounded-lg bg-space-cyan text-space-navy font-medium hover:bg-space-cyan/90"
+          className="min-h-[48px] px-4 py-3 rounded-xl bg-space-cyan text-space-navy font-medium hover:bg-space-cyan/90 active:scale-[0.98]"
         >
           {t('common.retry')}
         </button>
@@ -79,22 +79,24 @@ function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
           {t('room.selectPacksLabel')}
         </label>
         <button
+          type="button"
           onClick={handleSelectAll}
-          className="text-xs text-space-cyan hover:text-space-cyan/80 underline"
+          className="min-h-[44px] px-2 text-xs sm:text-sm text-space-cyan hover:text-space-cyan/80 underline touch-ignore"
         >
           {selectedPackIds.length === packs.length ? t('room.deselectAll') : t('room.selectAll')}
         </button>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         {packs.map((pack) => {
           const isSelected = selectedPackIds.includes(pack._id);
           return (
             <motion.button
               key={pack._id}
+              type="button"
               onClick={() => handlePackToggle(pack._id)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`p-4 rounded-lg border-2 transition-all relative ${
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={`min-h-[52px] p-4 rounded-xl border-2 transition-all relative text-left active:scale-[0.98] ${
                 isSelected
                   ? 'border-space-cyan bg-space-cyan/20'
                   : 'border-space-blue bg-space-blue hover:border-space-cyan/50'

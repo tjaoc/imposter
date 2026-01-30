@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '../hooks/useTranslation';
 import { processVotes, checkGameEnd } from '../utils/localGameLogic';
+import { capitalizeWord } from '../utils/formatWord';
 
 const DEFAULT_DISCUSSION_SECONDS = 240;
 
@@ -130,7 +131,7 @@ function LocalGame() {
     const minutes = Math.floor((timeLeft ?? 0) / 60);
     const secs = (timeLeft ?? 0) % 60;
     return (
-      <div className="min-h-screen p-4 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-screen p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-glow mb-4">
@@ -169,7 +170,7 @@ function LocalGame() {
 
   if (phase === 'voting-turn' && currentVoter) {
     return (
-      <div className="min-h-screen p-4 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-screen p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
         <div className="max-w-2xl mx-auto">
           <p className="text-space-cyan/60 text-sm uppercase tracking-widest mb-4 text-center">
             {t('local.securityScreen')}
@@ -203,7 +204,7 @@ function LocalGame() {
           <button
             onClick={handleConfirmVoteAndNext}
             disabled={!selectedVote}
-            className="w-full py-4 rounded-full bg-gradient-to-r from-space-purple to-space-pink font-semibold text-white disabled:opacity-50"
+            className="w-full min-h-[52px] py-4 rounded-full bg-gradient-to-r from-space-purple to-space-pink font-semibold text-white disabled:opacity-50 active:scale-[0.98]"
           >
             {t('common.next')}
           </button>
@@ -214,7 +215,7 @@ function LocalGame() {
 
   if (phase === 'vote-results' && voteResult) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
         <div className="glass-effect rounded-3xl p-8 max-w-2xl w-full text-center">
           <h1 className="text-4xl font-bold text-space-cyan mb-6">
             🗳️ {t('game.voteResults')}
@@ -331,7 +332,7 @@ function LocalGame() {
     const impostorsWon = gameResult.winner === 'impostors';
 
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -352,7 +353,7 @@ function LocalGame() {
           <p className="text-2xl text-space-cyan mb-6">
             {t('game.secretWordWas')}{' '}
             <span className="font-bold text-emerald-400">
-              {gameResult.secretWord}
+              {capitalizeWord(gameResult.secretWord)}
             </span>
           </p>
           {gameResult.eliminated && (
@@ -448,13 +449,13 @@ function LocalGame() {
                 },
               });
             }}
-            className="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl font-bold text-white mb-4"
+            className="w-full min-h-[52px] py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl font-bold text-white mb-4 active:scale-[0.98]"
           >
             🎮 {t('game.newGame')}
           </button>
           <button
             onClick={() => navigate('/')}
-            className="w-full py-4 bg-gradient-to-r from-space-purple to-space-pink rounded-xl font-bold text-white"
+            className="w-full min-h-[52px] py-4 bg-gradient-to-r from-space-purple to-space-pink rounded-xl font-bold text-white active:scale-[0.98]"
           >
             {t('game.backToHome')}
           </button>
@@ -464,7 +465,7 @@ function LocalGame() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 pt-14 md:pt-20">
       <p className="text-space-cyan">{t('common.loading')}</p>
     </div>
   );

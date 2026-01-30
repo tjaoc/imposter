@@ -23,22 +23,26 @@ export default defineConfig({
         name: 'Imposter',
         short_name: 'Imposter',
         description: 'PWA del juego Imposter (Who is the Spy?)',
+        id: '/',
         theme_color: '#0a0e27',
         background_color: '#0a0e27',
         display: 'standalone',
         orientation: 'portrait',
         scope: '/',
         start_url: '/',
+        categories: ['games', 'entertainment'],
         icons: [
           {
             src: 'pwa-64x64.png',
             sizes: '64x64',
             type: 'image/png',
+            purpose: 'any',
           },
           {
             src: 'pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png',
+            purpose: 'any',
           },
           {
             src: 'pwa-512x512.png',

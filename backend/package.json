@@ -1,12 +1,13 @@
 {
   "name": "imposter-backend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Backend para PWA de Imposter (Who is the Spy?)",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "seed": "node scripts/seed-standalone.js"
   },
   "keywords": [
     "imposter",

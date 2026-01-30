@@ -26,6 +26,8 @@
     "addCustomWords": "Adicionar palavras personalizadas",
     "footer": "Desenvolvido com ❤️ por Tiago Cruz",
     "version": "Versão",
+    "installIos": "Para instalar a app: toca no botão Partilhar (□↑) e depois «Adicionar ao ecrã principal».",
+    "installAndroid": "Para instalar a app: menu (⋮) → «Instalar app» ou «Adicionar ao ecrã principal».",
     "playLocal": "Um só dispositivo",
     "playLocalDesc": "Jogar em pessoa com um telemóvel",
     "playOnline": "Jogar online",

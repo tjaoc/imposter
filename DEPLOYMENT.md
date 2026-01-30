@@ -199,6 +199,55 @@ Después de añadir el dominio en Render, te dirá exactamente a qué CNAME apun
 
 ---
 
+## Base de datos de palabras (seed)
+
+- Al arrancar, el backend **borra todos los WordPacks** y vuelve a ejecutar el seed (es-ES + pt-PT).
+- Para ejecutar solo el seed sin levantar el servidor (por ejemplo desde un cron o tras cambiar datos):
+  ```bash
+  cd backend && npm run seed
+  ```
+  Requiere `MONGODB_URI` en `backend/.env`.
+
+---
+
+## Actualización mensual de palabras (día 1)
+
+El script `scripts/update-words-monthly.js` está pensado para ejecutarse **el día 1 de cada mes**:
+
+1. **Buscar actualizaciones**: Si están configuradas las URLs, descarga listas de palabras nuevas (es-ES y/o pt-PT).
+2. **Guardar**: Las fusiona en `backend/seeds/data/updates-es.json` y `updates-pt.json`.
+3. **Seed**: Ejecuta el seed para subir todo a la base de datos.
+4. **Commit y push**: Si hubo actualizaciones descargadas, hace commit y push con esos cambios.
+
+**Variables de entorno** (en `backend/.env` o al ejecutar):
+
+- `WORDS_ES_ES_UPDATE_URL`: URL que devuelve un JSON con formato `{ "slug": ["palabra1", "palabra2", ...], ... }` (mismos slugs que los packs: `cine-series`, `deportes`, etc.).
+- `WORDS_PT_PT_UPDATE_URL`: Idem para pt-PT.
+- `MONGODB_URI`: URI de MongoDB (necesaria para el seed).
+
+**Ejecución manual** (desde la raíz del repo):
+
+```bash
+node scripts/update-words-monthly.js
+```
+
+**En Render (automático):** El Blueprint incluye un **Cron Job** (`imposter-words-monthly`) que se ejecuta el **día 1 de cada mes a las 00:00 UTC**. En el Dashboard del cron debes configurar:
+
+- **MONGODB_URI**: la misma URI de producción (para que el seed actualice la DB de prod).
+- **GITHUB_TOKEN** (opcional): token de GitHub con permiso `repo` para que el script pueda hacer commit y push de las actualizaciones. Si no lo configuras, el seed se ejecuta pero el push fallará.
+
+**Nota:** Los Cron Jobs en Render **no están en el plan gratuito**; requieren plan de pago. Si no usas el cron de Render, puedes programar el script con un cron externo o con [GitHub Actions](https://docs.github.com/en/actions) (día 1 del mes).
+
+**Cron manual** (ejemplo: día 1 a las 00:00):
+
+```bash
+0 0 1 * * cd /ruta/al/repo && node scripts/update-words-monthly.js
+```
+
+Si no configuras las URLs, el script solo ejecuta el seed (sincroniza la DB con el código actual) y no hace commit ni push.
+
+---
+
 ## Alternativa: Vercel (frontend) + Render (backend)
 
 Si prefieres Vercel para el frontend:

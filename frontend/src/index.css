@@ -3,17 +3,36 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    /* iOS/Android: evitar zoom en inputs y mejorar scroll */
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     @apply bg-space-dark text-white font-space antialiased;
     background-image: 
       radial-gradient(at 0% 0%, rgba(108, 92, 231, 0.1) 0px, transparent 50%),
       radial-gradient(at 100% 100%, rgba(0, 243, 255, 0.1) 0px, transparent 50%);
     min-height: 100vh;
+    min-height: 100dvh;
     overflow-x: hidden;
+    padding-left: env(safe-area-inset-left, 0);
+    padding-right: env(safe-area-inset-right, 0);
   }
 
   #root {
     min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  /* Touch targets mínimos: iOS 44px, Android 48dp */
+  @media (pointer: coarse) {
+    button:not(.touch-ignore),
+    a:not(.touch-ignore),
+    [role="button"]:not(.touch-ignore) {
+      min-height: 44px;
+    }
   }
 }
 
@@ -33,4 +52,5 @@
     backdrop-filter: blur(10px);
     border: 1px solid rgba(0, 243, 255, 0.2);
   }
+
 }

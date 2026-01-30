@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSocket } from '../hooks/useSocket';
 import { useTranslation } from '../hooks/useTranslation';
+import { capitalizeWord } from '../utils/formatWord';
 
 function Game() {
   const { t } = useTranslation();
@@ -912,7 +913,7 @@ function Game() {
     // Si ya vio su rol, mostrar pantalla de espera
     if (hasSeenRole) {
       return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-black via-slate-950 to-black">
+        <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -933,7 +934,7 @@ function Game() {
             </p>
             <div className="text-xs text-gray-500 mt-4 p-3 bg-space-blue/30 rounded-lg inline-block">
               {t('game.yourRole')}:{' '}
-              {myRole?.isImpostor ? '🕵️ IMPOSTOR' : `🎯 ${myRole?.word}`}
+              {myRole?.isImpostor ? '🕵️ IMPOSTOR' : `🎯 ${capitalizeWord(myRole?.word)}`}
             </div>
           </motion.div>
         </div>
@@ -945,7 +946,7 @@ function Game() {
     const displayWord = myRole?.word || '';
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1022,7 +1023,7 @@ function Game() {
                       <p className="text-xs text-emerald-300 mb-4 px-4 py-2 bg-emerald-900/30 rounded-lg">
                         {t('game.hintCategory')} ({t('game.category')}):{' '}
                         <span className="font-bold text-emerald-200">
-                          {displayWord}
+                          {capitalizeWord(displayWord)}
                         </span>
                       </p>
                     )}
@@ -1042,7 +1043,7 @@ function Game() {
                       className="text-4xl font-extrabold text-emerald-400 drop-shadow-lg mb-4 text-center"
                       style={{ textShadow: '0 0 20px rgba(16, 185, 129, 0.5)' }}
                     >
-                      {displayWord}
+                      {capitalizeWord(displayWord)}
                     </motion.p>
                     <p className="text-xs text-slate-400 text-center px-4">
                       {t('game.describeWithoutSaying', { count: players.length > 5 ? '1-2' : '1' })}
@@ -1127,7 +1128,7 @@ function Game() {
     };
 
     return (
-      <div className="min-h-screen p-4 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-screen p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
         <div className="max-w-2xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -1163,16 +1164,16 @@ function Game() {
                     <span className="text-red-400">🕵️ {t('game.youAreImpostor')}</span>
                     {myRole?.word && (
                       <p className="text-sm text-emerald-300 mt-2">
-                        {t('game.hintCategory')}: {myRole.word}
+                        {t('game.hintCategory')}: {capitalizeWord(myRole.word)}
                       </p>
                     )}
                   </>
                 ) : (
                   <span className="text-space-cyan">
                     🎯 {t('game.yourWord')}:{' '}
-                    <span className="font-bold text-emerald-400">
-                      {myRole?.word}
-                    </span>
+<span className="font-bold text-emerald-400">
+                        {capitalizeWord(myRole?.word)}
+                      </span>
                   </span>
                 )}
               </div>
@@ -1269,7 +1270,7 @@ function Game() {
     console.log('   Mi ID (socket.id):', myPlayerId);
 
     return (
-      <div className="min-h-screen p-4 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-screen p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
         <div className="max-w-2xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -1398,7 +1399,7 @@ function Game() {
   // ===== FASE: RESULTADOS DE VOTACIÓN (antes de continuar) =====
   if (gamePhase === 'vote-results' && gameResult) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -1640,7 +1641,7 @@ function Game() {
       : gameResult.winner === 'civilians';
 
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -1680,7 +1681,7 @@ function Game() {
             >
               {t('game.secretWordWas')}{' '}
               <span className="text-glow font-bold text-3xl text-emerald-400">
-                {gameResult.secretWord}
+                {capitalizeWord(gameResult.secretWord)}
               </span>
             </motion.div>
 

@@ -104,46 +104,46 @@ function Home() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="absolute top-4 right-4">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 pt-14 sm:pt-16 md:pt-20">
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 md:top-8 md:right-8 pt-safe-top">
         <LanguageSelector />
       </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md md:max-w-lg lg:max-w-xl"
       >
         <motion.div
           initial={{ scale: 0.9 }}
           animate={{ scale: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-center mb-8"
+          className="text-center mb-6 sm:mb-8 md:mb-10"
         >
           <img
             src="/favicon.svg"
             alt="Imposter"
-            className="w-20 h-20 mx-auto mb-4"
+            className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-3 sm:mb-4"
           />
-          <h1 className="text-5xl font-bold text-glow mb-4">{t('home.title')}</h1>
-          <p className="text-space-cyan text-lg">{t('home.subtitle')}</p>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-glow mb-3 sm:mb-4">{t('home.title')}</h1>
+          <p className="text-space-cyan text-base sm:text-lg md:text-xl">{t('home.subtitle')}</p>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="glass-effect rounded-2xl p-6 mb-6"
+          className="glass-effect rounded-2xl p-4 sm:p-6 md:p-8 mb-4 sm:mb-6"
         >
           <button
             type="button"
             onClick={() => navigate('/local')}
-            className="w-full py-4 rounded-xl border-2 border-space-cyan/50 bg-space-blue/50 hover:bg-space-cyan/20 hover:border-space-cyan font-semibold text-space-cyan mb-4 flex items-center justify-center gap-3"
+            className="w-full min-h-[48px] py-3.5 sm:py-4 rounded-xl border-2 border-space-cyan/50 bg-space-blue/50 hover:bg-space-cyan/20 hover:border-space-cyan active:scale-[0.98] font-semibold text-space-cyan mb-4 flex items-center justify-center gap-3 text-left"
           >
             <span className="text-2xl">📱</span>
-            <div className="text-left">
-              <div>{t('home.playLocal')}</div>
-              <div className="text-xs font-normal text-gray-400">{t('home.playLocalDesc')}</div>
+            <div className="text-left flex-1 min-w-0">
+              <div className="text-base sm:text-lg">{t('home.playLocal')}</div>
+              <div className="text-xs sm:text-sm font-normal text-gray-400">{t('home.playLocalDesc')}</div>
             </div>
           </button>
           <div className="relative my-4">
@@ -154,17 +154,17 @@ function Home() {
               <span className="px-4 bg-space-blue text-gray-400">{t('common.or')}</span>
             </div>
           </div>
-          <div className="text-center text-gray-400 text-sm mb-4">{t('home.playOnlineDesc')}</div>
+          <div className="text-center text-gray-400 text-xs sm:text-sm mb-4">{t('home.playOnlineDesc')}</div>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="glass-effect rounded-2xl p-8 space-y-6"
+          className="glass-effect rounded-2xl p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6"
         >
           <div>
-            <label className="block text-sm font-medium mb-2 text-space-cyan">
+            <label className="block text-sm sm:text-base font-medium mb-2 text-space-cyan">
               {t('home.yourName')}
             </label>
             <input
@@ -172,7 +172,7 @@ function Home() {
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
               placeholder={t('home.yourNamePlaceholder')}
-              className="w-full px-4 py-3 bg-space-blue border border-space-cyan/30 rounded-lg focus:outline-none focus:border-space-cyan focus:ring-2 focus:ring-space-cyan/50 text-white placeholder-gray-400"
+              className="w-full px-4 py-3.5 sm:py-3 bg-space-blue border border-space-cyan/30 rounded-xl focus:outline-none focus:border-space-cyan focus:ring-2 focus:ring-space-cyan/50 text-white placeholder-gray-400 text-base"
               maxLength={20}
             />
           </div>
@@ -181,7 +181,7 @@ function Home() {
             <button
               onClick={handleCreateRoom}
               disabled={isCreating || !playerName.trim()}
-              className="w-full py-4 bg-gradient-to-r from-space-purple to-space-pink rounded-lg font-semibold text-white hover:from-space-pink hover:to-space-purple transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
+              className="w-full min-h-[48px] py-3.5 sm:py-4 bg-gradient-to-r from-space-purple to-space-pink rounded-xl font-semibold text-white hover:from-space-pink hover:to-space-purple active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isCreating ? t('home.creating') : t('home.createRoom')}
             </button>
@@ -201,7 +201,7 @@ function Home() {
                 value={roomCode}
                 onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
                 placeholder={t('home.roomCode')}
-                className="w-full px-4 py-3 bg-space-blue border border-space-cyan/30 rounded-lg focus:outline-none focus:border-space-cyan focus:ring-2 focus:ring-space-cyan/50 text-white placeholder-gray-400 mb-4 uppercase"
+                className="w-full px-4 py-3.5 sm:py-3 bg-space-blue border border-space-cyan/30 rounded-xl focus:outline-none focus:border-space-cyan focus:ring-2 focus:ring-space-cyan/50 text-white placeholder-gray-400 mb-4 uppercase text-base"
                 maxLength={6}
               />
               <button
@@ -210,7 +210,7 @@ function Home() {
                   handleJoinRoom();
                 }}
                 disabled={isJoining || !playerName.trim() || !roomCode.trim()}
-                className="w-full py-4 bg-space-blue border-2 border-space-cyan rounded-lg font-semibold text-space-cyan hover:bg-space-cyan hover:text-space-dark transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
+                className="w-full min-h-[48px] py-3.5 sm:py-4 bg-space-blue border-2 border-space-cyan rounded-xl font-semibold text-space-cyan hover:bg-space-cyan hover:text-space-dark active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isJoining ? t('home.joining') : t('home.joinRoom')}
               </button>
@@ -219,11 +219,12 @@ function Home() {
         </motion.div>
 
         <motion.button
+          type="button"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
           onClick={() => setShowCustomWords(true)}
-          className="mt-4 text-space-cyan hover:text-space-glow transition-colors text-sm underline block mx-auto"
+          className="mt-4 min-h-[44px] flex items-center justify-center text-space-cyan hover:text-space-glow transition-colors text-sm underline w-full sm:w-auto touch-ignore"
         >
           ✏️ {t('home.addCustomWords')}
         </motion.button>
