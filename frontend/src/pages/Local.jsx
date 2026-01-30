@@ -338,7 +338,7 @@ function Local() {
                           hintForImpostors: !prev.hintForImpostors,
                         }));
                       }}
-                      className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-space-cyan focus:ring-offset-2 focus:ring-offset-space-dark touch-manipulation select-none ${
+                      className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-2xl border border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-space-cyan focus:ring-offset-2 focus:ring-offset-space-dark touch-manipulation select-none ${
                         settings.hintForImpostors
                           ? 'bg-emerald-500'
                           : 'bg-gray-600'

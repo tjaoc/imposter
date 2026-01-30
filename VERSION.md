@@ -1,4 +1,4 @@
-# 🎮 Imposter - Version 1.1.15
+# 🎮 Imposter - Version 1.1.16
 
 **Fecha de lanzamiento:** 30 de Enero, 2026  
 **Estado:** ✅ Estable
@@ -7,6 +7,7 @@
 
 ## 🎯 Resumen de la Versión
 
+**v1.1.16** – Switch "Pista para Impostores" (Room y Local): track con forma rectangular y curvas en los 4 lados (rounded-2xl).  
 **v1.1.15** – Switch "Pista para Impostores" (Room y Local): tamaño reducido (track h-7 w-12, thumb h-5 w-5) para que no domine la fila.  
 **v1.1.14** – Switch "Pista para Impostores" (Room y Local): proporciones corregidas (track h-10, thumb h-7, márgenes simétricos) para que no se vea deformado.  
 **v1.1.13** – Splash al arranque: comprobación de actualizaciones PWA inmediata (registerSW immediate + registration.update); splash visible hasta que termina la verificación o timeout 4s.  
@@ -211,6 +212,6 @@ ISC - Proyecto personal y educativo
 
 ---
 
-**¡Gracias por probar Imposter v1.1.15!** 🎉
+**¡Gracias por probar Imposter v1.1.16!** 🎉
 
 Desarrollado con ❤️ por Tiago Cruz

@@ -1,5 +1,13 @@
 # 📝 Changelog - Imposter
 
+## [1.1.16] - 2026-01-30
+
+### 🐛 Switch "Pista para Impostores"
+
+- ✅ **Forma rectangular con curvas** (Room y Local): track con `rounded-2xl` para que sea un rectángulo con las cuatro esquinas redondeadas en lugar de pastilla circular.
+
+---
+
 ## [1.1.15] - 2026-01-30
 
 ### 🐛 Switch "Pista para Impostores"
