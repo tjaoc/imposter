@@ -16,6 +16,27 @@ const SRC = join(PUBLIC, 'icon_impostor.jpeg');
 /** Umbral: píxeles con R,G,B por encima se consideran blanco */
 const WHITE_THRESHOLD = 245;
 
+/** Factor de radio de esquinas (0.2 = 20% del lado, esquinas bien redondeadas) */
+const ROUND_RADIUS_FACTOR = 0.2;
+
+/** Genera una máscara PNG: opaca en rectángulo redondeado, transparente fuera. */
+async function createRoundedRectMask(size) {
+  const r = Math.max(4, Math.round(size * ROUND_RADIUS_FACTOR));
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">
+  <rect x="0" y="0" width="${size}" height="${size}" rx="${r}" ry="${r}" fill="white"/>
+</svg>`;
+  return sharp(Buffer.from(svg)).png().toBuffer();
+}
+
+/** Aplica esquinas redondeadas al buffer PNG (mismo tamaño que la máscara). */
+async function applyRoundedCorners(pngBuffer, size) {
+  const mask = await createRoundedRectMask(size);
+  return sharp(pngBuffer)
+    .composite([{ input: mask, blend: 'dest-in' }])
+    .png()
+    .toBuffer();
+}
+
 /** Rellena la zona blanca (fuera del círculo) con el gradiente del fondo (verde oscuro → verde claro). */
 async function fillWhiteWithGradient(inputBuffer) {
   const { data, info } = await sharp(inputBuffer)
@@ -129,34 +150,33 @@ async function main() {
         background: { r: 0, g: 0, b: 0, alpha: 0 },
       });
 
+  // Redimensionar: cover = el icono llena todo el cuadrado (para maskable, sin fondos)
+  const resizeSquareCover = (size) =>
+    sharp(withTransparency)
+      .resize(size, size, { fit: 'cover', position: 'center' });
+
   for (const { name, size: s } of SIZES) {
     const out = join(PUBLIC, name);
-    const pngBuffer = await resizeSquare(s).png().toBuffer();
+    let pngBuffer = await resizeSquare(s).png().toBuffer();
+    pngBuffer = await applyRoundedCorners(pngBuffer, s);
     await sharp(pngBuffer).toFile(out);
     console.log('✓', name);
   }
 
-  // Maskable: 512x512 con logo al 80% centrado (zona segura PWA), fondo oscuro
+  // Maskable: 512x512 con el icono cubriendo todo el tamaño (sin fondo azul)
   const maskableSize = 512;
-  const logoSize = Math.round(maskableSize * 0.8);
-  const offset = (maskableSize - logoSize) / 2;
   const maskablePath = join(PUBLIC, 'maskable-icon-512x512.png');
-  const maskablePng = await resizeSquare(logoSize).png().toBuffer();
-  await sharp(maskablePng)
-    .extend({
-      top: Math.floor(offset),
-      bottom: Math.ceil(offset),
-      left: Math.floor(offset),
-      right: Math.ceil(offset),
-      background: { r: 10, g: 14, b: 39, alpha: 1 },
-    })
-    .png()
-    .toFile(maskablePath);
+  let maskablePng = await resizeSquareCover(maskableSize).png().toBuffer();
+  maskablePng = await applyRoundedCorners(maskablePng, maskableSize);
+  await sharp(maskablePng).toFile(maskablePath);
   console.log('✓ maskable-icon-512x512.png');
 
-  // Favicon.ico (16, 32, 48) con transparencia
+  // Favicon.ico (16, 32, 48) con transparencia y esquinas redondeadas
   const icoBuffers = await Promise.all(
-    ICO_SIZES.map((s) => resizeSquare(s).png().toBuffer())
+    ICO_SIZES.map(async (s) => {
+      let buf = await resizeSquare(s).png().toBuffer();
+      return applyRoundedCorners(buf, s);
+    })
   );
   const sharpInstances = icoBuffers.map((buf) => sharp(buf));
   await sharpsToIco(sharpInstances, join(PUBLIC, 'favicon.ico'));
@@ -181,21 +201,12 @@ async function main() {
   ]) {
     const out = join(PUBLIC, 'icons', name);
     if (name.includes('maskable')) {
-      const logoSizeM = Math.round(512 * 0.8);
-      const offsetM = (512 - logoSizeM) / 2;
-      const maskablePngM = await resizeSquare(logoSizeM).png().toBuffer();
-      await sharp(maskablePngM)
-        .extend({
-          top: Math.floor(offsetM),
-          bottom: Math.ceil(offsetM),
-          left: Math.floor(offsetM),
-          right: Math.ceil(offsetM),
-          background: { r: 10, g: 14, b: 39, alpha: 1 },
-        })
-        .png()
-        .toFile(out);
+      let maskablePngM = await resizeSquareCover(512).png().toBuffer();
+      maskablePngM = await applyRoundedCorners(maskablePngM, 512);
+      await sharp(maskablePngM).toFile(out);
     } else {
-      const pngBuf = await resizeSquare(s).png().toBuffer();
+      let pngBuf = await resizeSquare(s).png().toBuffer();
+      pngBuf = await applyRoundedCorners(pngBuf, s);
       await sharp(pngBuf).toFile(out);
     }
     console.log('✓ icons/' + name);
