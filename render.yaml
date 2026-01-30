@@ -1,11 +1,13 @@
-# Blueprint Render: 1 proyecto, 2 entornos (plan gratuito)
-# Proyecto "imposter" con environments: production, development.
-# Dominios personalizados: añádelos después en Dashboard → cada servicio → Settings → Custom Domains.
+# Blueprint Render — Plan Hobby (gratuito)
+# Según https://render.com/pricing el plan Hobby incluye:
+#   - 1 project with 2 environments
+#   - Static Sites $0/mes, Web Services Free $0/mes
+#   - Custom domains: hasta 2 (añadirlos en Dashboard si los necesitas)
+# Variables MONGODB_URI, CORS_ORIGIN, VITE_*: configurar en Dashboard tras el deploy.
 
 projects:
   - name: imposter
     environments:
-      # ——— Producción ———
       - name: production
         services:
           - type: web
@@ -39,7 +41,6 @@ projects:
               - key: VITE_SOCKET_URL
                 value: https://apiimp.netic.app
 
-      # ——— Desarrollo ———
       - name: development
         services:
           - type: web

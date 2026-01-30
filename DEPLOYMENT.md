@@ -73,6 +73,21 @@ Si algo falla, revisa **Logs** del servicio que falle (build o runtime) y **REND
 
 ---
 
+## "Your render.yaml services require payment information"
+
+Si Render te pide **método de pago** al usar el Blueprint:
+
+1. **Opción A – Crear solo 2 servicios a mano (sin Blueprint)**  
+   No uses Blueprint. En el Dashboard: **New + → Web Service** (backend) y **New + → Static Site** (frontend). Conecta el mismo repo, pon **Root Directory** `backend` / `frontend` y las variables (MONGODB_URI, CORS_ORIGIN, VITE_API_URL, VITE_SOCKET_URL). Así suele no pedir tarjeta.
+
+2. **Opción B – Blueprint con 2 servicios (archivo `render-free.yaml`)**  
+   En el repo hay un **`render-free.yaml`** con solo 2 servicios (API + App), sin proyectos ni entornos. Puedes **sustituir el contenido de `render.yaml`** por el de `render-free.yaml`, hacer commit y push, y volver a aplicar el Blueprint. Con solo 2 servicios a veces no pide pago. Luego añades los dominios en **Settings → Custom Domains** de cada servicio.
+
+3. **Opción C – Añadir tarjeta**  
+   Según la documentación de Render, el **plan gratuito no cobra** si te mantienes en los límites (servicios free, ancho de banda incluido). Pedir la tarjeta es para verificación; no se hace cargo si no pasas a plan de pago. Si quieres mantener prod + dev (4 servicios) con el `render.yaml` actual, puedes añadir el método de pago y seguir usando el tier gratuito.
+
+---
+
 ## Por qué Render para todo
 
 - **Vercel** es ideal para frontend (SPA/estático) pero es **serverless**: no mantiene conexiones largas. El backend usa **Socket.io** (WebSockets), que necesita un servidor siempre activo, así que el backend no encaja en Vercel.
