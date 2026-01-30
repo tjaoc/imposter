@@ -1,4 +1,4 @@
-# 🎮 Imposter - Version 1.1.8
+# 🎮 Imposter - Version 1.1.9
 
 **Fecha de lanzamiento:** 30 de Enero, 2026  
 **Estado:** ✅ Estable
@@ -7,6 +7,7 @@
 
 ## 🎯 Resumen de la Versión
 
+**v1.1.9** – Móvil: switch Pista más pequeño y separado del texto; footer más compacto; card pistas + botón Próximo sin overflow (flex-col en móvil).  
 **v1.1.8** – Footer móvil: min-h-dvh en App, mt-auto y más padding inferior en Footer para pegarlo al fondo.  
 **v1.1.7** – Viewport: interactive-widget=resizes-visual; meta mobile-web-app-capable (reemplaza deprecado).  
 **v1.1.6** – Bump automático de versión en commit/push; regla actualizada para subir patch si no se indica versión.  
@@ -204,6 +205,6 @@ ISC - Proyecto personal y educativo
 
 ---
 
-**¡Gracias por probar Imposter v1.1.8!** 🎉
+**¡Gracias por probar Imposter v1.1.9!** 🎉
 
 Desarrollado con ❤️ por Tiago Cruz

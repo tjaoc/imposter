@@ -319,13 +319,13 @@ function Local() {
                 transition={{ delay: 0.2 }}
                 className="card mb-4"
               >
-                <div className="flex flex-row items-center justify-between gap-3 flex-wrap">
+                <div className="flex flex-row items-center justify-between gap-4 flex-wrap">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <span className="text-2xl flex-shrink-0">🔍</span>
                     <span className="text-white font-semibold whitespace-nowrap">{t('room.hintForImpostors')}</span>
                     <span className="text-sm text-gray-400 hidden sm:inline truncate">{t('room.hintForImpostorsDesc')}</span>
                   </div>
-                  <div className="flex items-center flex-shrink-0 min-h-[48px]">
+                  <div className="flex items-center flex-shrink-0 min-h-[44px] pl-2">
                     <button
                       type="button"
                       role="switch"
@@ -338,16 +338,16 @@ function Local() {
                           hintForImpostors: !prev.hintForImpostors,
                         }));
                       }}
-                      className={`relative inline-flex items-center h-12 w-20 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-space-cyan focus:ring-offset-2 focus:ring-offset-space-dark touch-manipulation select-none ${
+                      className={`relative inline-flex items-center h-9 w-14 flex-shrink-0 cursor-pointer rounded-full border border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-space-cyan focus:ring-offset-2 focus:ring-offset-space-dark touch-manipulation select-none ${
                         settings.hintForImpostors
                           ? 'bg-emerald-500'
                           : 'bg-gray-600'
                       }`}
                     >
                       <span
-                        className={`pointer-events-none absolute left-1 top-1/2 -translate-y-1/2 inline-block h-8 w-8 rounded-full bg-white shadow-lg transition-transform ${
+                        className={`pointer-events-none absolute left-0.5 top-1/2 -translate-y-1/2 inline-block h-6 w-6 rounded-full bg-white shadow transition-transform ${
                           settings.hintForImpostors
-                            ? 'translate-x-10'
+                            ? 'translate-x-7'
                             : 'translate-x-0'
                         }`}
                       />

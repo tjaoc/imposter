@@ -1,5 +1,15 @@
 # 📝 Changelog - Imposter
 
+## [1.1.9] - 2026-01-30
+
+### 📱 Móvil: switch, footer y card de pistas
+
+- ✅ **Switch "Pista para Impostores"** (Room y Local): más pequeño (h-9 w-14), más separado del texto (gap-4, pl-2).
+- ✅ **Footer**: texto más pequeño (text-xs sm:text-sm), menos padding (pt-2, pb 0.75rem).
+- ✅ **Card pistas + botón Próximo** (Game): en móvil input y botón en columna para evitar overflow; w-full min-w-0 y overflow-x-hidden.
+
+---
+
 ## [1.1.8] - 2026-01-30
 
 ### 📱 Footer móvil (online)

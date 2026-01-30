@@ -32,19 +32,19 @@ function Footer() {
   }, []);
 
   return (
-    <footer className="mt-auto flex-shrink-0 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-center text-gray-400 text-sm sm:text-base bg-space-dark/95 backdrop-blur-sm border-t border-gray-800/50 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
+    <footer className="mt-auto flex-shrink-0 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-center text-gray-400 text-xs sm:text-sm bg-space-dark/95 backdrop-blur-sm border-t border-gray-800/50 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
       {installHint === 'ios' && (
-        <p className="text-amber-200/90 text-sm mb-2 px-2">
+        <p className="text-amber-200/90 text-xs mb-1.5 px-2">
           {t('home.installIos')}
         </p>
       )}
       {installHint === 'android' && (
-        <p className="text-amber-200/90 text-sm mb-2 px-2">
+        <p className="text-amber-200/90 text-xs mb-1.5 px-2">
           {t('home.installAndroid')}
         </p>
       )}
       <p>{t('home.footer')}</p>
-      <p className="text-gray-500 text-sm mt-1">
+      <p className="text-gray-500 text-xs mt-0.5">
         {t('home.version')} {version}
       </p>
     </footer>

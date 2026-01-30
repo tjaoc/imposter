@@ -902,9 +902,9 @@ function Game() {
     };
 
     return (
-      <div className="min-h-full p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-full p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black overflow-x-hidden">
         <PageNav showBack onBack={handleBackToRoom} onExit={handleBackToLobby} />
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto w-full min-w-0">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -929,26 +929,26 @@ function Game() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="glass-effect rounded-2xl p-6 mb-6"
+              className="glass-effect rounded-2xl p-4 sm:p-6 mb-6 w-full min-w-0"
             >
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 {myRole?.isImpostor ? t('game.clueImpostorHint') : t('game.clueYourHint')}
               </label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 w-full min-w-0">
                 <input
                   type="text"
                   value={clueInput}
                   onChange={(e) => setClueInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSubmitClue()}
                   placeholder={t('game.cluePlaceholder')}
-                  className="flex-1 min-h-[48px] px-4 rounded-xl bg-slate-800/80 border border-slate-600 text-white placeholder-gray-500 focus:border-space-cyan focus:ring-1 focus:ring-space-cyan"
+                  className="flex-1 min-w-0 w-full min-h-[48px] px-4 rounded-xl bg-slate-800/80 border border-slate-600 text-white placeholder-gray-500 focus:border-space-cyan focus:ring-1 focus:ring-space-cyan"
                   maxLength={200}
                 />
                 <button
                   type="button"
                   onClick={handleSubmitClue}
                   disabled={!clueInput.trim()}
-                  className="min-h-[48px] px-6 rounded-xl font-semibold bg-space-cyan text-black hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  className="shrink-0 min-h-[48px] px-6 rounded-xl font-semibold bg-space-cyan text-black hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed transition sm:self-center"
                 >
                   {t('common.next')}
                 </button>
