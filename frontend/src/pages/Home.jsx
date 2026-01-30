@@ -5,7 +5,6 @@ import { useSocket } from '../hooks/useSocket';
 import { useTranslation } from '../hooks/useTranslation';
 import CustomWords from '../components/CustomWords';
 import LanguageSelector from '../components/LanguageSelector';
-import PageNav from '../components/PageNav';
 
 function Home() {
   const { t } = useTranslation();
@@ -90,8 +89,7 @@ function Home() {
 
   return (
     <div className="min-h-full flex flex-col p-4 sm:p-6 md:p-8">
-      <div className="flex items-center justify-between mb-2">
-        <PageNav showBack={false} onExit={() => navigate('/')} />
+      <div className="flex items-center justify-end mb-2 min-h-[48px]">
         <LanguageSelector />
       </div>
       <motion.div
