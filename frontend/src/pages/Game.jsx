@@ -913,7 +913,7 @@ function Game() {
     // Si ya vio su rol, mostrar pantalla de espera
     if (hasSeenRole) {
       return (
-        <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
+        <div className="min-h-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -1128,7 +1128,7 @@ function Game() {
     };
 
     return (
-      <div className="min-h-screen p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-full p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
         <div className="max-w-2xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -1270,7 +1270,7 @@ function Game() {
     console.log('   Mi ID (socket.id):', myPlayerId);
 
     return (
-      <div className="min-h-screen p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-full p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
         <div className="max-w-2xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -1399,7 +1399,7 @@ function Game() {
   // ===== FASE: RESULTADOS DE VOTACIÓN (antes de continuar) =====
   if (gamePhase === 'vote-results' && gameResult) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -1641,7 +1641,7 @@ function Game() {
       : gameResult.winner === 'civilians';
 
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -1894,7 +1894,7 @@ function Game() {
   console.log('🖼️ Renderizando fase:', gamePhase);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-full flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

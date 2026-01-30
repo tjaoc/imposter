@@ -26,7 +26,7 @@ function Footer() {
   }, []);
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 py-3 pb-safe-bottom pt-safe-top text-center text-gray-400 text-xs sm:text-sm bg-space-dark/95 backdrop-blur-sm border-t border-gray-800/50 z-10 pl-safe-left pr-safe-right">
+    <footer className="fixed left-0 right-0 py-3 pt-safe-top text-center text-gray-400 text-xs sm:text-sm bg-space-dark/95 backdrop-blur-sm border-t border-gray-800/50 z-10 pl-safe-left pr-safe-right bottom-[env(safe-area-inset-bottom,0px)]">
       {installHint === 'ios' && (
         <p className="text-amber-200/90 text-xs mb-2 px-2">
           {t('home.installIos')}

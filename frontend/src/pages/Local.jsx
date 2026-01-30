@@ -119,8 +119,8 @@ function Local() {
 
   if (step === 'players') {
     return (
-      <div className="min-h-screen p-4 sm:p-6 md:p-8 pt-14 sm:pt-16 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
-        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 md:top-8 md:right-8 pt-safe-top">
+      <div className="min-h-full p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
+        <div className="absolute top-content-safe right-4 sm:right-6 md:right-8">
           <LanguageSelector />
         </div>
         <motion.div
@@ -197,8 +197,8 @@ function Local() {
 
   if (step === 'pack') {
     return (
-      <div className="min-h-screen p-4 bg-gradient-to-b from-black via-slate-950 to-black">
-        <div className="absolute top-4 right-4">
+      <div className="min-h-full p-4 bg-gradient-to-b from-black via-slate-950 to-black">
+        <div className="absolute top-content-safe right-4">
           <LanguageSelector />
         </div>
         <motion.div
@@ -308,7 +308,7 @@ function Local() {
     const displayWord = currentPlayer.word || '';
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-full flex flex-col items-center justify-center p-4 bg-gradient-to-b from-black via-slate-950 to-black">
         <AnimatePresence mode="wait">
           {!roleRevealed ? (
             <motion.div

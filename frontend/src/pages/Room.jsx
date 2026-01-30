@@ -110,7 +110,7 @@ function Room() {
   // Mostrar error si la sala no existe
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 pt-14 md:pt-20">
+      <div className="min-h-full flex items-center justify-center p-4 sm:p-6 md:p-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -163,7 +163,7 @@ function Room() {
   }
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 md:p-8 pt-14 sm:pt-16 md:pt-20">
+    <div className="min-h-full p-4 sm:p-6 md:p-8">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

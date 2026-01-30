@@ -131,7 +131,7 @@ function LocalGame() {
     const minutes = Math.floor((timeLeft ?? 0) / 60);
     const secs = (timeLeft ?? 0) % 60;
     return (
-      <div className="min-h-screen p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-full p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-glow mb-4">
@@ -151,7 +151,7 @@ function LocalGame() {
           </div>
           <button
             onClick={handleStartVoting}
-            className="w-full py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600"
+            className="w-full min-h-[48px] py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 active:scale-[0.98]"
           >
             {timeLeft === 0
               ? t('game.timeUpStartVoting')
@@ -159,7 +159,7 @@ function LocalGame() {
           </button>
           <button
             onClick={() => navigate('/')}
-            className="w-full mt-6 py-3 text-gray-400 hover:text-white"
+            className="w-full mt-6 min-h-[48px] py-3 text-gray-400 hover:text-white active:scale-[0.98]"
           >
             {t('game.backToHome')}
           </button>
@@ -170,7 +170,7 @@ function LocalGame() {
 
   if (phase === 'voting-turn' && currentVoter) {
     return (
-      <div className="min-h-screen p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-full p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
         <div className="max-w-2xl mx-auto">
           <p className="text-space-cyan/60 text-sm uppercase tracking-widest mb-4 text-center">
             {t('local.securityScreen')}
@@ -188,7 +188,7 @@ function LocalGame() {
                 key={p.id}
                 type="button"
                 onClick={() => handleVote(p.id)}
-                className={`w-full p-4 rounded-xl border-2 flex items-center justify-between ${
+                className={`w-full min-h-[48px] p-4 rounded-xl border-2 flex items-center justify-between active:scale-[0.98] ${
                   selectedVote === p.id
                     ? 'border-emerald-400 bg-emerald-500/20'
                     : 'border-space-blue bg-space-blue/50'
@@ -215,8 +215,8 @@ function LocalGame() {
 
   if (phase === 'vote-results' && voteResult) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
-        <div className="glass-effect rounded-3xl p-8 max-w-2xl w-full text-center">
+      <div className="min-h-full flex items-center justify-center p-4 sm:p-6 md:p-8 py-6 bg-gradient-to-b from-black via-slate-950 to-black">
+        <div className="glass-effect rounded-3xl p-6 sm:p-8 max-w-2xl w-full text-center scroll-touch max-h-[85dvh] overflow-y-auto">
           <h1 className="text-4xl font-bold text-space-cyan mb-6">
             🗳️ {t('game.voteResults')}
           </h1>
@@ -313,13 +313,13 @@ function LocalGame() {
                 },
               })
             }
-            className="w-full mt-4 py-3 rounded-xl font-semibold text-white bg-space-blue border border-space-cyan/50 hover:bg-space-cyan/20"
+            className="w-full mt-4 min-h-[48px] py-3 rounded-xl font-semibold text-white bg-space-blue border border-space-cyan/50 hover:bg-space-cyan/20 active:scale-[0.98]"
           >
             🎮 {t('game.newGame')}
           </button>
           <button
             onClick={() => navigate('/')}
-            className="w-full mt-4 py-3 text-gray-400 hover:text-white"
+            className="w-full mt-4 min-h-[48px] py-3 text-gray-400 hover:text-white active:scale-[0.98]"
           >
             {t('game.backToHome')}
           </button>
@@ -332,11 +332,11 @@ function LocalGame() {
     const impostorsWon = gameResult.winner === 'impostors';
 
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-full flex items-center justify-center p-4 sm:p-6 md:p-8 py-6 bg-gradient-to-b from-black via-slate-950 to-black">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="glass-effect rounded-3xl p-8 max-w-2xl w-full text-center"
+          className="glass-effect rounded-3xl p-6 sm:p-8 max-w-2xl w-full text-center scroll-touch max-h-[85dvh] overflow-y-auto"
         >
           <div className="text-9xl mb-4">{impostorsWon ? '🕵️' : '🎯'}</div>
           <h1
@@ -465,7 +465,7 @@ function LocalGame() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 pt-14 md:pt-20">
+    <div className="min-h-full flex items-center justify-center p-4 sm:p-6 md:p-8">
       <p className="text-space-cyan">{t('common.loading')}</p>
     </div>
   );
