@@ -1,4 +1,4 @@
-# 🎮 Imposter - Version 1.1.10
+# 🎮 Imposter - Version 1.1.11
 
 **Fecha de lanzamiento:** 30 de Enero, 2026  
 **Estado:** ✅ Estable
@@ -7,6 +7,7 @@
 
 ## 🎯 Resumen de la Versión
 
+**v1.1.11** – Splash animado con icono de la app al abrir; se oculta al cargar contenido y verificación de actualizaciones.  
 **v1.1.10** – iOS: footer más compacto (texto 11px, menos padding); top subido 1–2 pts (pt-content-safe y top-content-safe).  
 **v1.1.9** – Móvil: switch Pista más pequeño y separado del texto; footer más compacto; card pistas + botón Próximo sin overflow (flex-col en móvil).  
 **v1.1.8** – Footer móvil: min-h-dvh en App, mt-auto y más padding inferior en Footer para pegarlo al fondo.  
@@ -206,6 +207,6 @@ ISC - Proyecto personal y educativo
 
 ---
 
-**¡Gracias por probar Imposter v1.1.10!** 🎉
+**¡Gracias por probar Imposter v1.1.11!** 🎉
 
 Desarrollado con ❤️ por Tiago Cruz

@@ -1,5 +1,13 @@
 # 📝 Changelog - Imposter
 
+## [1.1.11] - 2026-01-30
+
+### ✨ Splash al abrir
+
+- ✅ **Splash animado** con icono de la app (index.html): visible al instante, animación pulse; se oculta tras ~800 ms cuando la app ha cargado y se ha verificado si hay actualizaciones PWA.
+
+---
+
 ## [1.1.10] - 2026-01-30
 
 ### 📱 iOS: footer y top
