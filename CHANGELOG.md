@@ -1,5 +1,13 @@
 # 📝 Changelog - Imposter
 
+## [1.1.15] - 2026-01-30
+
+### 🐛 Switch "Pista para Impostores"
+
+- ✅ **Tamaño reducido** (Room y Local): track `h-7 w-12`, thumb `h-5 w-5` con `translate-x-5` cuando activo; switch más compacto y proporcionado respecto al icono y texto.
+
+---
+
 ## [1.1.14] - 2026-01-30
 
 ### 🐛 Switch "Pista para Impostores"
