@@ -1,9 +1,8 @@
 # Blueprint Render — Plan Hobby (gratuito)
-# Según https://render.com/pricing el plan Hobby incluye:
-#   - 1 project with 2 environments
-#   - Static Sites $0/mes, Web Services Free $0/mes
-#   - Custom domains: hasta 2 (añadirlos en Dashboard si los necesitas)
-# Variables MONGODB_URI, CORS_ORIGIN, VITE_*: configurar en Dashboard tras el deploy.
+# Spec: https://render.com/docs/blueprint-spec
+# Pricing: https://render.com/pricing — Hobby: 1 project, 2 environments; plan: free = $0/mes.
+# Variables MONGODB_URI (sync: false), CORS_ORIGIN, VITE_*: configurar en Dashboard.
+# Custom domains: añadir en Dashboard → Settings → Custom Domains.
 
 projects:
   - name: imposter
@@ -13,6 +12,7 @@ projects:
           - type: web
             runtime: node
             name: imposter-api-prod
+            plan: free
             rootDir: backend
             buildCommand: npm install
             startCommand: npm start
@@ -46,6 +46,7 @@ projects:
           - type: web
             runtime: node
             name: imposter-api-dev
+            plan: free
             rootDir: backend
             buildCommand: npm install
             startCommand: npm start
