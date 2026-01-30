@@ -12,11 +12,8 @@ const WordPack = require("./models/WordPack");
 const PORT = process.env.PORT || 4000;
 
 const app = express();
-// CORS: permite uno o varios orígenes separados por coma (ej. prod + dev o .onrender.com)
-const corsOriginRaw = process.env.CORS_ORIGIN || process.env.FRONTEND_URL || "*";
-const corsOrigins = corsOriginRaw.split(",").map((s) => s.trim()).filter(Boolean);
-const corsOrigin = corsOrigins.length === 0 ? "*" : corsOrigins.length === 1 ? corsOrigins[0] : corsOrigins;
-app.use(cors({ origin: corsOrigin, credentials: corsOrigin !== "*" }));
+// CORS: aceptar cualquier origen (*) para evitar bloqueos por CORS
+app.use(cors({ origin: "*", credentials: false }));
 app.use(express.json());
 
 // Rutas de API
@@ -25,8 +22,8 @@ app.use("/api/packs", wordPackRoutes);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: corsOrigin,
-    credentials: corsOrigin !== "*",
+    origin: "*",
+    credentials: false,
   },
 });
 
