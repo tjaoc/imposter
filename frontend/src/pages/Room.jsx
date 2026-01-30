@@ -6,6 +6,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import { useLanguage } from '../context/LanguageContext';
 import PackSelector from '../components/PackSelector';
 import LanguageSelector from '../components/LanguageSelector';
+import PageNav from '../components/PageNav';
 
 function Room() {
   const { t } = useTranslation();
@@ -186,6 +187,11 @@ function Room() {
 
   return (
     <div className="min-h-full p-4 sm:p-6 md:p-8">
+      <PageNav
+        showBack
+        onBack={() => navigate(-1)}
+        onExit={() => navigate('/')}
+      />
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -348,7 +354,7 @@ function Room() {
                           hintForImpostors: !prev.hintForImpostors,
                         }));
                       }}
-                      className={`relative inline-flex items-center min-h-[48px] min-w-[80px] flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-space-cyan focus:ring-offset-2 focus:ring-offset-space-dark touch-manipulation select-none ${
+                      className={`relative inline-flex items-center h-12 w-20 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-space-cyan focus:ring-offset-2 focus:ring-offset-space-dark touch-manipulation select-none ${
                         settings.hintForImpostors
                           ? 'bg-emerald-500'
                           : 'bg-gray-600'

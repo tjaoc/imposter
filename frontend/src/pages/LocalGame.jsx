@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '../hooks/useTranslation';
+import PageNav from '../components/PageNav';
 import { processVotes, checkGameEnd } from '../utils/localGameLogic';
 import { capitalizeWord } from '../utils/formatWord';
 
@@ -132,6 +133,7 @@ function LocalGame() {
     const secs = (timeLeft ?? 0) % 60;
     return (
       <div className="min-h-full p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
+        <PageNav showBack onBack={() => navigate('/local')} onExit={() => navigate('/')} />
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-glow mb-4">
@@ -171,6 +173,7 @@ function LocalGame() {
   if (phase === 'voting-turn' && currentVoter) {
     return (
       <div className="min-h-full p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
+        <PageNav showBack onBack={() => navigate('/local')} onExit={() => navigate('/')} />
         <div className="max-w-2xl mx-auto">
           <p className="text-space-cyan/60 text-sm uppercase tracking-widest mb-4 text-center">
             {t('local.securityScreen')}
@@ -215,7 +218,9 @@ function LocalGame() {
 
   if (phase === 'vote-results' && voteResult) {
     return (
-      <div className="min-h-full flex items-center justify-center p-4 sm:p-6 md:p-8 py-6 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-full flex flex-col p-4 sm:p-6 md:p-8 py-6 bg-gradient-to-b from-black via-slate-950 to-black">
+        <PageNav showBack onBack={() => navigate('/local')} onExit={() => navigate('/')} />
+        <div className="flex-1 flex items-center justify-center min-h-0">
         <div className="glass-effect rounded-3xl p-6 sm:p-8 max-w-2xl w-full text-center scroll-touch max-h-[85dvh] overflow-y-auto">
           <h1 className="text-4xl font-bold text-space-cyan mb-6">
             🗳️ {t('game.voteResults')}
@@ -324,6 +329,7 @@ function LocalGame() {
             {t('game.backToHome')}
           </button>
         </div>
+        </div>
       </div>
     );
   }
@@ -332,7 +338,9 @@ function LocalGame() {
     const impostorsWon = gameResult.winner === 'impostors';
 
     return (
-      <div className="min-h-full flex items-center justify-center p-4 sm:p-6 md:p-8 py-6 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-full flex flex-col p-4 sm:p-6 md:p-8 py-6 bg-gradient-to-b from-black via-slate-950 to-black">
+        <PageNav showBack onBack={() => navigate('/local')} onExit={() => navigate('/')} />
+        <div className="flex-1 flex items-center justify-center">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -460,13 +468,17 @@ function LocalGame() {
             {t('game.backToHome')}
           </button>
         </motion.div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-full flex items-center justify-center p-4 sm:p-6 md:p-8">
-      <p className="text-space-cyan">{t('common.loading')}</p>
+    <div className="min-h-full flex flex-col p-4 sm:p-6 md:p-8">
+      <PageNav showBack onBack={() => navigate('/local')} onExit={() => navigate('/')} />
+      <div className="flex-1 flex items-center justify-center">
+        <p className="text-space-cyan">{t('common.loading')}</p>
+      </div>
     </div>
   );
 }

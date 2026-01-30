@@ -5,6 +5,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import { useLanguage } from '../context/LanguageContext';
 import { assignRoles } from '../utils/localGameLogic';
 import LanguageSelector from '../components/LanguageSelector';
+import PageNav from '../components/PageNav';
 import { API_BASE } from '../config/env';
 import { capitalizeWord } from '../utils/formatWord';
 
@@ -131,10 +132,21 @@ function Local() {
 
   const currentPlayer = gameState?.players?.[currentRevealIndex];
 
+  const handleBackLocal = () => {
+    if (step === 'players') navigate('/');
+    else if (step === 'pack') setStep('players');
+    else if (step === 'reveal') setStep('pack');
+  };
+
   if (step === 'players') {
     return (
       <div className="min-h-full p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
-        <div className="absolute top-content-safe right-4 sm:right-6 md:right-8">
+        <div className="flex items-center justify-between mb-2">
+          <PageNav
+            showBack
+            onBack={handleBackLocal}
+            onExit={() => navigate('/')}
+          />
           <LanguageSelector />
         </div>
         <motion.div
@@ -201,13 +213,6 @@ function Local() {
           >
             {players.length < 3 ? t('local.minPlayers') : t('local.selectPack')}
           </button>
-          <button
-            type="button"
-            onClick={() => navigate('/')}
-            className="w-full mt-4 min-h-[48px] py-3.5 text-gray-400 hover:text-white active:scale-[0.98]"
-          >
-            {t('common.back')}
-          </button>
         </motion.div>
       </div>
     );
@@ -216,7 +221,12 @@ function Local() {
   if (step === 'pack') {
     return (
       <div className="min-h-full p-4 bg-gradient-to-b from-black via-slate-950 to-black">
-        <div className="absolute top-content-safe right-4">
+        <div className="flex items-center justify-between mb-2">
+          <PageNav
+            showBack
+            onBack={handleBackLocal}
+            onExit={() => navigate('/')}
+          />
           <LanguageSelector />
         </div>
         <motion.div
@@ -299,8 +309,13 @@ function Local() {
                   </div>
                 </div>
               </div>
-              {/* Pista para Impostores */}
-              <div className="glass-effect rounded-2xl p-4 sm:p-6 mb-4">
+              {/* Pista para Impostores (igual que Room) */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="glass-effect rounded-2xl p-4 sm:p-6 mb-4"
+              >
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">🔍</div>
@@ -326,7 +341,7 @@ function Local() {
                           hintForImpostors: !prev.hintForImpostors,
                         }));
                       }}
-                      className={`relative inline-flex items-center min-h-[48px] min-w-[80px] flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-space-cyan focus:ring-offset-2 focus:ring-offset-space-dark touch-manipulation select-none ${
+                      className={`relative inline-flex items-center h-12 w-20 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-space-cyan focus:ring-offset-2 focus:ring-offset-space-dark touch-manipulation select-none ${
                         settings.hintForImpostors
                           ? 'bg-emerald-500'
                           : 'bg-gray-600'
@@ -342,7 +357,7 @@ function Local() {
                     </button>
                   </div>
                 </div>
-              </div>
+              </motion.div>
               {/* Duración */}
               <div className="glass-effect rounded-2xl p-4 sm:p-6 mb-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -458,13 +473,6 @@ function Local() {
           >
             {t('local.startGame')}
           </button>
-          <button
-            type="button"
-            onClick={() => setStep('players')}
-            className="w-full mt-4 min-h-[48px] py-3.5 text-gray-400 hover:text-white active:scale-[0.98]"
-          >
-            {t('common.back')}
-          </button>
         </motion.div>
       </div>
     );
@@ -475,7 +483,14 @@ function Local() {
     const displayWord = currentPlayer.word || '';
 
     return (
-      <div className="min-h-full flex flex-col items-center justify-center p-4 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-full flex flex-col p-4 bg-gradient-to-b from-black via-slate-950 to-black">
+        <PageNav
+          showBack
+          onBack={handleBackLocal}
+          onExit={() => navigate('/')}
+          className="mb-2 flex-shrink-0"
+        />
+        <div className="flex-1 flex flex-col items-center justify-center">
         <AnimatePresence mode="wait">
           {!roleRevealed ? (
             <motion.div
@@ -554,6 +569,7 @@ function Local() {
             </motion.div>
           )}
         </AnimatePresence>
+        </div>
       </div>
     );
   }

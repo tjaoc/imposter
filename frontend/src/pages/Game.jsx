@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSocket } from '../hooks/useSocket';
 import { useTranslation } from '../hooks/useTranslation';
+import PageNav from '../components/PageNav';
 import { capitalizeWord } from '../utils/formatWord';
 
 function Game() {
@@ -557,6 +558,10 @@ function Game() {
     navigate('/');
   };
 
+  const handleBackToRoom = () => {
+    navigate(`/room/${code}`);
+  };
+
   // Unirse a la sala y obtener información (debe estar antes de cualquier early return)
   useEffect(() => {
     if (!socket || !isConnected) return;
@@ -630,8 +635,10 @@ function Game() {
   if (gamePhase === 'revealing') {
     // Si ya vio su rol, mostrar pantalla de espera
     if (hasSeenRole) {
-      return (
-        <div className="min-h-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
+    return (
+      <div className="min-h-full flex flex-col p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
+        <PageNav showBack onBack={() => navigate(-1)} onExit={handleBackToLobby} />
+        <div className="flex-1 flex items-center justify-center">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -656,7 +663,8 @@ function Game() {
             </div>
           </motion.div>
         </div>
-      );
+      </div>
+    );
     }
 
     // Mostrar rol con animación premium de flip 3D
@@ -664,7 +672,9 @@ function Game() {
     const displayWord = myRole?.word || '';
 
     return (
-      <div className="min-h-full flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-full flex flex-col p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
+        <PageNav showBack onBack={handleBackToRoom} onExit={handleBackToLobby} />
+        <div className="flex-1 flex flex-col items-center justify-center">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -849,6 +859,7 @@ function Game() {
 
     return (
       <div className="min-h-full p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
+        <PageNav showBack onBack={handleBackToRoom} onExit={handleBackToLobby} />
         <div className="max-w-2xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -955,6 +966,7 @@ function Game() {
             🏠 {t('game.backToHome')}
           </motion.button>
         </div>
+        </div>
       </div>
     );
   }
@@ -990,6 +1002,7 @@ function Game() {
     // Debug: Log para ver qué jugadores hay disponibles
     return (
       <div className="min-h-full p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
+        <PageNav showBack onBack={handleBackToRoom} onExit={handleBackToLobby} />
         <div className="max-w-2xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -1118,7 +1131,9 @@ function Game() {
   // ===== FASE: RESULTADOS DE VOTACIÓN (antes de continuar) =====
   if (gamePhase === 'vote-results' && gameResult) {
     return (
-      <div className="min-h-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-full flex flex-col p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
+        <PageNav showBack onBack={handleBackToRoom} onExit={handleBackToLobby} />
+        <div className="flex-1 flex items-center justify-center">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -1331,6 +1346,7 @@ function Game() {
             </motion.div>
           </div>
         </motion.div>
+        </div>
       </div>
     );
   }
@@ -1342,7 +1358,9 @@ function Game() {
       : gameResult.winner === 'civilians';
 
     return (
-      <div className="min-h-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-full flex flex-col p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
+        <PageNav showBack onBack={handleBackToRoom} onExit={handleBackToLobby} />
+        <div className="flex-1 flex items-center justify-center">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -1569,13 +1587,16 @@ function Game() {
             </motion.div>
           </div>
         </motion.div>
+        </div>
       </div>
     );
   }
 
   // ===== ESPERANDO INICIO =====
   return (
-    <div className="min-h-full flex items-center justify-center p-4">
+    <div className="min-h-full flex flex-col p-4">
+      <PageNav showBack onBack={() => navigate(-1)} onExit={handleBackToLobby} />
+      <div className="flex-1 flex items-center justify-center">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -1590,6 +1611,7 @@ function Game() {
           {isConnected ? '✅' : '❌'}
         </div>
       </motion.div>
+      </div>
     </div>
   );
 }
