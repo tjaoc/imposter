@@ -6,23 +6,26 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "generate-pwa-assets": "pwa-assets-generator"
+    "generate-pwa-assets": "pwa-assets-generator",
+    "generate-icons": "node scripts/generate-icons-from-logo.js"
   },
   "dependencies": {
+    "framer-motion": "^12.29.2",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.13.0",
     "socket.io-client": "^4.8.3",
-    "framer-motion": "^12.29.2",
     "zustand": "^5.0.10"
   },
   "devDependencies": {
     "@types/react": "^19.2.10",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.2",
     "@vite-pwa/assets-generator": "^1.0.2",
+    "@vitejs/plugin-react": "^5.1.2",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.32",
+    "sharp": "^0.33.5",
+    "sharp-ico": "^0.1.5",
     "tailwindcss": "^3.4.19",
     "vite": "^7.3.1",
     "vite-plugin-pwa": "^1.2.0",

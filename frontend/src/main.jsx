@@ -5,6 +5,20 @@ import { LanguageProvider } from './context/LanguageContext';
 import App from './App';
 import './index.css';
 
+import { registerSW } from 'virtual:pwa-register';
+
+const updateSW = registerSW({
+  onNeedRefresh() {
+    window.dispatchEvent(new CustomEvent('pwa-update-available'));
+  },
+  onOfflineReady() {
+    // Opcional: mensaje cuando la app está lista para offline
+  },
+});
+if (typeof window !== 'undefined') {
+  window.__pwaUpdate = () => updateSW && updateSW(true);
+}
+
 const rootElement = document.getElementById('root');
 
 // Suprimir warnings específicos de React 19 hydration en desarrollo (SPA sin SSR)

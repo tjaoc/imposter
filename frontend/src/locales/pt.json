@@ -12,7 +12,9 @@
     "or": "Ou",
     "playerDefault": "Jogador",
     "serverUnavailable": "Não foi possível ligar ao servidor. Se acabaste de abrir a app, espera um minuto e recarrega.",
-    "retry": "Recarregar"
+    "retry": "Recarregar",
+    "updateAvailable": "Há uma atualização disponível",
+    "updateNow": "Atualizar"
   },
   "home": {
     "title": "IMPOSTOR",
