@@ -1,4 +1,4 @@
-# 🎮 Imposter - Version 1.1.19
+# 🎮 Imposter - Version 1.1.20
 
 **Fecha de lanzamiento:** 30 de Enero, 2026  
 **Estado:** ✅ Estable
@@ -7,6 +7,7 @@
 
 ## 🎯 Resumen de la Versión
 
+**v1.1.20** – CSS: pt-content-safe reducido; footer iOS line-height 2; locales: eliminada clave selectPackDesc no usada.  
 **v1.1.19** – Duración (Room y Local): eliminada descripción "Tiempo de discusión"; etiqueta "Duración" y select en la misma línea.  
 **v1.1.18** – CSS: eliminada regla de touch targets (min-height: 48px en botones/enlaces en pointer: coarse).  
 **v1.1.17** – Switch Pista como ref.: track en cápsula (rounded-full), card-tight; selector de idioma: un contenedor, opción seleccionada con fondo cyan redondeado.  
@@ -215,6 +216,6 @@ ISC - Proyecto personal y educativo
 
 ---
 
-**¡Gracias por probar Imposter v1.1.19!** 🎉
+**¡Gracias por probar Imposter v1.1.20!** 🎉
 
 Desarrollado con ❤️ por Tiago Cruz

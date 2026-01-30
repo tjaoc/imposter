@@ -1,5 +1,15 @@
 # 📝 Changelog - Imposter
 
+## [1.1.20] - 2026-01-30
+
+### 🧹 CSS y locales
+
+- ✅ **pt-content-safe** (index.css): reducido a `max(0.25rem, calc(env(safe-area-inset-top) + 0.5rem))`.
+- ✅ **Footer iOS**: `line-height` de 1.15 a 2 en `body.ios footer`.
+- ✅ **Locales**: eliminada clave `selectPackDesc` no usada (es.json, pt.json).
+
+---
+
 ## [1.1.19] - 2026-01-30
 
 ### 🐛 UI: Duración (Room y Local)
