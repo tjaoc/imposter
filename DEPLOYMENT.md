@@ -73,6 +73,22 @@ Si algo falla, revisa **Logs** del servicio que falle (build o runtime) y **REND
 
 ---
 
+## Borrar y volver a ejecutar el seed (Render)
+
+El backend **borra todos los WordPacks y ejecuta el seed cada vez que arranca** (al conectar a MongoDB). No hace falta ejecutar nada a mano en MongoDB Atlas.
+
+**Para que se eliminen los packs actuales y se vuelvan a crear con el código actual (por ejemplo, solo palabras curadas):**
+
+1. **Redeploy del backend** en Render:
+   - Dashboard → proyecto **imposter** → entorno (**Production** o **Development**).
+   - Entra en el servicio de la API (**imposter-api-prod** o **imposter-api-dev**).
+   - Pestaña **Manual Deploy** → **Deploy latest commit** (o haz push a la rama conectada y espera al deploy automático).
+2. Cuando el backend arranque de nuevo, hará `WordPack.deleteMany({})` y luego insertará de nuevo todos los packs desde el seed (listas curadas de `wordPacks.js` + pt-PT + `updates-*.json`).
+
+Si usas **dos entornos** (prod y dev), repite el redeploy en el servicio de API del entorno que quieras actualizar (cada uno tiene su propia base en MongoDB Atlas: `production` / `develop`).
+
+---
+
 ## "Your render.yaml services require payment information"
 
 Si Render te pide **método de pago** al usar el Blueprint:

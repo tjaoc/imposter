@@ -21,6 +21,11 @@ function Local() {
   const [loadingPacks, setLoadingPacks] = useState(false);
   const [packsError, setPacksError] = useState(false);
   const [selectedPackIds, setSelectedPackIds] = useState([]);
+  const [settings, setSettings] = useState({
+    impostorCount: 1,
+    discussionSeconds: 240,
+    hintForImpostors: true,
+  });
   const [gameState, setGameState] = useState(null);
   const [currentRevealIndex, setCurrentRevealIndex] = useState(0);
   const [roleRevealed, setRoleRevealed] = useState(false);
@@ -94,18 +99,18 @@ function Local() {
         const pack = data.pack;
         const secretWord =
           pack.words[Math.floor(Math.random() * pack.words.length)];
-        const hintWord = pack.name || null;
+        const hintWord = settings.hintForImpostors ? (pack.name || null) : null;
         const playersWithRoles = assignRoles(
           players.map((p) => ({ id: p.id, name: p.name })),
           secretWord,
-          1,
+          settings.impostorCount,
           hintWord
         );
         setGameState({
           players: playersWithRoles,
           secretWord,
           impostorHint: hintWord,
-          discussionSeconds: 240,
+          discussionSeconds: settings.discussionSeconds,
           eliminatedPlayers: [],
           votes: {},
         });
@@ -242,6 +247,139 @@ function Local() {
             </div>
           ) : (
             <>
+              {/* Impostores */}
+              <div className="glass-effect rounded-2xl p-4 sm:p-6 mb-4">
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="text-2xl">🕵️</div>
+                    <div>
+                      <div className="text-white font-semibold">
+                        {t('room.impostors')}
+                      </div>
+                      <div className="text-sm text-gray-400">
+                        {t('room.impostorsDesc')}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          impostorCount: Math.max(1, prev.impostorCount - 1),
+                        }))
+                      }
+                      disabled={settings.impostorCount <= 1}
+                      className="min-w-[48px] min-h-[48px] w-12 h-12 rounded-xl bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xl flex items-center justify-center active:scale-95"
+                    >
+                      −
+                    </button>
+                    <span className="text-xl sm:text-2xl font-bold text-white w-12 text-center">
+                      {settings.impostorCount}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          impostorCount: Math.min(
+                            players.length - 1,
+                            prev.impostorCount + 1
+                          ),
+                        }))
+                      }
+                      disabled={
+                        settings.impostorCount >= Math.max(1, players.length - 1)
+                      }
+                      className="min-w-[48px] min-h-[48px] w-12 h-12 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xl flex items-center justify-center active:scale-95"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {/* Pista para Impostores */}
+              <div className="glass-effect rounded-2xl p-4 sm:p-6 mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="text-2xl">🔍</div>
+                    <div>
+                      <div className="text-white font-semibold">
+                        {t('room.hintForImpostors')}
+                      </div>
+                      <div className="text-sm text-gray-400">
+                        {t('room.hintForImpostorsDesc')}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-end sm:justify-end min-h-[48px]">
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={settings.hintForImpostors}
+                      onClick={() =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          hintForImpostors: !prev.hintForImpostors,
+                        }))
+                      }
+                      className={`relative inline-flex h-8 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-space-cyan focus:ring-offset-2 focus:ring-offset-space-dark ${
+                        settings.hintForImpostors
+                          ? 'bg-emerald-500'
+                          : 'bg-gray-600'
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow-lg ring-0 transition ${
+                          settings.hintForImpostors
+                            ? 'translate-x-6'
+                            : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {/* Duración */}
+              <div className="glass-effect rounded-2xl p-4 sm:p-6 mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="text-2xl">⏱️</div>
+                    <div>
+                      <div className="text-white font-semibold">
+                        {t('room.duration')}
+                      </div>
+                      <div className="text-sm text-gray-400">
+                        {t('room.durationDesc')}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {Array.from({ length: 20 }, (_, i) => (i + 1) * 60).map(
+                      (seconds) => (
+                        <button
+                          type="button"
+                          key={seconds}
+                          onClick={() =>
+                            setSettings((prev) => ({
+                              ...prev,
+                              discussionSeconds: seconds,
+                            }))
+                          }
+                          className={`min-h-[48px] px-3 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                            settings.discussionSeconds === seconds
+                              ? 'bg-space-cyan text-black'
+                              : 'bg-gray-700 text-white hover:bg-gray-600'
+                          }`}
+                        >
+                          {seconds / 60}min
+                        </button>
+                      )
+                    )}
+                  </div>
+                </div>
+              </div>
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm text-space-cyan">
                   {t('room.selectPacksLabel')}
@@ -310,7 +448,11 @@ function Local() {
             type="button"
             onClick={startGameWithPack}
             disabled={selectedPackIds.length === 0 || loadingPacks}
-            className="w-full min-h-[52px] py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl font-bold text-white disabled:opacity-50 active:scale-[0.98]"
+            className={`w-full min-h-[52px] py-4 rounded-xl font-bold transition-all active:scale-[0.98] disabled:cursor-not-allowed ${
+              selectedPackIds.length > 0 && !loadingPacks
+                ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 text-white'
+                : 'bg-gray-600 text-gray-400'
+            }`}
           >
             {t('local.startGame')}
           </button>

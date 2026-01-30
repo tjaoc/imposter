@@ -265,7 +265,7 @@ function Room() {
                 transition={{ delay: 0.1 }}
                 className="glass-effect rounded-2xl p-4 sm:p-6"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex flex-col gap-4">
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">🕵️</div>
                     <div>
@@ -277,7 +277,7 @@ function Room() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center gap-3">
                     <button
                       type="button"
                       onClick={() =>
@@ -335,25 +335,32 @@ function Room() {
                       </div>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setSettings((prev) => ({
-                        ...prev,
-                        hintForImpostors: !prev.hintForImpostors,
-                      }))
-                    }
-                    className={`relative w-14 h-9 min-h-[48px] rounded-full transition-colors flex-shrink-0 ${
-                      settings.hintForImpostors
-                        ? 'bg-emerald-500'
-                        : 'bg-gray-600'
-                    }`}
-                  >
-                    <motion.div
-                      animate={{ x: settings.hintForImpostors ? 24 : 4 }}
-                      className="absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-lg"
-                    />
-                  </button>
+                  <div className="flex items-center justify-end sm:justify-end min-h-[48px]">
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={settings.hintForImpostors}
+                      onClick={() =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          hintForImpostors: !prev.hintForImpostors,
+                        }))
+                      }
+                      className={`relative inline-flex h-8 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-space-cyan focus:ring-offset-2 focus:ring-offset-space-dark ${
+                        settings.hintForImpostors
+                          ? 'bg-emerald-500'
+                          : 'bg-gray-600'
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow-lg ring-0 transition ${
+                          settings.hintForImpostors
+                            ? 'translate-x-6'
+                            : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
               </motion.div>
 
@@ -377,25 +384,27 @@ function Room() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    {[60, 120, 180, 240, 300].map((seconds) => (
-                      <button
-                        type="button"
-                        key={seconds}
-                        onClick={() =>
-                          setSettings((prev) => ({
-                            ...prev,
-                            discussionSeconds: seconds,
-                          }))
-                        }
-                        className={`min-h-[48px] px-4 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
-                          settings.discussionSeconds === seconds
-                            ? 'bg-space-cyan text-black'
-                            : 'bg-gray-700 text-white hover:bg-gray-600'
-                        }`}
-                      >
-                        {seconds / 60}min
-                      </button>
-                    ))}
+                    {Array.from({ length: 20 }, (_, i) => (i + 1) * 60).map(
+                      (seconds) => (
+                        <button
+                          type="button"
+                          key={seconds}
+                          onClick={() =>
+                            setSettings((prev) => ({
+                              ...prev,
+                              discussionSeconds: seconds,
+                            }))
+                          }
+                          className={`min-h-[48px] px-3 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                            settings.discussionSeconds === seconds
+                              ? 'bg-space-cyan text-black'
+                              : 'bg-gray-700 text-white hover:bg-gray-600'
+                          }`}
+                        >
+                          {seconds / 60}min
+                        </button>
+                      )
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -414,7 +423,13 @@ function Room() {
                 selectedPacks.length === 0 ||
                 isStarting
               }
-              className="w-full min-h-[52px] py-4 sm:py-5 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-2xl font-bold text-white text-base sm:text-lg shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+              className={`w-full min-h-[52px] py-4 sm:py-5 rounded-2xl font-bold text-base sm:text-lg transition-all active:scale-[0.98] disabled:cursor-not-allowed ${
+                room.players.length >= 3 &&
+                selectedPacks.length > 0 &&
+                !isStarting
+                  ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 text-white shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70'
+                  : 'bg-gray-600 text-gray-400'
+              }`}
             >
               {isStarting
                 ? `⏳ ${t('room.starting')}`

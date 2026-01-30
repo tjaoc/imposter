@@ -1,12 +1,15 @@
 /**
  * Seed de packs de palabras: es-ES y pt-PT (Português de Portugal).
+ * Solo se usan listas curadas (TARGET_TOTAL_WORDS = 0): sin relleno con diccionario,
+ * para que las palabras sean adecuadas para jóvenes y niños.
  * Tras cambiar el modelo a índice único (slug + locale), si ya tenías DB:
  * en MongoDB: db.wordpacks.dropIndex('slug_1') y luego reinicia el backend para que ejecute el seed.
  */
 const WordPack = require('../models/WordPack');
 const { curatedWordPacksPtPT } = require('./wordPacksPtPT');
 
-const TARGET_TOTAL_WORDS = 50000;
+/** Solo palabras curadas: sin relleno con diccionario, para jóvenes y niños. */
+const TARGET_TOTAL_WORDS = 0;
 const MIN_WORD_LENGTH = 4;
 const MAX_WORD_LENGTH = 22;
 
