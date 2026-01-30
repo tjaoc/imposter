@@ -1,6 +1,6 @@
-# Blueprint Render: Producción + Desarrollo (2 entornos, 4 servicios)
-# Conecta el repo en Render como Blueprint; crea el proyecto con los dos entornos.
-# Variables secretas: configurar en Dashboard (ver RENDER_ENVS.md).
+# Blueprint Render: 1 proyecto, 2 entornos (plan gratuito)
+# Proyecto "imposter" con environments: production, development.
+# Dominios personalizados: añádelos después en Dashboard → cada servicio → Settings → Custom Domains.
 
 projects:
   - name: imposter
@@ -15,8 +15,6 @@ projects:
             buildCommand: npm install
             startCommand: npm start
             healthCheckPath: /health
-            domains:
-              - apiimp.netic.app
             envVars:
               - key: NODE_ENV
                 value: production
@@ -31,8 +29,6 @@ projects:
             rootDir: frontend
             buildCommand: npm install && npm run build
             staticPublishPath: dist
-            domains:
-              - impostor.netic.app
             routes:
               - type: rewrite
                 source: /*
@@ -53,8 +49,6 @@ projects:
             buildCommand: npm install
             startCommand: npm start
             healthCheckPath: /health
-            domains:
-              - apiimp.netic.dev
             envVars:
               - key: NODE_ENV
                 value: development
@@ -69,8 +63,6 @@ projects:
             rootDir: frontend
             buildCommand: npm install && npm run build
             staticPublishPath: dist
-            domains:
-              - impostor.netic.dev
             routes:
               - type: rewrite
                 source: /*
