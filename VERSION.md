@@ -1,4 +1,4 @@
-# 🎮 Imposter - Version 1.1.6
+# 🎮 Imposter - Version 1.1.7
 
 **Fecha de lanzamiento:** 30 de Enero, 2026  
 **Estado:** ✅ Estable
@@ -7,6 +7,7 @@
 
 ## 🎯 Resumen de la Versión
 
+**v1.1.7** – Viewport: interactive-widget=resizes-visual; meta mobile-web-app-capable (reemplaza deprecado).  
 **v1.1.6** – Bump automático de versión en commit/push; regla actualizada para subir patch si no se indica versión.  
 **v1.1.5** – Sincronización de versión en todo el proyecto; regla Cursor para actualizar versión automáticamente en commit/push.  
 **v1.1.2** – Corrección botón "Nueva Partida" en juego online (con/sin bots): backend siempre responde, room.settings asegurado, frontend solo emite tras room:join ok y timeout de respuesta.  
@@ -202,6 +203,6 @@ ISC - Proyecto personal y educativo
 
 ---
 
-**¡Gracias por probar Imposter v1.1.6!** 🎉
+**¡Gracias por probar Imposter v1.1.7!** 🎉
 
 Desarrollado con ❤️ por Tiago Cruz

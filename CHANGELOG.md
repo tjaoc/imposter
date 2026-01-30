@@ -1,5 +1,14 @@
 # 📝 Changelog - Imposter
 
+## [1.1.7] - 2026-01-30
+
+### 🐛 index.html
+
+- ✅ Viewport: `interactive-widget=resizes-visual` (valor válido; antes `resize-visual` se ignoraba).
+- ✅ Meta PWA: `mobile-web-app-capable` en lugar de `apple-mobile-web-app-capable` deprecado.
+
+---
+
 ## [1.1.6] - 2026-01-30
 
 ### 📌 Versión automática en commit/push
