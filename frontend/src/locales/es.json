@@ -9,7 +9,9 @@
     "loading": "Cargando...",
     "error": "Error",
     "or": "O",
-    "playerDefault": "Jugador"
+    "playerDefault": "Jugador",
+    "serverUnavailable": "No se pudo conectar al servidor. Si acabas de abrir la app, espera un minuto y recarga.",
+    "retry": "Recargar"
   },
   "home": {
     "title": "IMPOSTER",

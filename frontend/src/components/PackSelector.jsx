@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from '../hooks/useTranslation';
 import { useLanguage } from '../context/LanguageContext';
@@ -9,21 +9,34 @@ function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
   const { locale } = useLanguage();
   const [packs, setPacks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [serverError, setServerError] = useState(false);
 
-  useEffect(() => {
+  const loadPacks = useCallback(() => {
+    setServerError(false);
+    setLoading(true);
     fetch(`${API_BASE}/api/packs?locale=${locale}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.ok) {
-          setPacks(data.packs);
+      .then(res => {
+        if (!res.ok && res.status === 502) {
+          setServerError(true);
+          return null;
         }
+        return res.json();
+      })
+      .then(data => {
+        if (data?.ok) setPacks(data.packs);
+        else if (data === null) setPacks([]);
         setLoading(false);
       })
-      .catch(err => {
-        console.error('Error cargando packs:', err);
+      .catch(() => {
+        setServerError(true);
+        setPacks([]);
         setLoading(false);
       });
   }, [locale]);
+
+  useEffect(() => {
+    loadPacks();
+  }, [loadPacks]);
 
   const handlePackToggle = (packId) => {
     const newSelected = selectedPackIds.includes(packId)
@@ -40,8 +53,23 @@ function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
     }
   };
 
-  if (loading) {
+  if (loading && packs.length === 0) {
     return <div className="text-space-cyan text-center">{t('common.loading')}</div>;
+  }
+
+  if (serverError) {
+    return (
+      <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-4 text-center space-y-3">
+        <p className="text-amber-200 text-sm">{t('common.serverUnavailable')}</p>
+        <button
+          type="button"
+          onClick={() => loadPacks()}
+          className="px-4 py-2 rounded-lg bg-space-cyan text-space-navy font-medium hover:bg-space-cyan/90"
+        >
+          {t('common.retry')}
+        </button>
+      </div>
+    );
   }
 
   return (

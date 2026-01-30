@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '../hooks/useTranslation';
@@ -18,6 +18,7 @@ function Local() {
   const [playerName, setPlayerName] = useState('');
   const [packs, setPacks] = useState([]);
   const [loadingPacks, setLoadingPacks] = useState(false);
+  const [packsError, setPacksError] = useState(false);
   const [selectedPackIds, setSelectedPackIds] = useState([]);
   const [gameState, setGameState] = useState(null);
   const [currentRevealIndex, setCurrentRevealIndex] = useState(0);
@@ -36,18 +37,32 @@ function Local() {
     setStep('pack');
   }, [location.state]);
 
+  const loadPacks = useCallback(() => {
+    setPacksError(false);
+    setLoadingPacks(true);
+    fetch(`${API_BASE}/api/packs?locale=${locale}`)
+      .then((res) => {
+        if (!res.ok && res.status === 502) {
+          setPacksError(true);
+          return null;
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (data?.ok) setPacks(data.packs);
+        else if (data === null) setPacks([]);
+        setLoadingPacks(false);
+      })
+      .catch(() => {
+        setPacksError(true);
+        setPacks([]);
+        setLoadingPacks(false);
+      });
+  }, [locale]);
+
   useEffect(() => {
-    if (step === 'pack') {
-      setLoadingPacks(true);
-      fetch(`${API_BASE}/api/packs?locale=${locale}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.ok) setPacks(data.packs);
-          setLoadingPacks(false);
-        })
-        .catch(() => setLoadingPacks(false));
-    }
-  }, [step, locale]);
+    if (step === 'pack') loadPacks();
+  }, [step, loadPacks]);
 
   const addPlayer = () => {
     const name = playerName.trim();
@@ -191,8 +206,19 @@ function Local() {
             <h1 className="text-3xl font-bold text-glow mb-2">{t('local.selectPack')}</h1>
             <p className="text-space-cyan/80">{t('local.selectPackDesc')}</p>
           </div>
-          {loadingPacks ? (
+          {loadingPacks && packs.length === 0 ? (
             <p className="text-center text-space-cyan">{t('common.loading')}</p>
+          ) : packsError ? (
+            <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-4 text-center space-y-3 mb-4">
+              <p className="text-amber-200 text-sm">{t('common.serverUnavailable')}</p>
+              <button
+                type="button"
+                onClick={() => loadPacks()}
+                className="px-4 py-2 rounded-lg bg-space-cyan text-space-navy font-medium hover:bg-space-cyan/90"
+              >
+                {t('common.retry')}
+              </button>
+            </div>
           ) : (
             <>
               <div className="flex items-center justify-between mb-3">
