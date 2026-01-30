@@ -31,6 +31,7 @@ function Local() {
   const [gameState, setGameState] = useState(null);
   const [currentRevealIndex, setCurrentRevealIndex] = useState(0);
   const [roleRevealed, setRoleRevealed] = useState(false);
+  const [showCardBack, setShowCardBack] = useState(true);
 
   // Nueva partida con los mismos jugadores: venir desde resultados con state.keepPlayers
   useEffect(() => {
@@ -130,6 +131,7 @@ function Local() {
 
   const handleCloseRole = () => {
     setRoleRevealed(false);
+    setShowCardBack(true);
     if (currentRevealIndex >= gameState.players.length - 1) {
       navigate('/local/game', { state: { gameState } });
     } else {
@@ -450,7 +452,10 @@ function Local() {
               </p>
               <motion.button
                 type="button"
-                onClick={() => setRoleRevealed(true)}
+                onClick={() => {
+                  setRoleRevealed(true);
+                  setShowCardBack(true);
+                }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
                 className="w-full max-w-xs py-4 rounded-full bg-gradient-to-r from-space-purple to-space-pink font-semibold text-white"
@@ -461,46 +466,123 @@ function Local() {
           ) : (
             <motion.div
               key="role"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="w-full max-w-md text-center"
+              className="w-full flex flex-col items-center"
             >
-              <div className="glass-effect rounded-3xl p-8 mb-6">
-                <div className="text-6xl mb-4">{isImpostor ? '🕵️' : '🎯'}</div>
-                {isImpostor ? (
-                  <>
-                    <p className="text-red-400 font-bold text-xl mb-2">
-                      {t('game.youAreImpostor')}
-                    </p>
-                    {displayWord && (
-                      <p className="text-sm text-emerald-300">
-                        {t('game.hintCategory')}: {capitalizeWord(displayWord)}
-                      </p>
-                    )}
-                    <p className="text-gray-400 text-sm mt-4">
-                      {t('game.impostorHint')}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-gray-400 text-sm mb-2">
-                      {t('game.yourSecretWord')}
-                    </p>
-                    <p className="text-3xl font-bold text-emerald-400">
-                      {capitalizeWord(displayWord)}
-                    </p>
-                    <p className="text-gray-400 text-sm mt-4">
-                      {t('game.describeWithoutSaying', { count: 1 })}
-                    </p>
-                  </>
-                )}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6 text-center"
+              >
+                <h1 className="text-3xl font-extrabold tracking-wide text-red-400 drop-shadow-lg mb-2">
+                  {isImpostor
+                    ? t('game.youAreImpostor').toUpperCase()
+                    : t('game.yourWord').toUpperCase()}
+                </h1>
+                <p className="text-sm text-slate-400 uppercase tracking-[0.2em]">
+                  {t('game.revealSubtitle')}
+                </p>
+              </motion.div>
+
+              <div
+                className="relative w-72 h-96 mb-8"
+                style={{ perspective: '1200px' }}
+              >
+                <AnimatePresence mode="wait">
+                  {showCardBack ? (
+                    <motion.div
+                      key="card-back"
+                      initial={{ rotateY: 180, opacity: 0 }}
+                      animate={{ rotateY: 0, opacity: 1 }}
+                      exit={{ rotateY: -180, opacity: 0 }}
+                      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                      className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-900 via-indigo-900 to-slate-900 border-2 border-purple-500/50 shadow-[0_0_40px_rgba(139,92,246,0.5)] flex items-center justify-center cursor-pointer"
+                      onClick={() => setShowCardBack(false)}
+                      style={{ transformStyle: 'preserve-3d' }}
+                    >
+                      <div className="text-center" style={{ transform: 'translateZ(20px)' }}>
+                        <motion.div
+                          animate={{ scale: [1, 1.1, 1] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="text-6xl mb-4"
+                        >
+                          👁️‍🗨️
+                        </motion.div>
+                        <p className="text-slate-200 text-sm font-medium">
+                          {t('game.touchToReveal')}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="card-front"
+                      initial={{ rotateY: 180, opacity: 0 }}
+                      animate={{ rotateY: 0, opacity: 1 }}
+                      exit={{ rotateY: 180, opacity: 0 }}
+                      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                      className="absolute inset-0 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-950 to-black border-2 border-slate-700 shadow-[0_0_40px_rgba(15,23,42,0.8)] flex flex-col items-center justify-center px-6"
+                      style={{ transformStyle: 'preserve-3d', backfaceVisibility: 'hidden' }}
+                    >
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 1, type: 'spring', stiffness: 200 }}
+                        className="text-7xl mb-4"
+                      >
+                        {isImpostor ? '🕵️' : '🎯'}
+                      </motion.div>
+                      {isImpostor ? (
+                        <>
+                          <p className="text-red-400 font-semibold text-xl mb-2">
+                            {t('game.youAreImpostor')}
+                          </p>
+                          {displayWord && (
+                            <p className="text-sm text-emerald-300 mb-4 px-4 py-2 bg-emerald-900/30 rounded-lg">
+                              {t('game.hintCategory')} ({t('game.category')}):{' '}
+                              <span className="font-bold text-emerald-200">
+                                {capitalizeWord(displayWord)}
+                              </span>
+                            </p>
+                          )}
+                          <p className="text-sm text-slate-400 text-center px-4">
+                            {t('game.impostorHint')}
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-sm text-slate-400 mb-2">
+                            {t('game.yourSecretWord')}:
+                          </p>
+                          <motion.p
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ delay: 1.2 }}
+                            className="text-4xl font-extrabold text-emerald-400 drop-shadow-lg mb-4 text-center"
+                            style={{ textShadow: '0 0 20px rgba(16, 185, 129, 0.5)' }}
+                          >
+                            {capitalizeWord(displayWord)}
+                          </motion.p>
+                          <p className="text-sm text-slate-400 text-center px-4">
+                            {t('game.describeWithoutSaying', { count: 1 })}
+                          </p>
+                        </>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
+
               <motion.button
                 type="button"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 1.5 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={handleCloseRole}
-                whileTap={{ scale: 0.98 }}
-                className="w-full min-h-[52px] py-4 rounded-full bg-space-blue border-2 border-space-cyan font-semibold text-space-cyan hover:bg-space-cyan hover:text-space-dark transition-colors active:scale-[0.98]"
+                className="w-full max-w-xs min-h-[48px] py-4 rounded-full bg-emerald-500 hover:bg-emerald-400 font-semibold text-black tracking-wide shadow-lg shadow-emerald-500/40 transition"
               >
                 {t('local.hideRole')}
               </motion.button>

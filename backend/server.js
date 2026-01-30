@@ -58,18 +58,21 @@ const getPublicRoomState = (room) => ({
   settings: room.settings,
 });
 
-/** Genera y envía pistas para todos los bots en la ronda actual */
-function submitBotClues(io, code, games, roomClueTimers) {
+/** Genera y envía pistas para todos los bots en la ronda indicada (roundNum) o la actual */
+function submitBotClues(io, code, games, roomClueTimers, roundNum) {
   const gameState = games.get(code);
   if (!gameState || gameState.status !== 'clues') return;
 
-  const round = gameState.clueRound;
+  const round = roundNum != null ? roundNum : gameState.clueRound;
+  if (round < 1 || round > (gameState.maxClueRounds || 3)) return;
+
+  if (!gameState.cluesByRound[round]) gameState.cluesByRound[round] = {};
   const words = gameState.packWords || [];
   const secretWord = gameState.secretWord;
 
   gameState.players.forEach((p) => {
     if (!p.isBot) return;
-    if (gameState.cluesByRound[round]?.[p.id] !== undefined) return;
+    if (gameState.cluesByRound[round][p.id] !== undefined) return;
 
     let clue;
     if (p.role === 'civilian') {
@@ -78,13 +81,12 @@ function submitBotClues(io, code, games, roomClueTimers) {
     } else {
       clue = words.length > 0 ? words[Math.floor(Math.random() * words.length)] : (gameState.secretWord || '?');
     }
-    if (!gameState.cluesByRound[round]) gameState.cluesByRound[round] = {};
     gameState.cluesByRound[round][p.id] = clue;
     io.to(code).emit('game:clue-received', { playerId: p.id, playerName: p.name, clue, round });
   });
 
   const allSubmitted = gameState.players.every((pl) => gameState.cluesByRound[round]?.[pl.id] !== undefined);
-  if (allSubmitted) {
+  if (allSubmitted && round === gameState.clueRound) {
     const t = roomClueTimers.get(code);
     if (t) {
       clearTimeout(t);
@@ -128,7 +130,8 @@ function endClueRoundAndMaybeNext(io, code, games, roomClueTimers) {
     roomClueTimers.set(code, timer);
 
     if (gameState.players.some((p) => p.isBot)) {
-      setTimeout(() => submitBotClues(io, code, games, roomClueTimers), 3000);
+      const nextRound = gameState.clueRound;
+      setTimeout(() => submitBotClues(io, code, games, roomClueTimers, nextRound), 3000);
     }
   } else {
     gameState.status = 'discussion';
@@ -635,9 +638,9 @@ io.on("connection", (socket) => {
       }, gameState.clueRoundSeconds * 1000);
       roomClueTimers.set(code, timer);
 
-      // Bots envían pista a los 3 s si hay bots
+      // Bots envían pista en ronda 1 a los 3 s
       if (gameState.players.some((p) => p.isBot)) {
-        setTimeout(() => submitBotClues(io, code, games, roomClueTimers), 3000);
+        setTimeout(() => submitBotClues(io, code, games, roomClueTimers, 1), 3000);
       }
     }
 
@@ -848,57 +851,65 @@ io.on("connection", (socket) => {
 
   // Nueva partida (después de resultados de votación)
   socket.on("game:new-game", async ({ code: providedCode }, callback) => {
-    // Usar socket.data.roomCode como fuente principal, con fallback al código proporcionado
-    let code = socket.data.roomCode || providedCode;
-    if (!code) {
-      callback?.({ ok: false, error: "CODE_REQUIRED" });
-      return;
-    }
-
-    let room = rooms.get(code);
-
-    // Si la sala no existe, no podemos continuar
-    if (!room) {
-      callback?.({ ok: false, error: "ROOM_NOT_FOUND", message: "La sala ya no existe. Por favor, vuelve a crear o unirte a una sala desde el inicio." });
-      return;
-    }
-
-    // SIEMPRE asegurarse de que el socket esté unido a la sala y tenga roomCode establecido
-    if (!socket.data.roomCode || socket.data.roomCode !== code) {
-      socket.data.roomCode = code;
-      socket.join(code);
-    }
-
-    // También asegurarse de que el jugador esté en la lista de jugadores de la sala
-    const existingPlayer = room.players.find(p => p.id === socket.id);
-    if (!existingPlayer) {
-      // Si el jugador no existe, buscar si hay un jugador con el mismo socket.id en la lista
-      // Esto puede pasar si se desconectó y se reconectó
-      // En ese caso, intentar usar el nombre del socket.data o buscar en la lista de jugadores
-      const playerName = socket.data.playerName || 'Jugador';
-      room.players.push({
-        id: socket.id,
-        name: playerName
-      });
-      io.to(code).emit("room:updated", getPublicRoomState(room));
-    } else {
-      // Si el jugador ya existe, asegurarse de que socket.data.playerName esté actualizado
-      if (existingPlayer.name && existingPlayer.name !== 'Jugador') {
-        socket.data.playerName = existingPlayer.name;
-      }
-    }
-    // Solo el creador original de la sala puede iniciar una nueva partida
-    if (room.originalHostId !== socket.id) {
-      callback?.({ ok: false, error: "NOT_ORIGINAL_HOST" });
-      return;
-    }
-
-    if (room.players.length < 3) {
-      callback?.({ ok: false, error: "NOT_ENOUGH_PLAYERS" });
-      return;
-    }
+    const send = (result) => {
+      if (typeof callback === "function") callback(result);
+    };
 
     try {
+      // Usar socket.data.roomCode como fuente principal, con fallback al código proporcionado
+      let code = socket.data.roomCode || providedCode;
+      if (!code) {
+        send({ ok: false, error: "CODE_REQUIRED" });
+        return;
+      }
+
+      let room = rooms.get(code);
+
+      // Si la sala no existe, no podemos continuar
+      if (!room) {
+        send({ ok: false, error: "ROOM_NOT_FOUND", message: "La sala ya no existe. Por favor, vuelve a crear o unirte a una sala desde el inicio." });
+        return;
+      }
+
+      // Asegurar que room.settings existe (p. ej. sala antigua o creada solo con botCount)
+      if (!room.settings || typeof room.settings !== "object") {
+        room.settings = {};
+      }
+      room.settings.impostorCount = room.settings.impostorCount ?? 1;
+      room.settings.discussionSeconds = room.settings.discussionSeconds ?? 120;
+
+      // SIEMPRE asegurarse de que el socket esté unido a la sala y tenga roomCode establecido
+      if (!socket.data.roomCode || socket.data.roomCode !== code) {
+        socket.data.roomCode = code;
+        socket.join(code);
+      }
+
+      // También asegurarse de que el jugador esté en la lista de jugadores de la sala
+      const existingPlayer = room.players.find(p => p.id === socket.id);
+      if (!existingPlayer) {
+        const playerName = socket.data.playerName || 'Jugador';
+        room.players.push({
+          id: socket.id,
+          name: playerName
+        });
+        io.to(code).emit("room:updated", getPublicRoomState(room));
+      } else {
+        if (existingPlayer.name && existingPlayer.name !== 'Jugador') {
+          socket.data.playerName = existingPlayer.name;
+        }
+      }
+
+      // Solo el creador original de la sala puede iniciar una nueva partida
+      if (room.originalHostId !== socket.id) {
+        send({ ok: false, error: "NOT_ORIGINAL_HOST" });
+        return;
+      }
+
+      if (room.players.length < 3) {
+        send({ ok: false, error: "NOT_ENOUGH_PLAYERS" });
+        return;
+      }
+
       // Obtener packs seleccionados de la sala (si hay múltiples, seleccionar uno aleatorio)
       let packIds = room.settings?.selectedPacks || [];
 
@@ -909,7 +920,7 @@ io.on("connection", (socket) => {
       }
 
       if (packIds.length === 0) {
-        callback?.({ ok: false, error: "NO_PACKS_AVAILABLE" });
+        send({ ok: false, error: "NO_PACKS_AVAILABLE" });
         return;
       }
 
@@ -918,7 +929,7 @@ io.on("connection", (socket) => {
       let pack = await WordPack.findById(randomPackId);
 
       if (!pack || pack.words.length === 0) {
-        callback?.({ ok: false, error: "PACK_INVALID" });
+        send({ ok: false, error: "PACK_INVALID" });
         return;
       }
 
@@ -938,6 +949,7 @@ io.on("connection", (socket) => {
       const gameState = initializeGame(room, secretWord, impostorHint);
       gameState.packWords = pack.words || []; // Para pistas de bots
       games.set(code, gameState);
+
       // Notificar a todos que el juego comenzó
       io.to(code).emit("game:started", {
         playerCount: gameState.players.length,
@@ -954,7 +966,6 @@ io.on("connection", (socket) => {
 
       // Esperar un momento para que todos naveguen a /game/CODIGO
       setTimeout(() => {
-        // Enviar a cada jugador su rol individual
         gameState.players.forEach((player) => {
           io.to(player.id).emit("game:role", {
             role: player.role,
@@ -964,10 +975,10 @@ io.on("connection", (socket) => {
         });
       }, 1000);
 
-      callback?.({ ok: true });
+      send({ ok: true });
     } catch (error) {
       console.error('❌ Error iniciando nueva partida:', error);
-      callback?.({ ok: false, error: error.message });
+      send({ ok: false, error: error.message || "UNKNOWN_ERROR" });
     }
   });
 });

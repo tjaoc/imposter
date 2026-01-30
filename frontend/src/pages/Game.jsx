@@ -1466,48 +1466,49 @@ function Game() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={async () => {
-                    setVoteResultsCountdown(null); // Evitar que el timer de vote-results haga get-state y cambie a discussion
-                    // Asegurarse de que el socket esté unido a la sala antes de crear nueva partida
-                    // Esto es importante si el socket perdió su referencia
-                    if (code && socket) {
-                      // Intentar unirse a la sala primero para asegurar que socket.data.roomCode esté establecido
-                      socket.emit(
-                        'room:join',
-                        {
-                          code,
-                          name:
-                            room?.players?.find((p) => p.id === socket.id)
-                              ?.name || t('common.playerDefault'),
-                        },
-                        (joinResponse) => {
-                          if (joinResponse && joinResponse.ok) {
-                          } else {
-                          }
-
-                          // Ahora intentar crear la nueva partida
-                          socket.emit('game:new-game', { code }, (response) => {
-                            if (response && response.ok) {
-                              // El juego se reiniciará y recibiremos game:started
-                            } else {
-                              console.error(
-                                '❌ Error iniciando nueva partida:',
-                                response?.error
-                              );
-                              alert(
-                                `${t('common.error')}: ${
-                                  response?.error || t('errors.newGameError')
-                                }`
-                              );
-                            }
-                          });
-                        }
-                      );
-                    } else {
-                      console.error(
-                        '❌ No hay código de sala o socket disponible'
-                      );
+                    setVoteResultsCountdown(null);
+                    if (!code || !socket) {
+                      console.error('❌ No hay código de sala o socket disponible');
                       alert(t('errors.roomError'));
+                      return;
                     }
+                    socket.emit(
+                      'room:join',
+                      {
+                        code,
+                        name:
+                          room?.players?.find((p) => p.id === socket.id)
+                            ?.name || t('common.playerDefault'),
+                      },
+                      (joinResponse) => {
+                        if (!joinResponse?.ok) {
+                          alert(
+                            `${t('common.error')}: ${
+                              joinResponse?.error || t('errors.newGameError')
+                            }`
+                          );
+                          return;
+                        }
+                        const timeout = setTimeout(() => {
+                          alert(
+                            `${t('common.error')}: ${t('errors.newGameError')}`
+                          );
+                        }, 15000);
+                        socket.emit('game:new-game', { code }, (response) => {
+                          clearTimeout(timeout);
+                          if (response?.ok) return;
+                          console.error(
+                            '❌ Error iniciando nueva partida:',
+                            response?.error
+                          );
+                          alert(
+                            `${t('common.error')}: ${
+                              response?.error || t('errors.newGameError')
+                            }`
+                          );
+                        });
+                      }
+                    );
                   }}
                   className="w-full min-h-[48px] py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl font-bold text-white text-lg shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70 transition-all"
                 >
@@ -1704,48 +1705,49 @@ function Game() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={async () => {
-                    setVoteResultsCountdown(null); // Evitar que el timer de vote-results haga get-state y cambie a discussion
-                    // Asegurarse de que el socket esté unido a la sala antes de crear nueva partida
-                    // Esto es importante si el socket perdió su referencia
-                    if (code && socket) {
-                      // Intentar unirse a la sala primero para asegurar que socket.data.roomCode esté establecido
-                      socket.emit(
-                        'room:join',
-                        {
-                          code,
-                          name:
-                            room?.players?.find((p) => p.id === socket.id)
-                              ?.name || t('common.playerDefault'),
-                        },
-                        (joinResponse) => {
-                          if (joinResponse && joinResponse.ok) {
-                          } else {
-                          }
-
-                          // Ahora intentar crear la nueva partida
-                          socket.emit('game:new-game', { code }, (response) => {
-                            if (response && response.ok) {
-                              // El juego se reiniciará y recibiremos game:started
-                            } else {
-                              console.error(
-                                '❌ Error iniciando nueva partida:',
-                                response?.error
-                              );
-                              alert(
-                                `${t('common.error')}: ${
-                                  response?.error || t('errors.newGameError')
-                                }`
-                              );
-                            }
-                          });
-                        }
-                      );
-                    } else {
-                      console.error(
-                        '❌ No hay código de sala o socket disponible'
-                      );
+                    setVoteResultsCountdown(null);
+                    if (!code || !socket) {
+                      console.error('❌ No hay código de sala o socket disponible');
                       alert(t('errors.roomError'));
+                      return;
                     }
+                    socket.emit(
+                      'room:join',
+                      {
+                        code,
+                        name:
+                          room?.players?.find((p) => p.id === socket.id)
+                            ?.name || t('common.playerDefault'),
+                      },
+                      (joinResponse) => {
+                        if (!joinResponse?.ok) {
+                          alert(
+                            `${t('common.error')}: ${
+                              joinResponse?.error || t('errors.newGameError')
+                            }`
+                          );
+                          return;
+                        }
+                        const timeout = setTimeout(() => {
+                          alert(
+                            `${t('common.error')}: ${t('errors.newGameError')}`
+                          );
+                        }, 15000);
+                        socket.emit('game:new-game', { code }, (response) => {
+                          clearTimeout(timeout);
+                          if (response?.ok) return;
+                          console.error(
+                            '❌ Error iniciando nueva partida:',
+                            response?.error
+                          );
+                          alert(
+                            `${t('common.error')}: ${
+                              response?.error || t('errors.newGameError')
+                            }`
+                          );
+                        });
+                      }
+                    );
                   }}
                   className="w-full min-h-[48px] py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl font-bold text-white text-lg shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70 transition-all"
                 >
