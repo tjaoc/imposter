@@ -798,6 +798,7 @@ function Game() {
         >
           {t('game.iSawMyRole')}
         </motion.button>
+        </div>
       </div>
     );
   }
