@@ -1,0 +1,30 @@
+---
+description: Al pedir commit/push con versión, actualizar la versión en todo el proyecto antes de hacer commit
+alwaysApply: true
+---
+
+# Commit y push con versión
+
+Cuando el usuario pida hacer **commit** y **push** e indique una **versión** (ej. "commit push v1.1.5", "haz commit v1.1.6 y push"), **primero** actualiza el número de versión en **todos** estos archivos al valor que diga el usuario (ej. 1.1.5, 1.1.6), y **después** haz commit y push.
+
+## Archivos a actualizar
+
+1. **VERSION.md**
+   - Título: `# 🎮 Imposter - Version X.Y.Z` → usar la versión indicada.
+   - En "Resumen de la Versión": la primera línea debe ser `**vX.Y.Z** –` (descripción actual o genérica).
+   - Pie: `**¡Gracias por probar Imposter vX.Y.Z!**`
+
+2. **frontend/package.json**  
+   - `"version": "X.Y.Z"`
+
+3. **backend/package.json**  
+   - `"version": "X.Y.Z"`
+
+4. **CHANGELOG.md**  
+   - Añadir al inicio (después de `# 📝 Changelog - Imposter`) una nueva sección:
+     - `## [X.Y.Z] - AAAA-MM-DD` (usar fecha de hoy).
+     - Opcional: una o dos líneas de cambios si el usuario no da detalle.
+
+Luego: `git add` de los archivos modificados, `git commit -m "vX.Y.Z - ..."` (o mensaje que indique el usuario), `git push`.
+
+No toques `package-lock.json` ni otras dependencias; solo la versión del **proyecto** en los archivos listados.

@@ -1,5 +1,14 @@
 # 📝 Changelog - Imposter
 
+## [1.1.5] - 2026-01-30
+
+### 📌 Sincronización de versión
+
+- ✅ Versión unificada en VERSION.md, frontend/package.json, backend/package.json.
+- ✅ Regla Cursor: al pedir commit/push con versión (ej. v1.1.5), se actualiza la versión en todos los archivos antes del commit.
+
+---
+
 ## [1.1.1] - 2026-01-30
 
 ### 🧹 Limpieza y optimizaciones
