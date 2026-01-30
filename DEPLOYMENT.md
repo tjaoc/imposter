@@ -231,14 +231,7 @@ El script `scripts/update-words-monthly.js` está pensado para ejecutarse **el d
 node scripts/update-words-monthly.js
 ```
 
-**En Render (automático):** El Blueprint incluye un **Cron Job** (`imposter-words-monthly`) que se ejecuta el **día 1 de cada mes a las 00:00 UTC**. En el Dashboard del cron debes configurar:
-
-- **MONGODB_URI**: la misma URI de producción (para que el seed actualice la DB de prod).
-- **GITHUB_TOKEN** (opcional): token de GitHub con permiso `repo` para que el script pueda hacer commit y push de las actualizaciones. Si no lo configuras, el seed se ejecuta pero el push fallará.
-
-**Nota:** Los Cron Jobs en Render **no están en el plan gratuito**; requieren plan de pago. Si no usas el cron de Render, puedes programar el script con un cron externo o con [GitHub Actions](https://docs.github.com/en/actions) (día 1 del mes).
-
-**Cron manual** (ejemplo: día 1 a las 00:00):
+Para automatizar el día 1 de cada mes sin usar plan de pago en Render, programa el script con un **cron externo** (tu máquina, VPS, etc.) o con [GitHub Actions](https://docs.github.com/en/actions). **Cron manual** (ejemplo: día 1 a las 00:00):
 
 ```bash
 0 0 1 * * cd /ruta/al/repo && node scripts/update-words-monthly.js
