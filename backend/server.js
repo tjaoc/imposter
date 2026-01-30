@@ -278,8 +278,8 @@ io.on("connection", (socket) => {
     callback?.(response);
   });
 
-  socket.on("game:start", async ({ packId, selectedPacks, hintForImpostors = true, discussionSeconds = 240, impostorCount }, callback) => {
-    console.log(`🎮 game:start solicitado por ${socket.id}, pack: ${packId}, hint: ${hintForImpostors}, duration: ${discussionSeconds}`);
+  socket.on("game:start", async ({ packId, selectedPacks, hintForImpostors = true, discussionSeconds = 240, impostorCount, locale: clientLocale }, callback) => {
+    console.log(`🎮 game:start solicitado por ${socket.id}, pack: ${packId}, hint: ${hintForImpostors}, duration: ${discussionSeconds}, locale: ${clientLocale}`);
     const code = socket.data.roomCode;
     const room = rooms.get(code);
 
@@ -299,13 +299,19 @@ io.on("connection", (socket) => {
     }
 
     try {
-      // Obtener palabra aleatoria del pack
-      const pack = await WordPack.findById(packId);
+      // Obtener pack; si el cliente pidió un idioma (ej. pt), preferir el mismo slug en ese idioma para palabras/categoría
+      let pack = await WordPack.findById(packId);
       if (!pack || pack.words.length === 0) {
         callback?.({ ok: false, error: "PACK_INVALID" });
         return;
       }
-
+      const requestedLocale = clientLocale && String(clientLocale).trim().toLowerCase();
+      if (requestedLocale && !new RegExp(`^${requestedLocale}`).test(pack.locale || '')) {
+        const packInLocale = await WordPack.findOne({ slug: pack.slug, locale: new RegExp(`^${requestedLocale}`) });
+        if (packInLocale && packInLocale.words && packInLocale.words.length > 0) {
+          pack = packInLocale;
+        }
+      }
       const secretWord = pack.words[Math.floor(Math.random() * pack.words.length)];
       const impostorHint = hintForImpostors ? (pack.name || 'Categoría secreta') : null;
 
@@ -317,9 +323,12 @@ io.on("connection", (socket) => {
       }
       room.settings.discussionSeconds = discussionSeconds;
       room.settings.hintForImpostors = hintForImpostors;
-      // Guardar los packs seleccionados para futuras partidas
+      // Guardar los packs seleccionados y el locale para futuras partidas
       if (selectedPacks && Array.isArray(selectedPacks) && selectedPacks.length > 0) {
         room.settings.selectedPacks = selectedPacks;
+      }
+      if (requestedLocale) {
+        room.settings.locale = requestedLocale;
       }
 
       // Inicializar el juego
@@ -571,11 +580,12 @@ io.on("connection", (socket) => {
         }
       });
 
-      // Verificar si todos los civiles acertaron
-      const allCiviliansVotedForImpostor = currentActiveCivilians.length > 0 &&
+      // Verificar si todos los civiles acertaron (solo votos de civiles; el voto del impostor no cuenta)
+      const allCiviliansVotedForImpostor = !!impostor &&
+        currentActiveCivilians.length > 0 &&
         currentActiveCivilians.every(civilian => {
           const vote = gameState.votes[civilian.id];
-          return vote === impostor?.id;
+          return vote === impostor.id;
         });
 
       const impostorDiscovered = allCiviliansVotedForImpostor;
@@ -654,12 +664,13 @@ io.on("connection", (socket) => {
             role: p.role,
             word: p.word,
           })),
+          impostor: impostor ? { id: impostor.id, name: impostor.name } : null,
           eliminated: impostorDiscovered ? impostor : null, // Solo mostrar impostor si fue descubierto
-          votes: voteCounts, // Usar voteCounts en lugar de result.votes
+          votes: voteCounts, // Solo votos de civiles
           votesWithNames: votesWithNames, // Votos con información completa
-          impostorDiscovered: impostorDiscovered, // Indicar si el impostor fue descubierto
-          correctVoters: correctVoters, // IDs de jugadores que acertaron
-          incorrectVoters: incorrectVoters, // IDs de jugadores que no acertaron
+          impostorDiscovered: impostorDiscovered, // true solo si todos los civiles votaron por el impostor
+          correctVoters: correctVoters, // IDs de civiles que acertaron
+          incorrectVoters: incorrectVoters, // IDs de civiles que no acertaron
         };
 
         // Emitir a toda la sala
@@ -727,11 +738,12 @@ io.on("connection", (socket) => {
           }
         });
         
-        // Verificar si todos los civiles acertaron
-        const allCiviliansVotedForImpostor = activeCivilians.length > 0 &&
+        // Verificar si todos los civiles acertaron (solo votos de civiles; el voto del impostor no cuenta)
+        const allCiviliansVotedForImpostor = !!impostor &&
+          activeCivilians.length > 0 &&
           activeCivilians.every(civilian => {
             const vote = gameState.votes[civilian.id];
-            return vote === impostor?.id;
+            return vote === impostor.id;
           });
         
         const impostorDiscovered = allCiviliansVotedForImpostor;
@@ -949,11 +961,20 @@ io.on("connection", (socket) => {
 
       // Seleccionar un pack aleatorio de los seleccionados
       const randomPackId = packIds[Math.floor(Math.random() * packIds.length)];
-      const pack = await WordPack.findById(randomPackId);
+      let pack = await WordPack.findById(randomPackId);
 
       if (!pack || pack.words.length === 0) {
         callback?.({ ok: false, error: "PACK_INVALID" });
         return;
+      }
+
+      // Preferir el mismo slug en el idioma de la sala (ej. pt) para palabras/categoría
+      const savedLocale = room.settings?.locale && String(room.settings.locale).trim().toLowerCase();
+      if (savedLocale && !new RegExp(`^${savedLocale}`).test(pack.locale || '')) {
+        const packInLocale = await WordPack.findOne({ slug: pack.slug, locale: new RegExp(`^${savedLocale}`) });
+        if (packInLocale && packInLocale.words && packInLocale.words.length > 0) {
+          pack = packInLocale;
+        }
       }
 
       // Obtener palabra aleatoria del pack

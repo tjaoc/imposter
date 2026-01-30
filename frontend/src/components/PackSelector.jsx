@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from '../hooks/useTranslation';
+import { useLanguage } from '../context/LanguageContext';
 
 function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
+  const { t } = useTranslation();
+  const { locale } = useLanguage();
   const [packs, setPacks] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/packs')
+    fetch(`/api/packs?locale=${locale}`)
       .then(res => res.json())
       .then(data => {
         if (data.ok) {
@@ -18,7 +22,7 @@ function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
         console.error('Error cargando packs:', err);
         setLoading(false);
       });
-  }, []);
+  }, [locale]);
 
   const handlePackToggle = (packId) => {
     const newSelected = selectedPackIds.includes(packId)
@@ -36,20 +40,20 @@ function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
   };
 
   if (loading) {
-    return <div className="text-space-cyan text-center">Cargando packs...</div>;
+    return <div className="text-space-cyan text-center">{t('common.loading')}</div>;
   }
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between mb-2">
         <label className="block text-sm font-medium text-space-cyan">
-          Selecciona uno o más packs de palabras
+          {t('room.selectPacksLabel')}
         </label>
         <button
           onClick={handleSelectAll}
           className="text-xs text-space-cyan hover:text-space-cyan/80 underline"
         >
-          {selectedPackIds.length === packs.length ? 'Deseleccionar todos' : 'Seleccionar todos'}
+          {selectedPackIds.length === packs.length ? t('room.deselectAll') : t('room.selectAll')}
         </button>
       </div>
       <div className="grid grid-cols-2 gap-3">
@@ -72,7 +76,7 @@ function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
               )}
               <div className="text-left">
                 <div className="font-semibold text-white mb-1">
-                  {pack.name}
+                  {(t('packs.' + pack.slug) || '').startsWith('packs.') ? pack.name : t('packs.' + pack.slug)}
                   {pack.isAdult && <span className="ml-2 text-xs">🔞</span>}
                 </div>
                 <div className="text-xs text-gray-400">{pack.description}</div>
@@ -83,7 +87,7 @@ function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
       </div>
       {selectedPackIds.length > 0 && (
         <p className="text-xs text-gray-400 text-center mt-2">
-          {selectedPackIds.length} pack{selectedPackIds.length !== 1 ? 's' : ''} seleccionado{selectedPackIds.length !== 1 ? 's' : ''}
+          {selectedPackIds.length} {t('room.packsSelected')}
         </p>
       )}
     </div>

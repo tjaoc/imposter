@@ -80,9 +80,14 @@ function processVotes(gameState, votes) {
     (p) => !gameState.eliminatedPlayers.includes(p.id)
   );
 
-  // Contar votos
-  Object.values(votes).forEach((votedId) => {
-    voteCounts[votedId] = (voteCounts[votedId] || 0) + 1;
+  // Contar solo votos de civiles; el voto del impostor no cuenta para la eliminación
+  const civilianIds = new Set(
+    activePlayers.filter((p) => p.role === 'civilian').map((p) => p.id)
+  );
+  Object.entries(votes).forEach(([voterId, votedId]) => {
+    if (civilianIds.has(voterId) && votedId) {
+      voteCounts[votedId] = (voteCounts[votedId] || 0) + 1;
+    }
   });
 
   // Encontrar al jugador con más votos

@@ -1,9 +1,24 @@
 const WordPack = require('../models/WordPack');
 
-// Obtener todos los packs
+// Obtener todos los packs (opcional: ?locale=es|pt filtra por idioma)
+// Si locale=pt y no hay packs en esa locale, se devuelven todos (para Português de Portugal)
 const getAllPacks = async (req, res) => {
   try {
-    const packs = await WordPack.find({}, '-words').sort({ name: 1 });
+    const filter = {};
+    if (req.query.locale) {
+      const locale = String(req.query.locale).trim().toLowerCase();
+      if (locale) {
+        filter.locale = new RegExp(`^${locale}`);
+      }
+    }
+    let packs = await WordPack.find(filter, '-words').sort({ name: 1 });
+    // Português (PT): si no hay packs con locale pt, devolver todos para que vean categorías
+    if (packs.length === 0 && req.query.locale) {
+      const requestedLocale = String(req.query.locale).trim().toLowerCase();
+      if (requestedLocale === 'pt' || requestedLocale.startsWith('pt-')) {
+        packs = await WordPack.find({}, '-words').sort({ name: 1 });
+      }
+    }
     res.json({ ok: true, packs });
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
@@ -40,15 +55,15 @@ const getRandomWord = async (req, res) => {
   }
 };
 
-// Añadir palabra a pack personalizado
+// Añadir palabra a pack personalizado (locale opcional: es-ES, pt-PT)
 const addCustomWord = async (req, res) => {
   try {
-    const { word } = req.body;
+    const { word, locale } = req.body;
     if (!word || !word.trim()) {
       return res.status(400).json({ ok: false, error: 'WORD_REQUIRED' });
     }
-
-    const pack = await WordPack.findOne({ slug: 'personalizado' });
+    const packLocale = locale && /^pt(-|$)/i.test(locale) ? 'pt-PT' : 'es-ES';
+    const pack = await WordPack.findOne({ slug: 'personalizado', locale: packLocale });
     if (!pack) {
       return res.status(404).json({ ok: false, error: 'CUSTOM_PACK_NOT_FOUND' });
     }

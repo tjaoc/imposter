@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import { LanguageProvider } from './context/LanguageContext';
 import App from './App';
 import './index.css';
 
@@ -20,6 +21,8 @@ console.error = (...args) => {
 
 ReactDOM.createRoot(rootElement).render(
   <BrowserRouter>
-    <App />
+    <LanguageProvider>
+      <App />
+    </LanguageProvider>
   </BrowserRouter>
 );

@@ -1,5 +1,34 @@
 # 📝 Changelog - Imposter
 
+## [1.0.0-beta3] - 2026-01-30
+
+### 🎯 Modo local, i18n, UX y correcciones
+
+#### ✨ Nuevas Funcionalidades
+
+- ✅ **Modo un solo dispositivo (local)**: Partidas locales sin servidor: añadir jugadores, elegir pack, reparto de roles con “pasa el móvil” y votación por turnos
+- ✅ **Internacionalización (i18n)**: Soporte español y portugués con diccionarios (`es.json`, `pt.json`), contexto `LanguageContext`, hook `useTranslation` y selector de idioma en Home
+- ✅ **Pantalla de “pasa el turno”**: UI segura para que cada jugador vea su rol y palabra en privado antes de pasar el dispositivo
+- ✅ **API de packs por idioma**: El backend admite filtro opcional `locale` en `GET /api/packs` para solicitar packs por idioma
+- ✅ **Palabras y categorías en el idioma seleccionado**: Al iniciar partida (online o nueva partida) se envía `locale`; el backend usa el pack en ese idioma (mismo slug) para palabra secreta y pista
+- ✅ **Footer en todas las páginas**: “Desarrollado con ❤️ por Tiago Cruz” y versión de la app fijos en la parte inferior en todas las rutas
+- ✅ **Nueva partida con los mismos jugadores (local)**: Botón “Nueva Partida” en resultados intermedios y finales lleva a selección de categoría con la misma lista de jugadores
+
+#### 🐛 Correcciones
+
+- ✅ **Resultados de votación**: Solo se cuentan votos de civiles para “impostor descubierto”; el voto del impostor no cuenta para eliminación ni para acertar
+- ✅ **Colores en resultados**: Quien acertó al impostor se muestra en verde; quien no acertó, en rojo (online y local, resultados intermedios y finales)
+- ✅ **Nueva partida local**: Al pulsar “Nueva Partida” se navega a `/local` con `keepPlayers`; la pantalla de categorías se muestra con los mismos jugadores sin volver a contador/votación
+
+#### 🔧 Mejoras Técnicas
+
+- ✅ **Frontend**: Rutas `/local` y `/local/game`, páginas `Local.jsx` y `LocalGame.jsx`, lógica local en `utils/localGameLogic.js`
+- ✅ **UI localizada**: Textos traducidos en Home, Room, Game, PackSelector, CustomWords y flujo local
+- ✅ **Backend**: `processVotes` en `gameLogic.js` cuenta solo votos de civiles para eliminación; `impostorDiscovered` solo si hay impostor y todos los civiles votaron por él
+- ✅ **Versión**: La app muestra la versión desde `package.json` (Vite `define`); footer fijo con `fixed bottom-0`
+
+---
+
 ## [1.0.0-beta2] - 2026-01-28
 
 ### 🎯 Mejoras y Correcciones

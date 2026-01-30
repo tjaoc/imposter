@@ -2,9 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSocket } from '../hooks/useSocket';
+import { useTranslation } from '../hooks/useTranslation';
 import CustomWords from '../components/CustomWords';
+import LanguageSelector from '../components/LanguageSelector';
 
 function Home() {
+  const { t } = useTranslation();
   const [playerName, setPlayerName] = useState('');
   const [roomCode, setRoomCode] = useState('');
   const [isCreating, setIsCreating] = useState(false);
@@ -39,13 +42,13 @@ function Home() {
             navigate(`/room/${response.room.code}`);
           } else {
             console.error('❌ Error creando sala:', response?.error);
-            alert('Error al crear la sala. Intenta de nuevo.');
+            alert(t('errors.createRoom'));
           }
         },
       );
     } else {
       setIsCreating(false);
-      alert('No se pudo conectar al servidor. Verifica tu conexión.');
+      alert(t('errors.connection'));
     }
   };
 
@@ -90,18 +93,21 @@ function Home() {
           navigate(`/room/${response.room.code}`);
         } else {
           console.error('❌ Error al unirse:', response?.error);
-          alert(`Error: ${response?.error || 'DESCONOCIDO'}`);
+          alert(`Error: ${response?.error || t('errors.unknown')}`);
         }
       });
     } else {
       console.error('❌ Socket no disponible o no conectado');
       setIsJoining(false);
-      alert('No se pudo conectar al servidor. Verifica tu conexión.');
+      alert(t('errors.connection'));
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="absolute top-4 right-4">
+        <LanguageSelector />
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -112,15 +118,43 @@ function Home() {
           initial={{ scale: 0.9 }}
           animate={{ scale: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-center mb-12"
+          className="text-center mb-8"
         >
           <img
             src="/favicon.svg"
             alt="Imposter"
             className="w-20 h-20 mx-auto mb-4"
           />
-          <h1 className="text-5xl font-bold text-glow mb-4">IMPOSTER</h1>
-          <p className="text-space-cyan text-lg">Who is the Spy?</p>
+          <h1 className="text-5xl font-bold text-glow mb-4">{t('home.title')}</h1>
+          <p className="text-space-cyan text-lg">{t('home.subtitle')}</p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="glass-effect rounded-2xl p-6 mb-6"
+        >
+          <button
+            type="button"
+            onClick={() => navigate('/local')}
+            className="w-full py-4 rounded-xl border-2 border-space-cyan/50 bg-space-blue/50 hover:bg-space-cyan/20 hover:border-space-cyan font-semibold text-space-cyan mb-4 flex items-center justify-center gap-3"
+          >
+            <span className="text-2xl">📱</span>
+            <div className="text-left">
+              <div>{t('home.playLocal')}</div>
+              <div className="text-xs font-normal text-gray-400">{t('home.playLocalDesc')}</div>
+            </div>
+          </button>
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-space-cyan/30" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-space-blue text-gray-400">{t('common.or')}</span>
+            </div>
+          </div>
+          <div className="text-center text-gray-400 text-sm mb-4">{t('home.playOnlineDesc')}</div>
         </motion.div>
 
         <motion.div
@@ -131,13 +165,13 @@ function Home() {
         >
           <div>
             <label className="block text-sm font-medium mb-2 text-space-cyan">
-              Tu Nombre
+              {t('home.yourName')}
             </label>
             <input
               type="text"
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
-              placeholder="Ingresa tu nombre"
+              placeholder={t('home.yourNamePlaceholder')}
               className="w-full px-4 py-3 bg-space-blue border border-space-cyan/30 rounded-lg focus:outline-none focus:border-space-cyan focus:ring-2 focus:ring-space-cyan/50 text-white placeholder-gray-400"
               maxLength={20}
             />
@@ -149,7 +183,7 @@ function Home() {
               disabled={isCreating || !playerName.trim()}
               className="w-full py-4 bg-gradient-to-r from-space-purple to-space-pink rounded-lg font-semibold text-white hover:from-space-pink hover:to-space-purple transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
             >
-              {isCreating ? 'Creando...' : 'Crear Sala'}
+              {isCreating ? t('home.creating') : t('home.createRoom')}
             </button>
 
             <div className="relative">
@@ -157,7 +191,7 @@ function Home() {
                 <div className="w-full border-t border-space-cyan/30"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-space-blue text-gray-400">O</span>
+                <span className="px-4 bg-space-blue text-gray-400">{t('common.or')}</span>
               </div>
             </div>
 
@@ -165,55 +199,33 @@ function Home() {
               <input
                 type="text"
                 value={roomCode}
-                onChange={(e) => {
-                  console.log('🔤 Código ingresado:', e.target.value);
-                  setRoomCode(e.target.value.toUpperCase());
-                }}
-                placeholder="Código de sala"
+                onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                placeholder={t('home.roomCode')}
                 className="w-full px-4 py-3 bg-space-blue border border-space-cyan/30 rounded-lg focus:outline-none focus:border-space-cyan focus:ring-2 focus:ring-space-cyan/50 text-white placeholder-gray-400 mb-4 uppercase"
                 maxLength={6}
               />
               <button
                 onClick={(e) => {
                   e.preventDefault();
-                  console.log('🖱️ Botón Unirse clickeado', {
-                    playerName,
-                    roomCode,
-                    disabled:
-                      isJoining || !playerName.trim() || !roomCode.trim(),
-                  });
                   handleJoinRoom();
                 }}
                 disabled={isJoining || !playerName.trim() || !roomCode.trim()}
                 className="w-full py-4 bg-space-blue border-2 border-space-cyan rounded-lg font-semibold text-space-cyan hover:bg-space-cyan hover:text-space-dark transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
               >
-                {isJoining ? 'Uniéndose...' : 'Unirse a Sala'}
+                {isJoining ? t('home.joining') : t('home.joinRoom')}
               </button>
-              <p className="text-xs text-gray-500 mt-2 text-center">
-                Debug: Nombre: {playerName ? '✅' : '❌'} | Código:{' '}
-                {roomCode ? '✅' : '❌'}
-              </p>
             </div>
           </div>
         </motion.div>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="text-center text-gray-400 text-sm mt-8"
-        >
-          Todos los packs desbloqueados • Sin anuncios • Modo offline
-        </motion.p>
 
         <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
           onClick={() => setShowCustomWords(true)}
-          className="mt-4 text-space-cyan hover:text-space-glow transition-colors text-sm underline"
+          className="mt-4 text-space-cyan hover:text-space-glow transition-colors text-sm underline block mx-auto"
         >
-          ✏️ Añadir palabras personalizadas
+          ✏️ {t('home.addCustomWords')}
         </motion.button>
       </motion.div>
 

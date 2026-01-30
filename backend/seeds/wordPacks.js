@@ -1,4 +1,10 @@
+/**
+ * Seed de packs de palabras: es-ES y pt-PT (Português de Portugal).
+ * Tras cambiar el modelo a índice único (slug + locale), si ya tenías DB:
+ * en MongoDB: db.wordpacks.dropIndex('slug_1') y luego reinicia el backend para que ejecute el seed.
+ */
 const WordPack = require('../models/WordPack');
+const { curatedWordPacksPtPT } = require('./wordPacksPtPT');
 
 const TARGET_TOTAL_WORDS = 50000;
 const MIN_WORD_LENGTH = 4;
@@ -545,21 +551,22 @@ const wordPacks = buildWordPacksWithBulk(curatedWordPacks);
 async function seedWordPacks() {
   try {
     console.log('🌱 Iniciando seed de packs de palabras...');
-    const totalWords = wordPacks.reduce((acc, p) => acc + (p.words ? p.words.length : 0), 0);
-    console.log(`📚 Palabras totales a cargar: ~${totalWords.toLocaleString()}`);
-    for (const packData of wordPacks) {
-      const exists = await WordPack.findOne({ slug: packData.slug });
+    const allPacks = [...wordPacks, ...curatedWordPacksPtPT];
+    const totalWords = allPacks.reduce((acc, p) => acc + (p.words ? p.words.length : 0), 0);
+    console.log(`📚 Packs a cargar: ${wordPacks.length} (es-ES) + ${curatedWordPacksPtPT.length} (pt-PT) | ~${totalWords.toLocaleString()} palabras`);
+    for (const packData of allPacks) {
+      const exists = await WordPack.findOne({ slug: packData.slug, locale: packData.locale });
       
       if (exists) {
-        console.log(`⏭️  Pack "${packData.name}" ya existe, actualizando...`);
-        await WordPack.updateOne({ slug: packData.slug }, packData);
+        console.log(`⏭️  Pack "${packData.name}" (${packData.locale}) ya existe, actualizando...`);
+        await WordPack.updateOne({ slug: packData.slug, locale: packData.locale }, packData);
       } else {
-        console.log(`➕ Creando pack "${packData.name}"...`);
+        console.log(`➕ Creando pack "${packData.name}" (${packData.locale})...`);
         await WordPack.create(packData);
       }
     }
     
-    console.log(`✅ Seed completado! ${wordPacks.length} packs creados/actualizados`);
+    console.log(`✅ Seed completado! ${allPacks.length} packs creados/actualizados`);
     const total = await WordPack.countDocuments();
     const agg = await WordPack.aggregate([{ $project: { n: { $size: '$words' } } }, { $group: { _id: null, total: { $sum: '$n' } } }]);
     const totalWordsInDb = agg[0]?.total ?? 0;

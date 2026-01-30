@@ -1,8 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+const pkg = require('./package.json');
 
 export default defineConfig({
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version || '1.0.0-beta3'),
+  },
   plugins: [
     react(),
     VitePWA({
@@ -74,7 +81,8 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost:4000',
+        // En Docker usar API_PROXY_TARGET=http://backend:4000 (nombre del servicio)
+        target: process.env.API_PROXY_TARGET || 'http://localhost:4000',
         changeOrigin: true,
       },
     },

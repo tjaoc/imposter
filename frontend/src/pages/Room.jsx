@@ -2,9 +2,14 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSocket } from '../hooks/useSocket';
+import { useTranslation } from '../hooks/useTranslation';
+import { useLanguage } from '../context/LanguageContext';
 import PackSelector from '../components/PackSelector';
+import LanguageSelector from '../components/LanguageSelector';
 
 function Room() {
+  const { t } = useTranslation();
+  const { locale } = useLanguage();
   const { code } = useParams();
   const navigate = useNavigate();
   const { socket, isConnected } = useSocket();
@@ -34,7 +39,7 @@ function Room() {
     socket.on('room:updated', handleRoomUpdate);
 
     // Unirse a la sala
-    socket.emit('room:join', { code, name: 'Player' }, (response) => {
+    socket.emit('room:join', { code, name: localStorage.getItem('playerName') || t('common.playerDefault') }, (response) => {
       if (response && response.ok) {
         setRoom(response.room);
         setIsHost(socket.id === response.room.hostId);
@@ -76,12 +81,13 @@ function Room() {
       hintForImpostors: settings.hintForImpostors,
       discussionSeconds: settings.discussionSeconds,
       impostorCount: settings.impostorCount,
+      locale, // idioma seleccionado para que las palabras/categoría sean en ese idioma
     }, (response) => {
       setIsStarting(false);
       if (response && response.ok) {
         // La navegación se hará cuando recibamos el evento game:started
       } else {
-        alert(`Error: ${response?.error || 'No se pudo iniciar el juego'}`);
+        alert(`${t('common.error')}: ${response?.error || t('errors.startGame')}`);
       }
     });
   };
@@ -112,25 +118,25 @@ function Room() {
         >
           <div className="text-6xl mb-4">❌</div>
           <h2 className="text-2xl font-bold text-white mb-4">
-            {error === 'ROOM_NOT_FOUND' ? 'Sala no encontrada' : 
-             error === 'ROOM_FULL' ? 'Sala llena' :
-             error === 'NAME_REQUIRED' ? 'Nombre requerido' :
-             'Error al unirse'}
+            {error === 'ROOM_NOT_FOUND' ? t('room.roomNotFound') :
+             error === 'ROOM_FULL' ? t('room.roomFull') :
+             error === 'NAME_REQUIRED' ? t('room.nameRequired') :
+             t('common.error')}
           </h2>
           <p className="text-gray-400 mb-6">
-            {error === 'ROOM_NOT_FOUND' 
-              ? `La sala con código "${code}" no existe o ya se cerró.`
-              : 'No se pudo unir a la sala. Por favor intenta de nuevo.'}
+            {error === 'ROOM_NOT_FOUND'
+              ? t('room.roomNotFoundDesc')
+              : t('errors.createRoom')}
           </p>
           <button
             onClick={() => navigate('/')}
             className="w-full py-3 bg-gradient-to-r from-space-purple to-space-pink rounded-lg font-semibold text-white hover:opacity-90 transition-opacity"
           >
-            Volver al inicio
+            {t('room.backToHome')}
           </button>
           {error === 'ROOM_NOT_FOUND' && (
             <p className="text-sm text-gray-500 mt-4">
-              Redirigiendo en 3 segundos...
+              {t('room.redirecting')}
             </p>
           )}
         </motion.div>
@@ -148,9 +154,9 @@ function Room() {
           className="text-center"
         >
           <div className="animate-pulse text-space-cyan text-xl mb-4">
-            Conectando a la sala...
+            {t('room.connecting')}
           </div>
-          <div className="text-gray-400 text-sm">Código: {code}</div>
+          <div className="text-gray-400 text-sm">{code}</div>
         </motion.div>
       </div>
     );
@@ -164,8 +170,8 @@ function Room() {
         className="max-w-2xl mx-auto"
       >
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-glow mb-2">Sala {room.code}</h1>
-          <p className="text-space-cyan">Esperando jugadores...</p>
+          <h1 className="text-3xl font-bold text-glow mb-2">{t('room.title')} {room.code}</h1>
+          <p className="text-space-cyan">{t('room.waitingPlayers')}</p>
         </div>
 
         <motion.div
@@ -174,9 +180,9 @@ function Room() {
           className="glass-effect rounded-2xl p-6 mb-6"
         >
           <div className="flex justify-between items-center mb-4">
-            <span className="text-gray-400">Jugadores ({room.players.length}/{room.settings.maxPlayers})</span>
+            <span className="text-gray-400">{t('room.players')} ({room.players.length}/{room.settings.maxPlayers})</span>
             {isHost && (
-              <span className="text-xs bg-space-purple px-3 py-1 rounded-full">Anfitrión</span>
+              <span className="text-xs bg-space-purple px-3 py-1 rounded-full">{t('room.host')}</span>
             )}
           </div>
 
@@ -232,8 +238,8 @@ function Room() {
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">🕵️</div>
                     <div>
-                      <div className="text-white font-semibold">Impostores</div>
-                      <div className="text-xs text-gray-400">Número de impostores en el juego</div>
+                      <div className="text-white font-semibold">{t('room.impostors')}</div>
+                      <div className="text-xs text-gray-400">{t('room.impostorsDesc')}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -275,8 +281,8 @@ function Room() {
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">🔍</div>
                     <div>
-                      <div className="text-white font-semibold">Pista para Impostores</div>
-                      <div className="text-xs text-gray-400">Mostrar categoría a los impostores</div>
+                      <div className="text-white font-semibold">{t('room.hintForImpostors')}</div>
+                      <div className="text-xs text-gray-400">{t('room.hintForImpostorsDesc')}</div>
                     </div>
                   </div>
                   <button
@@ -307,8 +313,8 @@ function Room() {
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">⏱️</div>
                     <div>
-                      <div className="text-white font-semibold">Duración</div>
-                      <div className="text-xs text-gray-400">Tiempo de discusión</div>
+                      <div className="text-white font-semibold">{t('room.duration')}</div>
+                      <div className="text-xs text-gray-400">{t('room.durationDesc')}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
@@ -344,10 +350,10 @@ function Room() {
               disabled={room.players.length < 3 || selectedPacks.length === 0 || isStarting}
               className="w-full py-5 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-2xl font-bold text-white text-lg shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
-              {isStarting ? '⏳ Iniciando...' :
-               room.players.length < 3 ? `⏸️ Esperando más jugadores (${room.players.length}/3)` :
-               selectedPacks.length === 0 ? '📦 Selecciona al menos un pack' :
-               '🚀 Comenzar Juego'}
+              {isStarting ? `⏳ ${t('room.starting')}` :
+               room.players.length < 3 ? `⏸️ ${t('room.waitingMore')} (${room.players.length}/3)` :
+               selectedPacks.length === 0 ? `📦 ${t('room.selectPacks')}` :
+               `🚀 ${t('room.startGame')}`}
             </motion.button>
           </>
         )}

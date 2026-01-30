@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSocket } from '../hooks/useSocket';
+import { useTranslation } from '../hooks/useTranslation';
 
 function Game() {
+  const { t } = useTranslation();
   const { code } = useParams();
   const navigate = useNavigate();
   const { socket, isConnected } = useSocket();
@@ -59,16 +61,18 @@ function Game() {
       }
     });
 
-    // Juego iniciado
+    // Juego iniciado (nueva partida desde resultados o desde vote-results)
     socket.on('game:started', (data) => {
       console.log('🎮 Juego iniciado:', data);
-      // Si estamos en vote-results, cambiar a revealing para nueva partida
-      if (gamePhase === 'vote-results') {
-        console.log('   🎮 Nueva partida iniciada, cambiando a revealing...');
+      // Si estamos en resultados o en vote-results, ir siempre a revealing para la nueva partida
+      const isPostGamePhase = ['vote-results', 'results', 'discussion'].includes(gamePhase);
+      if (isPostGamePhase) {
+        console.log('   🎮 Nueva partida iniciada, cambiando a revealing (antes:', gamePhase, ')...');
         setGamePhase('revealing');
         setGameResult(null);
         setSelectedVote(null);
         setVoteResultsCountdown(null);
+        setHasSeenRole(false);
       }
       setPlayers(Array(data.playerCount).fill(null));
       if (data.players) {
@@ -170,7 +174,7 @@ function Game() {
       // Limpiar voto seleccionado cuando se recibe el resultado
       setSelectedVote(null);
 
-      // Preparar datos del resultado
+      // Preparar datos del resultado (impostorDiscovered/correctVoters vienen del servidor; solo votos de civiles cuentan)
       const voteResultData = {
         eliminated: result.eliminated,
         votes: result.votes,
@@ -179,6 +183,9 @@ function Game() {
         impostor: result.impostor,
         secretWord: result.secretWord,
         isTie: result.isTie,
+        impostorDiscovered: result.impostorDiscovered === true,
+        correctVoters: result.correctVoters || [],
+        incorrectVoters: result.incorrectVoters || [],
       };
 
       console.log('   📦 Datos preparados:', voteResultData);
@@ -724,7 +731,7 @@ function Game() {
       } else {
         if (response?.error === 'IMPOSTOR_CANNOT_VOTE') {
           console.log('⚠️ Los impostores no pueden votar');
-          alert('Los impostores no pueden votar');
+          alert(t('game.impostorsCannotVote'));
         } else if (response?.error === 'NOT_VOTING_PHASE') {
           console.error('❌ El juego no está en fase de votación.');
           console.error('   Estado local (frontend):', gamePhase);
@@ -734,9 +741,7 @@ function Game() {
           );
           // Solo mostrar alerta si no es impostor (el impostor puede intentar votar antes de que se inicie)
           if (!myRole?.isImpostor) {
-            alert(
-              `Error: El juego no está en fase de votación. Estado del servidor: ${response?.currentStatus || 'desconocido'}. Por favor, espera un momento.`,
-            );
+            alert(t('errors.votingPhase'));
           } else {
             console.log(
               '🎭 Impostor intentó votar - el servidor aún no está en fase de votación (puede ser un problema de sincronización)',
@@ -761,7 +766,7 @@ function Game() {
           console.error('❌ Error votando:', response?.error);
           // Solo mostrar alerta si no es impostor
           if (!myRole?.isImpostor) {
-            alert(`Error al votar: ${response?.error || 'Error desconocido'}`);
+            alert(t('errors.voteError', { error: response?.error || t('errors.unknown') }));
           }
         }
       }
@@ -780,7 +785,7 @@ function Game() {
     const joinRoom = () => {
       // Primero intentar obtener información de la sala para ver si el jugador ya está en ella
       socket.emit('room:get-info', { code }, (infoResponse) => {
-        let playerName = 'Jugador'; // Valor por defecto
+        let playerName = t('common.playerDefault');
         let existingPlayer = null; // Declarar fuera del if para usarlo después
 
         if (infoResponse && infoResponse.ok && infoResponse.room) {
@@ -800,7 +805,7 @@ function Game() {
             playerName =
               socket.data?.playerName ||
               localStorage.getItem('playerName') ||
-              'Jugador';
+              t('common.playerDefault');
             console.log('   📝 Jugador nuevo, usando nombre:', playerName);
           }
         } else {
@@ -808,7 +813,7 @@ function Game() {
           playerName =
             socket.data?.playerName ||
             localStorage.getItem('playerName') ||
-            'Jugador';
+            t('common.playerDefault');
           console.log(
             '   📝 No se pudo obtener info de sala, usando nombre:',
             playerName,
@@ -921,13 +926,13 @@ function Game() {
               ⏳
             </motion.div>
             <h2 className="text-2xl font-bold text-space-cyan mb-4">
-              Esperando a los demás jugadores...
+              {t('game.waitingOthers')}
             </h2>
             <p className="text-gray-400 mb-4">
-              Todos deben confirmar su rol antes de continuar
+              {t('game.everyoneConfirm')}
             </p>
             <div className="text-xs text-gray-500 mt-4 p-3 bg-space-blue/30 rounded-lg inline-block">
-              Tu rol:{' '}
+              {t('game.yourRole')}:{' '}
               {myRole?.isImpostor ? '🕵️ IMPOSTOR' : `🎯 ${myRole?.word}`}
             </div>
           </motion.div>
@@ -947,10 +952,10 @@ function Game() {
           className="mb-6 text-center"
         >
           <h1 className="text-3xl font-extrabold tracking-wide text-red-400 drop-shadow-lg mb-2">
-            {isImpostor ? 'IMPOSTOR' : 'TU PALABRA'}
+            {isImpostor ? t('game.youAreImpostor').toUpperCase() : t('game.yourWord').toUpperCase()}
           </h1>
           <p className="text-xs text-slate-400 uppercase tracking-[0.2em]">
-            Desliza tu mirada, no reveles tu carta
+            {t('game.revealSubtitle')}
           </p>
         </motion.div>
 
@@ -983,7 +988,7 @@ function Game() {
                     👁️‍🗨️
                   </motion.div>
                   <p className="text-slate-200 text-sm font-medium">
-                    Toca para revelar tu rol
+                    {t('game.touchToReveal')}
                   </p>
                 </div>
               </motion.div>
@@ -1011,24 +1016,24 @@ function Game() {
                 {isImpostor ? (
                   <>
                     <p className="text-red-400 font-semibold text-xl mb-2">
-                      Eres el IMPOSTOR
+                      {t('game.youAreImpostor')}
                     </p>
                     {displayWord && (
                       <p className="text-xs text-emerald-300 mb-4 px-4 py-2 bg-emerald-900/30 rounded-lg">
-                        Pista: categoría{' '}
+                        {t('game.hintCategory')} ({t('game.category')}):{' '}
                         <span className="font-bold text-emerald-200">
                           {displayWord}
                         </span>
                       </p>
                     )}
                     <p className="text-xs text-slate-400 text-center px-4">
-                      Finge que conoces la palabra secreta sin delatarte.
+                      {t('game.impostorHint')}
                     </p>
                   </>
                 ) : (
                   <>
                     <p className="text-sm text-slate-400 mb-2">
-                      Tu palabra secreta es:
+                      {t('game.yourSecretWord')}:
                     </p>
                     <motion.p
                       initial={{ scale: 0.8, opacity: 0 }}
@@ -1040,9 +1045,7 @@ function Game() {
                       {displayWord}
                     </motion.p>
                     <p className="text-xs text-slate-400 text-center px-4">
-                      Describe sin decirla. Hay{' '}
-                      {players.length > 5 ? '1-2' : '1'} impostor(es) intentando
-                      adivinarla.
+                      {t('game.describeWithoutSaying', { count: players.length > 5 ? '1-2' : '1' })}
                     </p>
                   </>
                 )}
@@ -1060,7 +1063,7 @@ function Game() {
           onClick={handleRevealConfirm}
           className="w-full max-w-xs py-4 rounded-full bg-emerald-500 hover:bg-emerald-400 font-semibold text-black tracking-wide shadow-lg shadow-emerald-500/40 transition"
         >
-          He visto mi rol
+          {t('game.iSawMyRole')}
         </motion.button>
       </div>
     );
@@ -1081,7 +1084,7 @@ function Game() {
 
       if (!code) {
         console.error('❌ No hay código de sala disponible');
-        alert('Error: No hay código de sala disponible');
+        alert(`${t('common.error')}: ${t('errors.noRoomCode')}`);
         return;
       }
 
@@ -1090,9 +1093,7 @@ function Game() {
           '⚠️ No estás en fase de discusión. Estado actual:',
           gamePhase,
         );
-        alert(
-          `No puedes iniciar la votación ahora. Estado actual: ${gamePhase}`,
-        );
+        alert(t('errors.cannotStartVotingNow', { phase: gamePhase }));
         return;
       }
 
@@ -1102,7 +1103,7 @@ function Game() {
         } else {
           if (response?.error === 'NOT_HOST') {
             console.log('⚠️ Solo el host puede iniciar la votación');
-            alert('Solo el host puede iniciar la votación');
+            alert(t('game.onlyHostStartsVoting'));
           } else if (response?.error === 'NOT_DISCUSSION_PHASE') {
             console.error(
               '❌ El juego no está en fase de discusión. Estado actual:',
@@ -1110,18 +1111,16 @@ function Game() {
             );
             console.error('   Estado local - gamePhase:', gamePhase);
             alert(
-              `Error: El juego no está en fase de discusión. Estado: ${response?.currentStatus || 'desconocido'}`,
+              `${t('common.error')}: ${t('errors.notDiscussionPhase', { status: response?.currentStatus || 'desconocido' })}`,
             );
           } else if (response?.error === 'GAME_NOT_FOUND') {
             console.error(
               '❌ Juego no encontrado al intentar iniciar votación manualmente',
             );
-            alert(
-              'Error: El juego no se encontró. Por favor, recarga la página.',
-            );
+            alert(`${t('common.error')}: ${t('errors.gameNotFound')}`);
           } else {
             console.error('❌ Error iniciando votación:', response?.error);
-            alert(`Error: ${response?.error || 'Error desconocido'}`);
+            alert(`${t('common.error')}: ${response?.error || t('errors.unknown')}`);
           }
         }
       });
@@ -1135,7 +1134,7 @@ function Game() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-8"
           >
-            <h1 className="text-4xl font-bold text-glow mb-4">💬 Discusión</h1>
+            <h1 className="text-4xl font-bold text-glow mb-4">💬 {t('game.discussion')}</h1>
             <motion.div
               animate={timeLeft === 0 ? {} : { scale: [1, 1.05, 1] }}
               transition={{
@@ -1148,7 +1147,7 @@ function Game() {
               {String(seconds).padStart(2, '0')}
             </motion.div>
             <p className="text-gray-400 mt-4 text-lg">
-              Discutan y descubran quién es el impostor
+              {t('game.discussAndDiscover')}
             </p>
           </motion.div>
 
@@ -1161,16 +1160,16 @@ function Game() {
               <div className="text-2xl mb-4">
                 {myRole?.isImpostor ? (
                   <>
-                    <span className="text-red-400">🕵️ Eres el IMPOSTOR</span>
+                    <span className="text-red-400">🕵️ {t('game.youAreImpostor')}</span>
                     {myRole?.word && (
                       <p className="text-sm text-emerald-300 mt-2">
-                        Pista: {myRole.word}
+                        {t('game.hintCategory')}: {myRole.word}
                       </p>
                     )}
                   </>
                 ) : (
                   <span className="text-space-cyan">
-                    🎯 Tu palabra:{' '}
+                    🎯 {t('game.yourWord')}:{' '}
                     <span className="font-bold text-emerald-400">
                       {myRole?.word}
                     </span>
@@ -1179,8 +1178,8 @@ function Game() {
               </div>
               <p className="text-gray-300 text-sm">
                 {myRole?.isImpostor
-                  ? 'Intenta descubrir la palabra sin revelar que eres el impostor'
-                  : 'Habla sobre la palabra sin decirla directamente'}
+                  ? t('game.impostorGoal')
+                  : t('game.civilHint')}
               </p>
             </div>
           </motion.div>
@@ -1200,8 +1199,8 @@ function Game() {
               }`}
             >
               {timeLeft === 0
-                ? '⏰ Tiempo agotado - Iniciar Votación'
-                : '🗳️ Iniciar Votación'}
+                ? `⏰ ${t('game.timeUpStartVoting')}`
+                : `🗳️ ${t('game.startVoting')}`}
             </motion.button>
           )}
 
@@ -1213,8 +1212,7 @@ function Game() {
               className="text-center mb-4 p-4 bg-yellow-500/20 rounded-xl border border-yellow-500/50"
             >
               <p className="text-yellow-400 font-semibold">
-                ⏰ Tiempo agotado. Esperando que los civiles inicien la
-                votación...
+                ⏰ {t('game.timeUpWaiting')}
               </p>
             </motion.div>
           )}
@@ -1229,7 +1227,7 @@ function Game() {
             onClick={handleBackToLobby}
             className="w-full py-3 rounded-xl font-medium text-gray-300 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 hover:border-gray-600 transition-all"
           >
-            🏠 Volver al Inicio
+            🏠 {t('game.backToHome')}
           </motion.button>
         </div>
       </div>
@@ -1255,7 +1253,7 @@ function Game() {
       activePlayersForVote = players
         .map((_, idx) => ({
           id: `player-${idx}`,
-          name: `Jugador ${idx + 1}`,
+          name: `${t('common.playerDefault')} ${idx + 1}`,
         }))
         .filter((p) => {
           const isEliminated = gameResult?.eliminatedPlayers?.includes(p.id);
@@ -1278,15 +1276,15 @@ function Game() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-8"
           >
-            <h1 className="text-4xl font-bold text-glow mb-4">🗳️ Votación</h1>
+            <h1 className="text-4xl font-bold text-glow mb-4">🗳️ {t('game.voting')}</h1>
             <p className="text-gray-400 text-lg">
               {myRole?.isImpostor
-                ? 'Finge que votas para no delatarte'
-                : '¿Quién crees que es el impostor?'}
+                ? t('game.impostorFakeVote')
+                : t('game.whoIsImpostor')}
             </p>
             {myRole?.isImpostor && (
               <p className="text-red-400 text-sm mt-2">
-                ⚠️ Tu voto no contará, pero puedes fingir que votas
+                ⚠️ {t('game.impostorVoteNoCount')}
               </p>
             )}
           </motion.div>
@@ -1295,10 +1293,10 @@ function Game() {
             {activePlayersForVote.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-gray-400 text-lg mb-4">
-                  No hay jugadores disponibles para votar
+                  {t('game.noPlayersToVote')}
                 </p>
                 <p className="text-gray-500 text-sm">
-                  Esperando actualización de la lista de jugadores...
+                  {t('game.waitingPlayerList')}
                 </p>
               </div>
             ) : (
@@ -1318,7 +1316,7 @@ function Game() {
                   })
                   .map((player, index) => {
                     const playerId = player.id || `player-${index}`;
-                    const playerName = player.name || `Jugador ${index + 1}`;
+                    const playerName = player.name || `${t('common.playerDefault')} ${index + 1}`;
                     const isSelected = selectedVote === playerId;
 
                     return (
@@ -1367,7 +1365,7 @@ function Game() {
               className="text-center mt-6 p-4 bg-emerald-500/20 rounded-xl border border-emerald-400/50"
             >
               <p className="text-emerald-300 font-semibold">
-                ✓ Voto enviado. Esperando a los demás...
+                ✓ {t('game.voteSent')}
               </p>
             </motion.div>
           )}
@@ -1390,7 +1388,7 @@ function Game() {
             onClick={handleBackToLobby}
             className="w-full mt-6 py-3 rounded-xl font-medium text-gray-300 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 hover:border-gray-600 transition-all"
           >
-            🏠 Volver al Inicio
+            🏠 {t('game.backToHome')}
           </motion.button>
         </div>
       </div>
@@ -1414,7 +1412,7 @@ function Game() {
               transition={{ delay: 0.2 }}
               className="text-4xl font-bold mb-6 text-space-cyan"
             >
-              🗳️ Resultados de la Votación
+              🗳️ {t('game.voteResults')}
             </motion.h1>
 
             {gameResult.impostorDiscovered && gameResult.eliminated && (
@@ -1425,12 +1423,12 @@ function Game() {
                 className="mb-6 p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/50"
               >
                 <p className="font-semibold text-lg text-emerald-300">
-                  🎯 El Impostor fue descubierto: {gameResult.eliminated.name}
+                  🎯 {t('game.impostorDiscovered')}: {gameResult.eliminated.name}
                 </p>
               </motion.div>
             )}
 
-            {/* Mostrar votos de cada jugador */}
+            {/* Mostrar votos: quién votó a quién; el impostor solo nombre + "Impostor" */}
             {gameResult.votesWithNames &&
               Object.keys(gameResult.votesWithNames).length > 0 && (
                 <motion.div
@@ -1440,13 +1438,14 @@ function Game() {
                   className="mb-6"
                 >
                   <h3 className="text-2xl font-semibold text-white mb-4 text-center">
-                    🗳️ Votos:
+                    🗳️ {t('game.votes')}
                   </h3>
                   <div className="space-y-2">
                     {gameResult.players.map((player, index) => {
                       const voteInfo = gameResult.votesWithNames[player.id];
                       const isImpostor = player.role === 'impostor';
                       const votedForImpostor =
+                        !isImpostor &&
                         voteInfo &&
                         voteInfo.votedId &&
                         gameResult.impostor &&
@@ -1475,12 +1474,12 @@ function Game() {
                           }`}
                         >
                           <span className="text-white font-medium">
-                            {player.name}:
+                            {player.name}
                           </span>
                           <div className="flex items-center gap-2">
                             {isImpostor ? (
                               <span className="text-yellow-400 font-semibold">
-                                🕵️ IMPOSTOR
+                                🕵️ {t('game.impostorLabel')}
                               </span>
                             ) : voteInfo && voteInfo.votedName ? (
                               <>
@@ -1491,20 +1490,20 @@ function Game() {
                                       : 'text-red-400'
                                   }`}
                                 >
-                                  → {voteInfo.votedName}
+                                  {t('game.votedFor', { name: voteInfo.votedName })}
                                 </span>
                                 {votedForImpostor ? (
                                   <span className="text-emerald-300 text-sm">
-                                    ✓ Acertó
+                                    ✓ {t('game.correct')}
                                   </span>
                                 ) : (
                                   <span className="text-red-300 text-sm">
-                                    ✗ No acertó
+                                    ✗ {t('game.wrong')}
                                   </span>
                                 )}
                               </>
                             ) : (
-                              <span className="text-gray-400">No votó</span>
+                              <span className="text-gray-400">{t('game.noVote')}</span>
                             )}
                           </div>
                         </motion.div>
@@ -1523,7 +1522,7 @@ function Game() {
                 className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl"
               >
                 <p className="text-red-300 font-semibold text-lg">
-                  🕵️ El impostor era:{' '}
+                  🕵️ {t('game.impostorWas')}{' '}
                   <span className="text-red-400">
                     {gameResult.impostor.name}
                   </span>
@@ -1556,6 +1555,7 @@ function Game() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={async () => {
+                    setVoteResultsCountdown(null); // Evitar que el timer de vote-results haga get-state y cambie a discussion
                     console.log('🎮 Iniciando nueva partida...', {
                       code,
                       socketId: socket?.id,
@@ -1573,7 +1573,7 @@ function Game() {
                           code,
                           name:
                             room?.players?.find((p) => p.id === socket.id)
-                              ?.name || 'Jugador',
+                              ?.name || t('common.playerDefault'),
                         },
                         (joinResponse) => {
                           if (joinResponse && joinResponse.ok) {
@@ -1597,7 +1597,7 @@ function Game() {
                                 response?.error,
                               );
                               alert(
-                                `Error: ${response?.error || 'No se pudo iniciar nueva partida'}`,
+                                `${t('common.error')}: ${response?.error || t('errors.newGameError')}`,
                               );
                             }
                           });
@@ -1608,13 +1608,13 @@ function Game() {
                         '❌ No hay código de sala o socket disponible',
                       );
                       alert(
-                        'Error: No se pudo determinar la sala. Por favor, vuelve al inicio.',
+                        t('errors.roomError'),
                       );
                     }
                   }}
                   className="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl font-bold text-white text-lg shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70 transition-all"
                 >
-                  🎮 Nueva Partida
+                  🎮 {t('game.newGame')}
                 </motion.button>
               )}
 
@@ -1624,7 +1624,7 @@ function Game() {
                 onClick={handleBackToLobby}
                 className="w-full py-4 bg-gradient-to-r from-space-purple to-space-pink rounded-xl font-bold text-white text-lg shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70 transition-all"
               >
-                🏠 Volver al Inicio
+                🏠 {t('game.backToHome')}
               </motion.button>
             </motion.div>
           </div>
@@ -1668,8 +1668,8 @@ function Game() {
               }`}
             >
               {gameResult.winner === 'impostors'
-                ? '🕵️ Impostores Ganan!'
-                : '🎯 Civiles Ganan!'}
+                ? `🕵️ ${t('game.impostorsWin')}`
+                : `🎯 ${t('game.civiliansWin')}`}
             </motion.h1>
 
             <motion.div
@@ -1678,7 +1678,7 @@ function Game() {
               transition={{ delay: 0.4 }}
               className="text-2xl text-space-cyan mb-8 p-4 bg-space-blue/30 rounded-xl"
             >
-              La palabra secreta era:{' '}
+              {t('game.secretWordWas')}{' '}
               <span className="text-glow font-bold text-3xl text-emerald-400">
                 {gameResult.secretWord}
               </span>
@@ -1704,17 +1704,17 @@ function Game() {
                 >
                   {gameResult.impostorDiscovered ? (
                     <>
-                      🎯 El Impostor fue descubierto:{' '}
+                      🎯 {t('game.impostorDiscovered')}:{' '}
                       {gameResult.eliminated.name}
                     </>
                   ) : (
-                    <>❌ {gameResult.eliminated.name} fue eliminado</>
+                    <>❌ {gameResult.eliminated.name} {t('game.eliminated')}</>
                   )}
                 </p>
               </motion.div>
             )}
 
-            {/* Mostrar votos de cada jugador */}
+            {/* Mostrar votos: quién votó a quién; el impostor solo nombre + "Impostor" */}
             {gameResult.votesWithNames &&
               Object.keys(gameResult.votesWithNames).length > 0 && (
                 <motion.div
@@ -1724,12 +1724,21 @@ function Game() {
                   className="mb-8"
                 >
                   <h3 className="text-2xl font-semibold text-white mb-4 text-center">
-                    🗳️ Votos:
+                    🗳️ {t('game.votes')}
                   </h3>
                   <div className="space-y-2">
                     {gameResult.players.map((player, index) => {
                       const voteInfo = gameResult.votesWithNames[player.id];
                       const isImpostor = player.role === 'impostor';
+                      const votedForImpostor =
+                        !isImpostor &&
+                        gameResult.impostor &&
+                        voteInfo?.votedId === gameResult.impostor.id;
+                      const didNotVoteForImpostor =
+                        !isImpostor &&
+                        voteInfo?.votedId &&
+                        gameResult.impostor &&
+                        voteInfo.votedId !== gameResult.impostor.id;
 
                       return (
                         <motion.div
@@ -1740,22 +1749,26 @@ function Game() {
                           className={`p-3 rounded-lg flex items-center justify-between ${
                             isImpostor
                               ? 'bg-red-500/10 border border-red-500/30'
-                              : 'bg-gray-800/50 border border-gray-700/50'
+                              : votedForImpostor
+                                ? 'bg-emerald-500/20 border border-emerald-500/50'
+                                : didNotVoteForImpostor
+                                  ? 'bg-red-500/20 border border-red-500/50'
+                                  : 'bg-gray-800/50 border border-gray-700/50'
                           }`}
                         >
                           <span className="text-white font-medium">
-                            {player.name}:
+                            {player.name}
                           </span>
                           <span
                             className={`font-semibold ${
-                              isImpostor ? 'text-red-400' : 'text-emerald-400'
+                              isImpostor ? 'text-red-400' : votedForImpostor ? 'text-emerald-400' : didNotVoteForImpostor ? 'text-red-400' : 'text-emerald-400'
                             }`}
                           >
                             {isImpostor
-                              ? '🕵️ IMPOSTOR'
+                              ? `🕵️ ${t('game.impostorLabel')}`
                               : voteInfo && voteInfo.votedName
-                                ? `→ ${voteInfo.votedName}`
-                                : 'No votó'}
+                                ? t('game.votedFor', { name: voteInfo.votedName })
+                                : t('game.noVote')}
                           </span>
                         </motion.div>
                       );
@@ -1792,6 +1805,7 @@ function Game() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={async () => {
+                    setVoteResultsCountdown(null); // Evitar que el timer de vote-results haga get-state y cambie a discussion
                     console.log(
                       '🎮 Iniciando nueva partida desde resultados finales...',
                       {
@@ -1812,7 +1826,7 @@ function Game() {
                           code,
                           name:
                             room?.players?.find((p) => p.id === socket.id)
-                              ?.name || 'Jugador',
+                              ?.name || t('common.playerDefault'),
                         },
                         (joinResponse) => {
                           if (joinResponse && joinResponse.ok) {
@@ -1836,7 +1850,7 @@ function Game() {
                                 response?.error,
                               );
                               alert(
-                                `Error: ${response?.error || 'No se pudo iniciar nueva partida'}`,
+                                `${t('common.error')}: ${response?.error || t('errors.newGameError')}`,
                               );
                             }
                           });
@@ -1847,13 +1861,13 @@ function Game() {
                         '❌ No hay código de sala o socket disponible',
                       );
                       alert(
-                        'Error: No se pudo determinar la sala. Por favor, vuelve al inicio.',
+                        t('errors.roomError'),
                       );
                     }
                   }}
                   className="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl font-bold text-white text-lg shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70 transition-all"
                 >
-                  🎮 Nueva Partida
+                  🎮 {t('game.newGame')}
                 </motion.button>
               )}
 
@@ -1866,7 +1880,7 @@ function Game() {
                 onClick={handleBackToLobby}
                 className="w-full py-4 bg-gradient-to-r from-space-purple to-space-pink rounded-xl font-bold text-white text-lg shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70 transition-all"
               >
-                🏠 Volver al Inicio
+                🏠 {t('game.backToHome')}
               </motion.button>
             </motion.div>
           </div>
@@ -1886,7 +1900,7 @@ function Game() {
         className="text-center"
       >
         <div className="animate-pulse text-space-cyan text-xl mb-4">
-          Esperando que el host inicie el juego...
+          {t('game.waitingHost')}
         </div>
         <div className="text-gray-400 text-sm">Sala: {code}</div>
         <div className="text-xs text-gray-500 mt-4">
