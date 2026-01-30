@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSocket } from '../hooks/useSocket';
@@ -26,6 +26,7 @@ function Game() {
   const [voteResultsCountdown, setVoteResultsCountdown] = useState(null); // Timer para resultados de votación
   // Fase de pistas (3 rondas, 30 s)
   const [clueRound, setClueRound] = useState(1);
+  const clueRoundRef = useRef(1); // Ref para que el listener game:clue-received vea siempre la ronda actual
   const [clueRoundEndsAt, setClueRoundEndsAt] = useState(null);
   const [clueTimeLeft, setClueTimeLeft] = useState(null);
   const [cluesForRound, setCluesForRound] = useState({}); // { playerId: { name, clue } }
@@ -68,6 +69,7 @@ function Game() {
         setVoteResultsCountdown(null);
         setHasSeenRole(false);
         setClueRound(1);
+        clueRoundRef.current = 1;
         setClueRoundEndsAt(null);
         setClueTimeLeft(null);
         setCluesForRound({});
@@ -113,8 +115,10 @@ function Game() {
 
     // Fase de pistas: nueva ronda
     socket.on('game:clue-round-started', (data) => {
+      const round = data.round ?? 1;
       setGamePhase('clues');
-      setClueRound(data.round ?? 1);
+      setClueRound(round);
+      clueRoundRef.current = round;
       setClueRoundEndsAt(data.endsAt ?? null);
       setMyClueSubmitted(false);
       setClueInput('');
@@ -126,7 +130,7 @@ function Game() {
     });
 
     socket.on('game:clue-received', ({ playerId, playerName, clue, round }) => {
-      if (round !== clueRound) return;
+      if (round !== clueRoundRef.current) return;
       setCluesForRound((prev) => ({
         ...prev,
         [playerId]: { name: playerName, clue },
@@ -298,10 +302,11 @@ function Game() {
             }
           }
           else if (response.gameState.status === 'clues') {
-            setGamePhase('clues');
-            setClueRound(response.gameState.clueRound ?? 1);
-            setClueRoundEndsAt(response.gameState.clueRoundEndsAt ?? null);
             const round = response.gameState.clueRound ?? 1;
+            setGamePhase('clues');
+            setClueRound(round);
+            clueRoundRef.current = round;
+            setClueRoundEndsAt(response.gameState.clueRoundEndsAt ?? null);
             const raw = response.gameState.cluesByRound?.[round];
             const withNames = {};
             if (raw && typeof raw === 'object') {
