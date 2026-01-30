@@ -12,7 +12,10 @@ const WordPack = require("./models/WordPack");
 const PORT = process.env.PORT || 4000;
 
 const app = express();
-const corsOrigin = process.env.CORS_ORIGIN || process.env.FRONTEND_URL || "*";
+// CORS: permite uno o varios orígenes separados por coma (ej. prod + dev o .onrender.com)
+const corsOriginRaw = process.env.CORS_ORIGIN || process.env.FRONTEND_URL || "*";
+const corsOrigins = corsOriginRaw.split(",").map((s) => s.trim()).filter(Boolean);
+const corsOrigin = corsOrigins.length === 0 ? "*" : corsOrigins.length === 1 ? corsOrigins[0] : corsOrigins;
 app.use(cors({ origin: corsOrigin, credentials: corsOrigin !== "*" }));
 app.use(express.json());
 

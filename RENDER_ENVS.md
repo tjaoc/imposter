@@ -36,6 +36,9 @@ No hace falta crearlas a mano: al arrancar el backend con una `MONGODB_URI` que 
 
 Sustituye `TU_PASSWORD` por la contraseña real del usuario `impostoradm`. No subas la contraseña al repo.
 
+**CORS:** Si usas varios frontends (ej. prod + dev), puedes poner varios orígenes separados por coma:  
+`CORS_ORIGIN=https://impostor.netic.app,https://impostor.netic.dev`
+
 **imposter-app-prod**
 
 | Variable          | Valor |
@@ -93,6 +96,18 @@ En el proveedor de tu dominio (netic.app), configura:
 1. En Render, tras crear el Blueprint, entra en cada servicio y en **Environment** asigna **solo** `MONGODB_URI` (producción con `/production`, desarrollo con `/develop`). El resto de variables ya vienen del `render.yaml`.
 2. En MongoDB Atlas, **Network Access**: permite acceso desde cualquier IP (`0.0.0.0/0`) para que Render pueda conectar.
 3. Comprueba: `https://apiimp.netic.app/health` y `https://dev.apiimp.netic.app/health`; luego abre las URLs de la app.
+
+---
+
+## 6. 502 Bad Gateway + CORS en el navegador
+
+Si ves **502 (Bad Gateway)** y **"No 'Access-Control-Allow-Origin' header"** al abrir la app:
+
+1. **Backend dormido (plan Free):** En Render, los Web Services Free se suspenden tras ~15 min sin tráfico. La primera petición puede tardar **30–60 segundos** y a veces el proxy responde 502 antes de que el servicio despierte. **Solución:** Espera 1 minuto, recarga la página o abre primero `https://apiimp.netic.app/health` hasta que responda `{"ok":true,...}` y luego usa la app.
+2. **Backend caído:** Revisa en Render → **imposter-api-prod** → **Logs**. Si falla al arrancar, suele ser **MONGODB_URI** incorrecta (contraseña, red) o que Atlas no tiene `0.0.0.0/0` en Network Access.
+3. **CORS:** Cuando el backend sí responde, debe tener `CORS_ORIGIN=https://impostor.netic.app` (sin barra final). Si usas también la URL `.onrender.com` del frontend, añade ese origen separado por coma en `CORS_ORIGIN`.
+
+Los avisos de **Permissions-Policy** (browsing-topics, run-ad-auction, etc.) vienen del host (Render/CDN) y son inofensivos; no afectan a la app.
 
 ---
 
