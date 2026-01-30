@@ -1,5 +1,24 @@
 # 📝 Changelog - Imposter
 
+## [1.0.4] - 2026-01-30
+
+### ✨ Mejoras y correcciones de iconos/PWA
+
+#### Mejoras
+
+- ✅ **PWA: popup de actualización**: La app ahora notifica al usuario cuando hay una nueva versión disponible y permite actualizar con un clic.
+- ✅ **Iconos desde `icon_impostor.jpeg`**: Todos los iconos (favicon, PWA, Apple Touch Icon, `public/icons/`) se generan a partir de `public/icon_impostor.jpeg`.
+- ✅ **Fondo transparente en iconos**: Los iconos PNG se generan con fondo transparente (donde antes había blanco o donde el logo no llena el lienzo).
+- ✅ **SVG autocontenidos**: Los archivos SVG de iconos (`favicon.svg`, `public/icons/*.svg`) ahora embeben la imagen PNG en base64 para asegurar que se muestran correctamente en cualquier contexto.
+- ✅ **Script `generate-icons`**: Creado `frontend/scripts/generate-icons-from-logo.js` para automatizar la generación de todos los formatos de icono (PNG, ICO, SVG) con la lógica de relleno de fondo y transparencia.
+- ✅ **Fondo extendido en `icon_impostor-filled.png`**: El script ahora genera una versión de la imagen de origen con el fondo degradado extendido a las esquinas, usándola como base para todos los iconos.
+
+#### 🐞 Correcciones
+
+- ✅ Corregida la lógica para muestrear colores de gradiente en el script de generación de iconos.
+
+---
+
 ## [1.0.3] - 2026-01-30
 
 ### 🐛 Correcciones y mejoras UI
