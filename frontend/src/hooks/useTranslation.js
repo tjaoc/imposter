@@ -22,6 +22,12 @@ function interpolate (str, vars = {}) {
   );
 }
 
+/** Capitaliza la primera letra de cada palabra (español y portugués). */
+function capitalizeWords (str) {
+  if (typeof str !== 'string') return str;
+  return str.replace(/(^|[\s\u00A0])([\p{L}])/gu, (_, prefix, letter) => prefix + letter.toUpperCase());
+}
+
 export function useTranslation () {
   const { locale } = useLanguage();
   const dict = useMemo(
@@ -34,7 +40,8 @@ export function useTranslation () {
       const value = getNested(dict, key);
       if (value == null) return key;
       if (typeof value !== 'string') return key;
-      return interpolate(value, vars);
+      const interpolated = interpolate(value, vars);
+      return capitalizeWords(interpolated);
     },
     [dict]
   );

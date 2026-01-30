@@ -16,9 +16,8 @@
   },
   "home": {
     "title": "IMPOSTOR",
-    "subtitle": "Quem é o Espião?",
-    "yourName": "O teu nome",
-    "yourNamePlaceholder": "Introduz o teu nome",
+    "yourName": "O Teu Nome",
+    "yourNamePlaceholder": "Introduz o Teu Nome",
     "createRoom": "Criar Sala",
     "creating": "A criar...",
     "roomCode": "Código da sala",
@@ -29,10 +28,9 @@
     "version": "Versão",
     "installIos": "Para instalar a app: toca no botão Partilhar (□↑) e depois «Adicionar ao ecrã principal».",
     "installAndroid": "Para instalar a app: menu (⋮) → «Instalar app» ou «Adicionar ao ecrã principal».",
-    "playLocal": "Um só dispositivo",
+    "playLocal": "Jogar em Pessoa",
     "playLocalDesc": "Jogar em pessoa com um telemóvel",
-    "playOnline": "Jogar online",
-    "playOnlineDesc": "Criar ou entrar numa sala"
+    "playOnline": "Jogar Online"
   },
   "local": {
     "discussionReminder": "Cada jogador já conhece o seu papel. Falem sem revelar a palavra nem o vosso papel.",

@@ -47,8 +47,10 @@ function PackSelector({ onSelectPacks, selectedPackIds = [], allowRandom = true 
         return res.json();
       })
       .then((data) => {
-        if (data?.ok) setPacks(data.packs);
-        else if (data === null) setPacks([]);
+        if (data?.ok) {
+          const list = (data.packs || []).filter((p) => p.slug !== 'personalizado');
+          setPacks(list);
+        } else if (data === null) setPacks([]);
         setLoading(false);
       })
       .catch(() => {

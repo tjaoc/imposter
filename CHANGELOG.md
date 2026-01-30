@@ -1,5 +1,23 @@
 # 📝 Changelog - Imposter
 
+## [1.0.3] - 2026-01-30
+
+### 🐛 Correcciones y mejoras UI
+
+#### ✨ Mejoras
+
+- ✅ **Footer en iOS**: Layout flex con scroll solo en `main`; footer fijo al fondo sin `position: fixed` para evitar que se mueva al hacer scroll en Safari iOS.
+- ✅ **Home**: Una sola card que agrupa "Um só dispositivo", nombre, crear sala y entrar en sala para ganar espacio.
+- ✅ **Espacio del título**: Menos margen entre el título IMPOSTOR y el logo/card.
+- ✅ **Capitalización**: Primera letra de cada palabra en todas las traducciones (ES/PT) aplicada en el hook de traducciones.
+- ✅ **Palabras personalizadas**: Desactivado temporalmente (botón en Home y categoría "Personalizado" en Local/online).
+
+#### 📋 Notas
+
+- Categoría aleatoria, iconos por categoría y cajas uniformes (`.card`) ya incluidos desde commits anteriores.
+
+---
+
 ## [1.0.2] - 2026-01-30
 
 ### 📱 Móvil y tablet (iPhone, Android, iPad)

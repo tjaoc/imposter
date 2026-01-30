@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useSocket } from '../hooks/useSocket';
 import { useTranslation } from '../hooks/useTranslation';
-import CustomWords from '../components/CustomWords';
 import LanguageSelector from '../components/LanguageSelector';
+
+// Añadir palabras personalizadas: desactivado por ahora
+// import CustomWords from '../components/CustomWords';
 
 function Home() {
   const { t } = useTranslation();
@@ -12,7 +14,6 @@ function Home() {
   const [roomCode, setRoomCode] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
-  const [showCustomWords, setShowCustomWords] = useState(false);
   const navigate = useNavigate();
   const { socket, connectSocket } = useSocket();
 
@@ -102,31 +103,28 @@ function Home() {
           initial={{ scale: 0.9 }}
           animate={{ scale: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-center mb-6 sm:mb-8 md:mb-10"
+          className="text-center mb-4 sm:mb-5"
         >
           <img
             src="/favicon.svg"
             alt="Imposter"
-            className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-3 sm:mb-4"
+            className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-2 sm:mb-3"
           />
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-glow mb-3 sm:mb-4">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-glow mb-2 sm:mb-3">
             {t('home.title')}
           </h1>
-          <p className="text-space-cyan text-base sm:text-lg md:text-xl">
-            {t('home.subtitle')}
-          </p>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="card mb-4 w-full"
+          className="card space-y-4 w-full"
         >
           <button
             type="button"
             onClick={() => navigate('/local')}
-            className="w-full min-h-[48px] py-3.5 sm:py-4 px-4 sm:px-5 rounded-xl border-2 border-space-cyan/50 bg-space-blue/50 hover:bg-space-cyan/20 hover:border-space-cyan active:scale-[0.98] font-semibold text-space-cyan mb-4 flex items-center justify-center gap-4 text-left"
+            className="w-full min-h-[48px] py-3.5 sm:py-4 px-4 sm:px-5 rounded-xl border-2 border-space-cyan/50 bg-space-blue/50 hover:bg-space-cyan/20 hover:border-space-cyan active:scale-[0.98] font-semibold text-space-cyan flex items-center justify-center gap-4 text-left"
           >
             <span className="text-2xl flex-shrink-0">📱</span>
             <div className="text-left flex-1 min-w-0">
@@ -136,7 +134,8 @@ function Home() {
               </div>
             </div>
           </button>
-          <div className="relative my-4">
+
+          <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-space-cyan/30" />
             </div>
@@ -146,17 +145,6 @@ function Home() {
               </span>
             </div>
           </div>
-          <div className="text-center text-gray-400 text-sm mb-4">
-            {t('home.playOnlineDesc')}
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="card space-y-4 w-full"
-        >
           <div>
             <label className="block text-sm sm:text-base font-medium mb-2 text-space-cyan">
               {t('home.yourName')}
@@ -171,66 +159,47 @@ function Home() {
             />
           </div>
 
-          <div className="space-y-4">
-            <button
-              onClick={handleCreateRoom}
-              disabled={isCreating || !playerName.trim()}
-              className="w-full min-h-[48px] py-3.5 sm:py-4 bg-gradient-to-r from-space-purple to-space-pink rounded-xl font-semibold text-white hover:from-space-pink hover:to-space-purple active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isCreating ? t('home.creating') : t('home.createRoom')}
-            </button>
+          <button
+            onClick={handleCreateRoom}
+            disabled={isCreating || !playerName.trim()}
+            className="w-full min-h-[48px] py-3.5 sm:py-4 bg-gradient-to-r from-space-purple to-space-pink rounded-xl font-semibold text-white hover:from-space-pink hover:to-space-purple active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isCreating ? t('home.creating') : t('home.createRoom')}
+          </button>
 
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-space-cyan/30"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-space-blue text-gray-400">
-                  {t('common.or')}
-                </span>
-              </div>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-space-cyan/30" />
             </div>
-
-            <div>
-              <input
-                type="text"
-                value={roomCode}
-                onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-                placeholder={t('home.roomCode')}
-                className="w-full px-4 py-3.5 sm:py-3 bg-space-blue border border-space-cyan/30 rounded-xl focus:outline-none focus:border-space-cyan focus:ring-2 focus:ring-space-cyan/50 text-white placeholder-gray-400 mb-4 uppercase text-base"
-                maxLength={6}
-              />
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleJoinRoom();
-                }}
-                disabled={isJoining || !playerName.trim() || !roomCode.trim()}
-                className="w-full min-h-[48px] py-3.5 sm:py-4 bg-space-blue border-2 border-space-cyan rounded-xl font-semibold text-space-cyan hover:bg-space-cyan hover:text-space-dark active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isJoining ? t('home.joining') : t('home.joinRoom')}
-              </button>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-space-blue text-gray-400">
+                {t('common.or')}
+              </span>
             </div>
           </div>
+
+          <div>
+            <input
+              type="text"
+              value={roomCode}
+              onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+              placeholder={t('home.roomCode')}
+              className="w-full px-4 py-3.5 sm:py-3 bg-space-blue border border-space-cyan/30 rounded-xl focus:outline-none focus:border-space-cyan focus:ring-2 focus:ring-space-cyan/50 text-white placeholder-gray-400 mb-4 uppercase text-base"
+              maxLength={6}
+            />
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                handleJoinRoom();
+              }}
+              disabled={isJoining || !playerName.trim() || !roomCode.trim()}
+              className="w-full min-h-[48px] py-3.5 sm:py-4 bg-space-blue border-2 border-space-cyan rounded-xl font-semibold text-space-cyan hover:bg-space-cyan hover:text-space-dark active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isJoining ? t('home.joining') : t('home.joinRoom')}
+            </button>
+          </div>
         </motion.div>
-
-        <motion.button
-          type="button"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-          onClick={() => setShowCustomWords(true)}
-          className="mt-4 min-h-[48px] flex items-center justify-center text-space-cyan hover:text-space-glow transition-colors text-sm underline w-full sm:w-auto active:opacity-80"
-        >
-          ✏️ {t('home.addCustomWords')}
-        </motion.button>
       </motion.div>
-
-      <AnimatePresence>
-        {showCustomWords && (
-          <CustomWords onClose={() => setShowCustomWords(false)} />
-        )}
-      </AnimatePresence>
     </div>
   );
 }

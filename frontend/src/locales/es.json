@@ -16,7 +16,6 @@
   },
   "home": {
     "title": "IMPOSTOR",
-    "subtitle": "¿Quién es el impostor?",
     "yourName": "Tu Nombre",
     "yourNamePlaceholder": "Ingresa tu nombre",
     "createRoom": "Crear Sala",
@@ -31,8 +30,7 @@
     "installAndroid": "Para instalar la app: menú (⋮) → «Instalar app» o «Añadir a la pantalla de inicio».",
     "playLocal": "Un solo dispositivo",
     "playLocalDesc": "Jugar en persona con un móvil",
-    "playOnline": "Jugar en línea",
-    "playOnlineDesc": "Crear o unirse a una sala"
+    "playOnline": "Jugar en línea"
   },
   "local": {
     "discussionReminder": "Cada jugador ya conoce su rol. Hablad sin revelar la palabra ni vuestro papel.",
