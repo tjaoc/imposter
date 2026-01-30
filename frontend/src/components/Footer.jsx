@@ -36,14 +36,14 @@ function Footer() {
 
   return (
     <footer
-      className={`mt-auto flex-shrink-0 text-center text-gray-400 bg-space-dark/95 backdrop-blur-sm border-t border-gray-800/50 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] ${
-        isIOSDevice
-          ? 'pt-1 pb-[max(0.5rem,env(safe-area-inset-bottom))] text-[11px] leading-tight'
-          : 'pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-xs sm:text-sm'
-      }`}
+      className={`mt-auto flex-shrink-0 text-center text-gray-400 bg-space-dark/95 backdrop-blur-sm border-t border-gray-800/50 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] leading-tight
+        max-sm:pt-1 max-sm:pb-[max(0.375rem,env(safe-area-inset-bottom))] max-sm:text-[10px]
+        sm:pt-2 sm:pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:text-xs
+        md:text-sm
+        ${isIOSDevice ? 'pt-1 pb-[max(0.375rem,env(safe-area-inset-bottom))] text-[10px]' : ''}`}
     >
       {installHint === 'ios' && (
-        <p className="text-amber-200/90 text-[11px] mb-1 px-2">
+        <p className="text-amber-200/90 text-[10px] mb-0.5 px-2">
           {t('home.installIos')}
         </p>
       )}
@@ -53,7 +53,7 @@ function Footer() {
         </p>
       )}
       <p>{t('home.footer')}</p>
-      <p className={`text-gray-500 mt-0.5 ${isIOSDevice ? 'text-[11px]' : 'text-xs'}`}>
+      <p className={`text-gray-500 mt-0.5 ${isIOSDevice ? 'text-[10px]' : 'max-sm:text-[10px] sm:text-xs'}`}>
         {t('home.version')} {version}
       </p>
     </footer>

@@ -1,5 +1,13 @@
 # 📝 Changelog - Imposter
 
+## [1.1.12] - 2026-01-30
+
+### 📱 Footer móvil/iPhone
+
+- ✅ Footer compacto por defecto en móvil (max-sm): texto 10px, pt-1, pb 0.375rem, leading-tight; no depende de detección iOS en primer pintado para verse pequeño en iPhone.
+
+---
+
 ## [1.1.11] - 2026-01-30
 
 ### ✨ Splash al abrir
