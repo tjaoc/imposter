@@ -987,7 +987,6 @@ function Game() {
   if (gamePhase === 'discussion') {
     const minutes = Math.floor((timeLeft ?? 0) / 60);
     const seconds = (timeLeft ?? 0) % 60;
-    const seconds = (timeLeft ?? 0) % 60;
     // Verificar si es host - el backend verificará de todas formas
     const isHost = room?.hostId === socket?.id;
 
