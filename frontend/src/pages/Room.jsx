@@ -19,6 +19,7 @@ function Room() {
   const [error, setError] = useState(null);
   const [selectedPacks, setSelectedPacks] = useState([]);
   const [isStarting, setIsStarting] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [settings, setSettings] = useState({
     impostorCount: 1,
     discussionSeconds: 240, // 4 minutos
@@ -197,11 +198,31 @@ function Room() {
         animate={{ opacity: 1 }}
         className="max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-3xl mx-auto"
       >
-        <div className="text-center mb-6 sm:mb-8">
+        <div className="text-center mb-4">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-glow mb-2">
             {t('room.title')} {room.code}
           </h1>
-          <p className="text-space-cyan text-sm sm:text-base">
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(room.code);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              } catch {
+                // fallback
+                const ok = document.execCommand?.('copy');
+                if (ok) {
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }
+              }
+            }}
+            className="min-h-[48px] px-5 py-2.5 rounded-xl text-sm font-semibold bg-space-blue border border-space-cyan/40 text-space-cyan hover:bg-space-cyan/20 hover:border-space-cyan/60 active:scale-[0.98] transition-all"
+          >
+            {copied ? `✓ ${t('room.copied')}` : `📋 ${t('room.copyCode')}`}
+          </button>
+          <p className="text-space-cyan text-sm sm:text-base mt-4">
             {t('room.waitingPlayers')}
           </p>
         </div>
@@ -391,29 +412,24 @@ function Room() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <select
+                    value={settings.discussionSeconds}
+                    onChange={(e) =>
+                      setSettings((prev) => ({
+                        ...prev,
+                        discussionSeconds: Number(e.target.value),
+                      }))
+                    }
+                    className="min-h-[48px] px-4 py-2.5 rounded-xl text-sm font-semibold bg-space-blue border border-space-cyan/40 text-white focus:outline-none focus:ring-2 focus:ring-space-cyan focus:border-space-cyan"
+                  >
                     {Array.from({ length: 20 }, (_, i) => (i + 1) * 60).map(
                       (seconds) => (
-                        <button
-                          type="button"
-                          key={seconds}
-                          onClick={() =>
-                            setSettings((prev) => ({
-                              ...prev,
-                              discussionSeconds: seconds,
-                            }))
-                          }
-                          className={`min-h-[48px] px-3 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
-                            settings.discussionSeconds === seconds
-                              ? 'bg-space-cyan text-black'
-                              : 'bg-gray-700 text-white hover:bg-gray-600'
-                          }`}
-                        >
-                          {seconds / 60}min
-                        </button>
+                        <option key={seconds} value={seconds}>
+                          {seconds / 60} min
+                        </option>
                       )
                     )}
-                  </div>
+                  </select>
                 </div>
               </motion.div>
             </motion.div>
@@ -431,12 +447,12 @@ function Room() {
                 selectedPacks.length === 0 ||
                 isStarting
               }
-              className={`w-full min-h-[52px] py-4 sm:py-5 rounded-2xl font-bold text-base sm:text-lg transition-all active:scale-[0.98] disabled:cursor-not-allowed ${
+              className={`w-full min-h-[52px] py-4 sm:py-5 rounded-2xl font-bold text-base sm:text-lg transition-all disabled:cursor-not-allowed ${
                 room.players.length >= 3 &&
                 selectedPacks.length > 0 &&
                 !isStarting
-                  ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 text-white shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70'
-                  : 'bg-gray-600 text-gray-400'
+                  ? 'btn-primary'
+                  : 'bg-gray-700 border border-gray-600 text-gray-500'
               }`}
             >
               {isStarting

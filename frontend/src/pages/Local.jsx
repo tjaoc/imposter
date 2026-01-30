@@ -372,29 +372,24 @@ function Local() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <select
+                    value={settings.discussionSeconds}
+                    onChange={(e) =>
+                      setSettings((prev) => ({
+                        ...prev,
+                        discussionSeconds: Number(e.target.value),
+                      }))
+                    }
+                    className="min-h-[48px] px-4 py-2.5 rounded-xl text-sm font-semibold bg-space-blue border border-space-cyan/40 text-white focus:outline-none focus:ring-2 focus:ring-space-cyan focus:border-space-cyan"
+                  >
                     {Array.from({ length: 20 }, (_, i) => (i + 1) * 60).map(
                       (seconds) => (
-                        <button
-                          type="button"
-                          key={seconds}
-                          onClick={() =>
-                            setSettings((prev) => ({
-                              ...prev,
-                              discussionSeconds: seconds,
-                            }))
-                          }
-                          className={`min-h-[48px] px-3 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
-                            settings.discussionSeconds === seconds
-                              ? 'bg-space-cyan text-black'
-                              : 'bg-gray-700 text-white hover:bg-gray-600'
-                          }`}
-                        >
-                          {seconds / 60}min
-                        </button>
+                        <option key={seconds} value={seconds}>
+                          {seconds / 60} min
+                        </option>
                       )
                     )}
-                  </div>
+                  </select>
                 </div>
               </div>
               <div className="flex items-center justify-between mb-3">

@@ -16,7 +16,7 @@ function PageNav({ showBack = true, onBack, onExit, className = '' }) {
         <button
           type="button"
           onClick={onBack}
-          className="min-h-[48px] min-w-[48px] px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-300 hover:text-white hover:bg-space-blue/80 active:scale-[0.98] transition-colors flex items-center gap-2"
+          className="btn-secondary min-h-[48px] min-w-[48px] px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2"
         >
           ← {t('common.back')}
         </button>
@@ -26,7 +26,7 @@ function PageNav({ showBack = true, onBack, onExit, className = '' }) {
       <button
         type="button"
         onClick={onExit}
-        className="min-h-[48px] px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-400 hover:text-white hover:bg-space-blue/80 active:scale-[0.98] transition-colors flex items-center gap-2"
+        className="btn-secondary min-h-[48px] px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
       >
         🏠 {t('common.exit')}
       </button>

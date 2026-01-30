@@ -77,6 +77,8 @@
     "roomFull": "Sala cheia",
     "nameRequired": "Nome obrigatório",
     "backToHome": "Voltar ao início",
+    "copyCode": "Copiar código",
+    "copied": "Copiado!",
     "roomNotFoundDesc": "A sala não existe ou já foi fechada.",
     "redirecting": "A redirecionar em 3 segundos..."
   },
