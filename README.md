@@ -46,7 +46,6 @@ spy/
 │   └── docker-clean.sh    # Script limpieza
 ├── docker-compose.yml     # Docker Compose desarrollo
 ├── docker-compose.prod.yml # Docker Compose producción
-├── DOCKER.md              # Guía completa de Docker
 └── README.md
 ```
 
@@ -76,7 +75,7 @@ docker-compose -f docker-compose.prod.yml build
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
-📖 **Ver [DOCKER.md](./DOCKER.md) para guía completa de Docker**
+📖 Ver `docker-compose.yml` y `docker-compose.prod.yml` para uso con Docker.
 
 ### Opción 2: Instalación Manual
 

@@ -1,5 +1,15 @@
 # 📝 Changelog - Imposter
 
+## [1.1.1] - 2026-01-30
+
+### 🧹 Limpieza y optimizaciones
+
+- ✅ **Optimizaciones frontend**: Lazy loading de rutas, chunks manuales (react-vendor, router, motion, socket-zustand), fuente no bloqueante, console override solo en dev.
+- ✅ **Backend**: Compresión gzip (`compression`), eliminado `processVotes` y `an-array-of-spanish-words`; seed solo con listas curadas.
+- ✅ **Limpieza**: Eliminados 8 .md no usados (TEST_*, GAME_FEATURES, QUICKSTART, MONITORING, RENDER_ENVS, DEPLOYMENT, DOCKER); CustomWords.jsx, pwa-assets.config.js, bulkWordsLoader.js, generate-data.js; deps @vite-pwa/assets-generator, workbox-window. README sin referencias a DOCKER.md.
+
+---
+
 ## [1.1.0] - 2026-01-30
 
 ### ✨ Juego online: fase de pistas y bots

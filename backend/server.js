@@ -1,17 +1,18 @@
 require("dotenv").config();
 const express = require("express");
+const compression = require("compression");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
 const { connectDb } = require("./config/db");
 const wordPackRoutes = require("./routes/wordPacks");
-const { initializeGame, processVotes, checkGameEnd } = require("./utils/gameLogic");
+const { initializeGame, checkGameEnd } = require("./utils/gameLogic");
 const WordPack = require("./models/WordPack");
 
 const PORT = process.env.PORT || 4000;
 
 const app = express();
-// CORS: aceptar cualquier origen (*) para evitar bloqueos por CORS
+app.use(compression());
 app.use(cors({ origin: "*", credentials: false }));
 app.use(express.json());
 

@@ -77,61 +77,6 @@ function initializeGame (room, secretWord, hintWord = null) {
 }
 
 /**
- * Procesar votación
- * @param {Object} gameState - Estado actual del juego
- * @param {Object} votes - Votos {playerId: votedPlayerId}
- * @returns {Object} Resultado de la votación
- */
-function processVotes (gameState, votes) {
-  const voteCounts = {};
-  const activePlayers = gameState.players.filter(
-    (p) => !gameState.eliminatedPlayers.includes(p.id)
-  );
-
-  // Contar solo votos de civiles; el voto del impostor no cuenta para la eliminación
-  const civilianIds = new Set(
-    activePlayers.filter((p) => p.role === 'civilian').map((p) => p.id)
-  );
-  Object.entries(votes).forEach(([voterId, votedId]) => {
-    if (civilianIds.has(voterId) && votedId) {
-      voteCounts[votedId] = (voteCounts[votedId] || 0) + 1;
-    }
-  });
-
-  // Encontrar al jugador con más votos
-  let maxVotes = 0;
-  let eliminatedId = null;
-  let isTie = false;
-
-  Object.entries(voteCounts).forEach(([playerId, count]) => {
-    if (count > maxVotes) {
-      maxVotes = count;
-      eliminatedId = playerId;
-      isTie = false;
-    } else if (count === maxVotes && count > 0) {
-      isTie = true;
-    }
-  });
-
-  // Si hay empate, nadie es eliminado
-  if (isTie || !eliminatedId) {
-    return {
-      eliminated: null,
-      votes: voteCounts,
-      isTie: true,
-    };
-  }
-
-  const eliminatedPlayer = activePlayers.find((p) => p.id === eliminatedId);
-
-  return {
-    eliminated: eliminatedPlayer,
-    votes: voteCounts,
-    isTie: false,
-  };
-}
-
-/**
  * Verificar si el juego ha terminado
  * @param {Object} gameState - Estado actual del juego
  * @returns {Object} {finished: boolean, winner: 'impostors'|'civilians'|null}
@@ -161,6 +106,5 @@ function checkGameEnd (gameState) {
 module.exports = {
   assignRoles,
   initializeGame,
-  processVotes,
   checkGameEnd,
 };

@@ -10,6 +10,25 @@ export default defineConfig({
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version || '1.0.0'),
   },
+  build: {
+    target: 'es2020',
+    minify: 'esbuild',
+    cssMinify: true,
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) return 'react-vendor';
+          if (id.includes('node_modules/react-router')) return 'router';
+          if (id.includes('node_modules/framer-motion')) return 'motion';
+          if (id.includes('node_modules/socket.io-client') || id.includes('node_modules/zustand')) return 'socket-zustand';
+        },
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash][extname]',
+      },
+    },
+  },
   plugins: [
     react(),
     VitePWA({
@@ -62,6 +81,7 @@ export default defineConfig({
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//, /^\/socket\.io\//],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        maximumFileSizeToCacheInBytes: 1.5 * 1024 * 1024,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

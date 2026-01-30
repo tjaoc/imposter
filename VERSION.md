@@ -1,4 +1,4 @@
-# 🎮 Imposter - Version 1.1.0
+# 🎮 Imposter - Version 1.1.1
 
 **Fecha de lanzamiento:** 30 de Enero, 2026  
 **Estado:** ✅ Estable
@@ -7,7 +7,8 @@
 
 ## 🎯 Resumen de la Versión
 
-**v1.1.0** añade la **fase de pistas** (3 rondas de 30 s) antes de la discusión y la opción de **jugar con bots** en línea cuando no hay con quien jugar.
+**v1.1.1** – Optimizaciones de rendimiento, compresión backend y limpieza de proyecto (código/deps/docs no usados).  
+**v1.1.0** – Fase de pistas (3 rondas de 30 s) y bots automáticos en juego online.
 
 ### ✨ Características Principales
 
@@ -198,6 +199,6 @@ ISC - Proyecto personal y educativo
 
 ---
 
-**¡Gracias por probar Imposter v1.1.0!** 🎉
+**¡Gracias por probar Imposter v1.1.1!** 🎉
 
 Desarrollado con ❤️ por Tiago Cruz

@@ -5,9 +5,6 @@ import { useSocket } from '../hooks/useSocket';
 import { useTranslation } from '../hooks/useTranslation';
 import LanguageSelector from '../components/LanguageSelector';
 
-// Añadir palabras personalizadas: desactivado por ahora
-// import CustomWords from '../components/CustomWords';
-
 function Home() {
   const { t } = useTranslation();
   const [playerName, setPlayerName] = useState('');

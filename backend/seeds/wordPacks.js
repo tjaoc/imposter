@@ -8,70 +8,6 @@
 const WordPack = require('../models/WordPack');
 const { curatedWordPacksPtPT } = require('./wordPacksPtPT');
 
-/** Solo palabras curadas: sin relleno con diccionario, para jóvenes y niños. */
-const TARGET_TOTAL_WORDS = 0;
-const MIN_WORD_LENGTH = 4;
-const MAX_WORD_LENGTH = 22;
-
-function loadBulkSpanishWords () {
-  try {
-    return require('an-array-of-spanish-words');
-  } catch (e) {
-    console.warn('⚠️  an-array-of-spanish-words no disponible. Instala con: npm install an-array-of-spanish-words');
-    return [];
-  }
-}
-
-function buildWordPacksWithBulk (curatedPacks) {
-  const bulk = loadBulkSpanishWords();
-  const packsWithWords = curatedPacks.filter((p) => p.words && p.words.length >= 0 && p.slug !== 'personalizado');
-  const numPacks = packsWithWords.length;
-  if (numPacks === 0 || bulk.length === 0) return curatedPacks;
-
-  const curatedTotal = packsWithWords.reduce((acc, p) => acc + p.words.length, 0);
-  const curatedSet = new Set();
-  packsWithWords.forEach((p) => p.words.forEach((w) => curatedSet.add(String(w).toLowerCase().trim())));
-
-  const extraNeeded = Math.max(0, TARGET_TOTAL_WORDS - curatedTotal);
-  if (extraNeeded === 0) return curatedPacks;
-
-  const filtered = bulk.filter((w) => {
-    const s = String(w).trim();
-    if (s.length < MIN_WORD_LENGTH || s.length > MAX_WORD_LENGTH) return false;
-    if (curatedSet.has(s.toLowerCase())) return false;
-    if (/\d/.test(s)) return false;
-    return /^[a-záéíóúñü\s-]+$/i.test(s);
-  });
-
-  const uniqueFiltered = [...new Set(filtered)];
-  for (let i = uniqueFiltered.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [uniqueFiltered[i], uniqueFiltered[j]] = [uniqueFiltered[j], uniqueFiltered[i]];
-  }
-  const pool = uniqueFiltered.slice(0, extraNeeded);
-  const perPack = Math.floor(pool.length / numPacks);
-  const remainder = pool.length % numPacks;
-
-  let offset = 0;
-  return curatedPacks.map((pack) => {
-    if (pack.slug === 'personalizado' || !pack.words) return { ...pack };
-    const idx = packsWithWords.findIndex((p) => p.slug === pack.slug);
-    const size = perPack + (idx < remainder ? 1 : 0);
-    const chunk = pool.slice(offset, offset + size);
-    offset += size;
-    const merged = [...pack.words];
-    const seen = new Set(merged.map((w) => String(w).toLowerCase()));
-    chunk.forEach((w) => {
-      const wl = String(w).toLowerCase();
-      if (!seen.has(wl)) {
-        seen.add(wl);
-        merged.push(w);
-      }
-    });
-    return { ...pack, words: merged };
-  });
-}
-
 const curatedWordPacks = [
   {
     name: 'Cine y Series',
@@ -549,7 +485,7 @@ const curatedWordPacks = [
   },
 ];
 
-const wordPacks = buildWordPacksWithBulk(curatedWordPacks);
+const wordPacks = curatedWordPacks;
 
 function loadUpdatesByLocale () {
   const fs = require('fs');
