@@ -1,4 +1,4 @@
-# 🎮 Imposter - Version 1.0.1
+# 🎮 Imposter - Version 1.0.2
 
 **Fecha de lanzamiento:** 30 de Enero, 2026  
 **Estado:** ✅ Estable
@@ -19,6 +19,7 @@ Esta es la **primera versión beta completa** del juego Imposter, una versión d
 - ✅ **Animaciones fluidas** - Framer Motion en todas las transiciones
 - ✅ **PWA configurada** - Instalar y jugar offline
 - ✅ **Responsive** - Funciona en móviles y desktop
+- ✅ **Optimizado móvil/tablet (v1.0.2)** - iPhone, Android, iPad y tablets Android: safe areas, teclado, max-width en tablet, PWA orientation any
 
 ---
 
@@ -195,6 +196,6 @@ ISC - Proyecto personal y educativo
 
 ---
 
-**¡Gracias por probar Imposter v1.0.0!** 🎉
+**¡Gracias por probar Imposter v1.0.2!** 🎉
 
 Desarrollado con ❤️ por Tiago Cruz

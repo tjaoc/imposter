@@ -48,7 +48,7 @@ function CustomWords({ onClose }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-[max(1rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))]"
       onClick={onClose}
     >
       <motion.div
@@ -56,7 +56,7 @@ function CustomWords({ onClose }) {
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
-        className="glass-effect rounded-2xl p-8 max-w-md w-full"
+        className="glass-effect rounded-2xl p-6 sm:p-8 max-w-md w-full max-h-[85dvh] overflow-y-auto"
       >
         <h2 className="text-3xl font-bold text-glow mb-6 text-center">
           ✏️ {t('customWords.title')}
@@ -103,7 +103,7 @@ function CustomWords({ onClose }) {
 
         <button
           onClick={onClose}
-          className="w-full py-3 bg-space-blue border-2 border-space-cyan rounded-lg font-semibold text-space-cyan hover:bg-space-cyan hover:text-space-dark transition-all"
+          className="w-full min-h-[48px] py-3 bg-space-blue border-2 border-space-cyan rounded-lg font-semibold text-space-cyan hover:bg-space-cyan hover:text-space-dark transition-all active:scale-[0.98]"
         >
           {t('common.close')}
         </button>

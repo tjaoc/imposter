@@ -85,7 +85,7 @@ function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
         <button
           type="button"
           onClick={handleSelectAll}
-          className="min-h-[44px] px-2 text-xs sm:text-sm text-space-cyan hover:text-space-cyan/80 underline touch-ignore"
+          className="min-h-[48px] px-3 flex items-center text-sm text-space-cyan hover:text-space-cyan/80 underline active:opacity-80"
         >
           {selectedPackIds.length === packs.length
             ? t('room.deselectAll')
@@ -120,14 +120,14 @@ function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
                     : t('packs.' + pack.slug)}
                   {pack.isAdult && <span className="ml-2 text-xs">🔞</span>}
                 </div>
-                <div className="text-xs text-gray-400">{pack.description}</div>
+                <div className="text-sm text-gray-400">{pack.description}</div>
               </div>
             </motion.button>
           );
         })}
       </div>
       {selectedPackIds.length > 0 && (
-        <p className="text-xs text-gray-400 text-center mt-2">
+        <p className="text-sm text-gray-400 text-center mt-2">
           {selectedPackIds.length} {t('room.packsSelected')}
         </p>
       )}

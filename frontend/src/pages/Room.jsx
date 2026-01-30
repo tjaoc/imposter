@@ -169,7 +169,7 @@ function Room() {
   // Mostrar cargando mientras se conecta
   if (!room) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-full flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -211,7 +211,7 @@ function Room() {
               {room.settings.maxPlayers})
             </span>
             {isHost && (
-              <span className="text-xs bg-space-purple px-3 py-1 rounded-full">
+              <span className="text-sm bg-space-purple px-3 py-1.5 rounded-full">
                 {t('room.host')}
               </span>
             )}
@@ -230,7 +230,7 @@ function Room() {
                 >
                   <span className="text-white">{player.name}</span>
                   {player.isHost && (
-                    <span className="text-xs text-space-cyan">👑</span>
+                    <span className="text-sm text-space-cyan">👑</span>
                   )}
                 </motion.div>
               ))}
@@ -272,7 +272,7 @@ function Room() {
                       <div className="text-white font-semibold">
                         {t('room.impostors')}
                       </div>
-                      <div className="text-xs text-gray-400">
+                      <div className="text-sm text-gray-400">
                         {t('room.impostorsDesc')}
                       </div>
                     </div>
@@ -287,7 +287,7 @@ function Room() {
                         }))
                       }
                       disabled={settings.impostorCount <= 1}
-                      className="min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xl flex items-center justify-center active:scale-95"
+                      className="min-w-[48px] min-h-[48px] w-12 h-12 rounded-xl bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xl flex items-center justify-center active:scale-95"
                     >
                       −
                     </button>
@@ -308,7 +308,7 @@ function Room() {
                       disabled={
                         settings.impostorCount >= room.players.length - 1
                       }
-                      className="min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xl flex items-center justify-center active:scale-95"
+                      className="min-w-[48px] min-h-[48px] w-12 h-12 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xl flex items-center justify-center active:scale-95"
                     >
                       +
                     </button>
@@ -330,7 +330,7 @@ function Room() {
                       <div className="text-white font-semibold">
                         {t('room.hintForImpostors')}
                       </div>
-                      <div className="text-xs text-gray-400">
+                      <div className="text-sm text-gray-400">
                         {t('room.hintForImpostorsDesc')}
                       </div>
                     </div>
@@ -343,7 +343,7 @@ function Room() {
                         hintForImpostors: !prev.hintForImpostors,
                       }))
                     }
-                    className={`relative w-14 h-9 min-h-[44px] rounded-full transition-colors flex-shrink-0 ${
+                    className={`relative w-14 h-9 min-h-[48px] rounded-full transition-colors flex-shrink-0 ${
                       settings.hintForImpostors
                         ? 'bg-emerald-500'
                         : 'bg-gray-600'
@@ -371,7 +371,7 @@ function Room() {
                       <div className="text-white font-semibold">
                         {t('room.duration')}
                       </div>
-                      <div className="text-xs text-gray-400">
+                      <div className="text-sm text-gray-400">
                         {t('room.durationDesc')}
                       </div>
                     </div>
@@ -387,7 +387,7 @@ function Room() {
                             discussionSeconds: seconds,
                           }))
                         }
-                        className={`min-h-[44px] px-4 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                        className={`min-h-[48px] px-4 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
                           settings.discussionSeconds === seconds
                             ? 'bg-space-cyan text-black'
                             : 'bg-gray-700 text-white hover:bg-gray-600'

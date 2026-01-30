@@ -1,5 +1,26 @@
 # 📝 Changelog - Imposter
 
+## [1.0.2] - 2026-01-30
+
+### 📱 Móvil y tablet (iPhone, Android, iPad)
+
+#### ✨ Mejoras
+
+- ✅ **Viewport y teclado**: `viewport-fit=cover`, `interactive-widget=resize-visual` para mejor comportamiento del teclado en móvil/tablet.
+- ✅ **Safe areas**: Contenido y footer respetan notch, Dynamic Island y home indicator (iOS); padding con `env(safe-area-inset-*)`.
+- ✅ **Touch targets**: Botones y enlaces interactivos con mínimo 48px de altura; eliminado `touch-ignore` en controles táctiles.
+- ✅ **Legibilidad**: Texto secundario en `text-sm` en Footer, PackSelector, Local, Home, Game.
+- ✅ **Modal CustomWords**: Overlay con safe areas; contenido con `max-h-[85dvh]` y scroll para teclado en móvil.
+- ✅ **Layout**: `min-h-full` en páginas (Home, Local, Room, Game, LocalGame) para evitar doble scroll; breakpoint `tablet: 600px` en Tailwind.
+- ✅ **Tablet/iPad**: Contenido centrado con `tablet:max-w-3xl`, `lg:max-w-4xl` en el layout principal.
+- ✅ **PWA**: `orientation: 'any'` en el manifest para permitir vertical y horizontal en tablets.
+
+#### 📋 Notas
+
+- Probado en iPhone, Android, iPad y tablets Android. Recomendado validar en dispositivo real.
+
+---
+
 ## [1.0.1] - 2026-01-30
 
 ### 🔧 Producción y móvil

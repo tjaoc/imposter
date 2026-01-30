@@ -131,7 +131,7 @@ function Home() {
             <span className="text-2xl">📱</span>
             <div className="text-left flex-1 min-w-0">
               <div className="text-base sm:text-lg">{t('home.playLocal')}</div>
-              <div className="text-xs sm:text-sm font-normal text-gray-400">
+              <div className="text-sm font-normal text-gray-400">
                 {t('home.playLocalDesc')}
               </div>
             </div>
@@ -146,7 +146,7 @@ function Home() {
               </span>
             </div>
           </div>
-          <div className="text-center text-gray-400 text-xs sm:text-sm mb-4">
+          <div className="text-center text-gray-400 text-sm mb-4">
             {t('home.playOnlineDesc')}
           </div>
         </motion.div>
@@ -220,7 +220,7 @@ function Home() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
           onClick={() => setShowCustomWords(true)}
-          className="mt-4 min-h-[44px] flex items-center justify-center text-space-cyan hover:text-space-glow transition-colors text-sm underline w-full sm:w-auto touch-ignore"
+          className="mt-4 min-h-[48px] flex items-center justify-center text-space-cyan hover:text-space-glow transition-colors text-sm underline w-full sm:w-auto active:opacity-80"
         >
           ✏️ {t('home.addCustomWords')}
         </motion.button>

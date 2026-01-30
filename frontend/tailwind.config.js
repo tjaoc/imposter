@@ -6,11 +6,14 @@ export default {
   ],
   theme: {
     screens: {
+      xs: '375px',
       sm: '640px',
+      /** Tablets pequeños (Android) y contenido centrado en iPad */
+      tablet: '600px',
       md: '768px',
       lg: '1024px',
       xl: '1280px',
-      // Tablet: iPad min 768, Android tablet ~600-960
+      '2xl': '1536px',
     },
     extend: {
       colors: {

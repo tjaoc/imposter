@@ -32,19 +32,19 @@ function Footer() {
   }, []);
 
   return (
-    <footer className="fixed left-0 right-0 py-3 pt-safe-top text-center text-gray-400 text-xs sm:text-sm bg-space-dark/95 backdrop-blur-sm border-t border-gray-800/50 z-10 pl-safe-left pr-safe-right bottom-[env(safe-area-inset-bottom,0px)]">
+    <footer className="fixed left-0 right-0 py-3 text-center text-gray-400 text-sm sm:text-base bg-space-dark/95 backdrop-blur-sm border-t border-gray-800/50 z-10 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] bottom-[env(safe-area-inset-bottom,0px)]">
       {installHint === 'ios' && (
-        <p className="text-amber-200/90 text-xs mb-2 px-2">
+        <p className="text-amber-200/90 text-sm mb-2 px-2">
           {t('home.installIos')}
         </p>
       )}
       {installHint === 'android' && (
-        <p className="text-amber-200/90 text-xs mb-2 px-2">
+        <p className="text-amber-200/90 text-sm mb-2 px-2">
           {t('home.installAndroid')}
         </p>
       )}
       <p>{t('home.footer')}</p>
-      <p className="text-gray-500 text-xs mt-1">
+      <p className="text-gray-500 text-sm mt-1">
         {t('home.version')} {version}
       </p>
     </footer>

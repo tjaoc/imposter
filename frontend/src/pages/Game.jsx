@@ -648,7 +648,7 @@ function Game() {
               {t('game.waitingOthers')}
             </h2>
             <p className="text-gray-400 mb-4">{t('game.everyoneConfirm')}</p>
-            <div className="text-xs text-gray-500 mt-4 p-3 bg-space-blue/30 rounded-lg inline-block">
+            <div className="text-sm text-gray-500 mt-4 p-3 bg-space-blue/30 rounded-lg inline-block">
               {t('game.yourRole')}:{' '}
               {myRole?.isImpostor
                 ? '🕵️ IMPOSTOR'
@@ -664,18 +664,18 @@ function Game() {
     const displayWord = myRole?.word || '';
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 pt-14 md:pt-20 bg-gradient-to-b from-black via-slate-950 to-black">
+      <div className="min-h-full flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-6 text-center"
         >
           <h1 className="text-3xl font-extrabold tracking-wide text-red-400 drop-shadow-lg mb-2">
-            {isImpostor
+            {isImposter
               ? t('game.youAreImpostor').toUpperCase()
               : t('game.yourWord').toUpperCase()}
           </h1>
-          <p className="text-xs text-slate-400 uppercase tracking-[0.2em]">
+          <p className="text-sm text-slate-400 uppercase tracking-[0.2em]">
             {t('game.revealSubtitle')}
           </p>
         </motion.div>
@@ -740,14 +740,14 @@ function Game() {
                       {t('game.youAreImpostor')}
                     </p>
                     {displayWord && (
-                      <p className="text-xs text-emerald-300 mb-4 px-4 py-2 bg-emerald-900/30 rounded-lg">
+                      <p className="text-sm text-emerald-300 mb-4 px-4 py-2 bg-emerald-900/30 rounded-lg">
                         {t('game.hintCategory')} ({t('game.category')}):{' '}
                         <span className="font-bold text-emerald-200">
                           {capitalizeWord(displayWord)}
                         </span>
                       </p>
                     )}
-                    <p className="text-xs text-slate-400 text-center px-4">
+                    <p className="text-sm text-slate-400 text-center px-4">
                       {t('game.impostorHint')}
                     </p>
                   </>
@@ -765,7 +765,7 @@ function Game() {
                     >
                       {capitalizeWord(displayWord)}
                     </motion.p>
-                    <p className="text-xs text-slate-400 text-center px-4">
+                    <p className="text-sm text-slate-400 text-center px-4">
                       {t('game.describeWithoutSaying', {
                         count: players.length > 5 ? '1-2' : '1',
                       })}
@@ -784,7 +784,7 @@ function Game() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.97 }}
           onClick={handleRevealConfirm}
-          className="w-full max-w-xs py-4 rounded-full bg-emerald-500 hover:bg-emerald-400 font-semibold text-black tracking-wide shadow-lg shadow-emerald-500/40 transition"
+          className="w-full max-w-xs min-h-[48px] py-4 rounded-full bg-emerald-500 hover:bg-emerald-400 font-semibold text-black tracking-wide shadow-lg shadow-emerald-500/40 transition"
         >
           {t('game.iSawMyRole')}
         </motion.button>
@@ -917,7 +917,7 @@ function Game() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleStartVoting}
-              className={`w-full py-4 rounded-xl font-semibold text-white shadow-lg transition-all mb-4 ${
+              className={`w-full min-h-[48px] py-4 rounded-xl font-semibold text-white shadow-lg transition-all mb-4 ${
                 timeLeft === 0
                   ? 'bg-gradient-to-r from-red-600 to-orange-600 shadow-red-500/50 hover:shadow-red-500/70 animate-pulse'
                   : 'bg-gradient-to-r from-purple-600 to-pink-600 shadow-purple-500/50 hover:shadow-purple-500/70'
@@ -950,7 +950,7 @@ function Game() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleBackToLobby}
-            className="w-full py-3 rounded-xl font-medium text-gray-300 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 hover:border-gray-600 transition-all"
+            className="w-full min-h-[48px] py-3 rounded-xl font-medium text-gray-300 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 hover:border-gray-600 transition-all"
           >
             🏠 {t('game.backToHome')}
           </motion.button>
@@ -1050,7 +1050,7 @@ function Game() {
                         disabled={selectedVote !== null}
                         whileHover={selectedVote ? {} : { scale: 1.02, x: 5 }}
                         whileTap={selectedVote ? {} : { scale: 0.98 }}
-                        className={`w-full p-4 rounded-xl border-2 transition-all flex items-center justify-between ${
+                        className={`w-full min-h-[48px] p-4 rounded-xl border-2 transition-all flex items-center justify-between ${
                           isSelected
                             ? 'border-emerald-400 bg-emerald-500/20 shadow-lg shadow-emerald-500/30'
                             : 'border-space-blue bg-space-blue/50 hover:border-space-cyan hover:bg-space-cyan/20'
@@ -1092,7 +1092,7 @@ function Game() {
 
           {/* Debug: mostrar estado actual */}
           {process.env.NODE_ENV === 'development' && (
-            <div className="mt-4 text-xs text-gray-500 text-center">
+            <div className="mt-4 text-sm text-gray-500 text-center">
               Debug: gamePhase={gamePhase}, selectedVote=
               {selectedVote ? 'set' : 'null'}
             </div>
@@ -1106,7 +1106,7 @@ function Game() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleBackToLobby}
-            className="w-full mt-6 py-3 rounded-xl font-medium text-gray-300 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 hover:border-gray-600 transition-all"
+            className="w-full mt-6 min-h-[48px] py-3 rounded-xl font-medium text-gray-300 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 hover:border-gray-600 transition-all"
           >
             🏠 {t('game.backToHome')}
           </motion.button>
@@ -1314,7 +1314,7 @@ function Game() {
                       alert(t('errors.roomError'));
                     }
                   }}
-                  className="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl font-bold text-white text-lg shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70 transition-all"
+                  className="w-full min-h-[48px] py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl font-bold text-white text-lg shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70 transition-all"
                 >
                   🎮 {t('game.newGame')}
                 </motion.button>
@@ -1324,7 +1324,7 @@ function Game() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleBackToLobby}
-                className="w-full py-4 bg-gradient-to-r from-space-purple to-space-pink rounded-xl font-bold text-white text-lg shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70 transition-all"
+                className="w-full min-h-[48px] py-4 bg-gradient-to-r from-space-purple to-space-pink rounded-xl font-bold text-white text-lg shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70 transition-all"
               >
                 🏠 {t('game.backToHome')}
               </motion.button>
@@ -1549,7 +1549,7 @@ function Game() {
                       alert(t('errors.roomError'));
                     }
                   }}
-                  className="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl font-bold text-white text-lg shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70 transition-all"
+                  className="w-full min-h-[48px] py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl font-bold text-white text-lg shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70 transition-all"
                 >
                   🎮 {t('game.newGame')}
                 </motion.button>
@@ -1562,7 +1562,7 @@ function Game() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleBackToLobby}
-                className="w-full py-4 bg-gradient-to-r from-space-purple to-space-pink rounded-xl font-bold text-white text-lg shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70 transition-all"
+                className="w-full min-h-[48px] py-4 bg-gradient-to-r from-space-purple to-space-pink rounded-xl font-bold text-white text-lg shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70 transition-all"
               >
                 🏠 {t('game.backToHome')}
               </motion.button>
@@ -1585,7 +1585,7 @@ function Game() {
           {t('game.waitingHost')}
         </div>
         <div className="text-gray-400 text-sm">Sala: {code}</div>
-        <div className="text-xs text-gray-500 mt-4">
+        <div className="text-sm text-gray-500 mt-4">
           Debug: Phase={gamePhase} | Role={myRole ? '✅' : '❌'} | Connected=
           {isConnected ? '✅' : '❌'}
         </div>

@@ -179,7 +179,7 @@ function Local() {
                     <button
                       type="button"
                       onClick={() => removePlayer(p.id)}
-                      className="min-h-[44px] min-w-[44px] flex items-center justify-center text-red-400 hover:text-red-300 text-sm flex-shrink-0"
+                      className="min-h-[48px] min-w-[48px] flex items-center justify-center text-red-400 hover:text-red-300 text-sm flex-shrink-0 active:opacity-80"
                     >
                       {t('common.close')}
                     </button>
@@ -255,7 +255,7 @@ function Local() {
                         : packs.map((p) => p._id)
                     )
                   }
-                  className="text-xs text-space-cyan hover:text-space-cyan/80 underline"
+                  className="min-h-[48px] flex items-center text-sm text-space-cyan hover:text-space-cyan/80 underline active:opacity-80"
                 >
                   {selectedPackIds.length === packs.length
                     ? t('room.deselectAll')
@@ -300,7 +300,7 @@ function Local() {
                 })}
               </div>
               {selectedPackIds.length > 0 && (
-                <p className="text-xs text-gray-400 text-center mb-4">
+                <p className="text-sm text-gray-400 text-center mb-4">
                   {selectedPackIds.length} {t('room.packsSelected')}
                 </p>
               )}
