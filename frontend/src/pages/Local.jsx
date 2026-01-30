@@ -338,16 +338,16 @@ function Local() {
                           hintForImpostors: !prev.hintForImpostors,
                         }));
                       }}
-                      className={`relative inline-flex items-center h-9 w-14 flex-shrink-0 cursor-pointer rounded-full border border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-space-cyan focus:ring-offset-2 focus:ring-offset-space-dark touch-manipulation select-none ${
+                      className={`relative inline-flex h-10 w-[4.25rem] flex-shrink-0 cursor-pointer rounded-full border border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-space-cyan focus:ring-offset-2 focus:ring-offset-space-dark touch-manipulation select-none ${
                         settings.hintForImpostors
                           ? 'bg-emerald-500'
                           : 'bg-gray-600'
                       }`}
                     >
                       <span
-                        className={`pointer-events-none absolute left-0.5 top-1/2 -translate-y-1/2 inline-block h-6 w-6 rounded-full bg-white shadow transition-transform ${
+                        className={`pointer-events-none absolute left-1 top-1/2 -translate-y-1/2 inline-block h-7 w-7 rounded-full bg-white shadow-md transition-transform ${
                           settings.hintForImpostors
-                            ? 'translate-x-7'
+                            ? 'translate-x-8'
                             : 'translate-x-0'
                         }`}
                       />

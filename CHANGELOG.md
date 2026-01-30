@@ -1,5 +1,13 @@
 # 📝 Changelog - Imposter
 
+## [1.1.14] - 2026-01-30
+
+### 🐛 Switch "Pista para Impostores"
+
+- ✅ **Proporciones corregidas** (Room y Local): track `h-10 w-[4.25rem]`, thumb `h-7 w-7` con `left-1` y `translate-x-8` cuando activo; márgenes simétricos para que el switch no se vea deformado/aplastado.
+
+---
+
 ## [1.1.13] - 2026-01-30
 
 ### ✨ Splash y comprobación de actualizaciones PWA
