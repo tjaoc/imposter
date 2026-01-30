@@ -75,30 +75,31 @@ function Room() {
   }, [code, socket, isConnected]);
 
   const handleStartGame = () => {
+    const useRandom = selectedPacks.length === 1 && selectedPacks[0] === 'random';
     if (
       !isHost ||
       !room ||
       room.players.length < 3 ||
-      selectedPacks.length === 0
+      (!useRandom && selectedPacks.length === 0)
     ) {
       return;
     }
 
     setIsStarting(true);
 
-    // Si hay múltiples packs, seleccionar uno aleatorio
-    const randomPackId =
-      selectedPacks[Math.floor(Math.random() * selectedPacks.length)];
+    const packId = useRandom
+      ? 'random'
+      : selectedPacks[Math.floor(Math.random() * selectedPacks.length)];
 
     socket.emit(
       'game:start',
       {
-        packId: randomPackId,
-        selectedPacks: selectedPacks, // Enviar todos los packs seleccionados para guardarlos
+        packId,
+        selectedPacks: useRandom ? [] : selectedPacks,
         hintForImpostors: settings.hintForImpostors,
         discussionSeconds: settings.discussionSeconds,
         impostorCount: settings.impostorCount,
-        locale, // idioma seleccionado para que las palabras/categoría sean en ese idioma
+        locale,
       },
       (response) => {
         setIsStarting(false);
@@ -230,7 +231,7 @@ function Room() {
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="glass-effect rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6"
+          className="card mb-4"
         >
           <div className="flex justify-between items-center mb-4">
             <span className="text-gray-400">
@@ -267,30 +268,17 @@ function Room() {
 
         {isHost && (
           <>
-            {/* Configuración Avanzada - Estilo del video */}
+            {/* Orden igual que Local: Impostores → Pista → Duración → Categorías */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               className="space-y-4 mb-6"
             >
-              {/* Pack Selector */}
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                className="glass-effect rounded-2xl p-4 sm:p-6"
-              >
-                <PackSelector
-                  onSelectPacks={setSelectedPacks}
-                  selectedPackIds={selectedPacks}
-                />
-              </motion.div>
-
               {/* Número de Impostores */}
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.1 }}
-                className="glass-effect rounded-2xl p-4 sm:p-6"
+                className="card"
               >
                 <div className="flex flex-row items-center justify-between gap-3 flex-wrap">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -341,8 +329,8 @@ function Room() {
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="glass-effect rounded-2xl p-4 sm:p-6"
+                transition={{ delay: 0.1 }}
+                className="card"
               >
                 <div className="flex flex-row items-center justify-between gap-3 flex-wrap">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -385,8 +373,8 @@ function Room() {
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="glass-effect rounded-2xl p-4 sm:p-6"
+                transition={{ delay: 0.2 }}
+                className="card"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div className="flex items-center gap-3">
@@ -420,9 +408,28 @@ function Room() {
                   </select>
                 </div>
               </motion.div>
+
+              {/* Categorías (Pack Selector) */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="card"
+              >
+                <PackSelector
+                  onSelectPacks={setSelectedPacks}
+                  selectedPackIds={selectedPacks}
+                  allowRandom
+                />
+              </motion.div>
             </motion.div>
 
-            {/* Botón Iniciar Juego - Estilo del video */}
+            {/* Botón Iniciar Juego */}
+            {(() => {
+              const hasPacksOrRandom =
+                (selectedPacks.length === 1 && selectedPacks[0] === 'random') ||
+                selectedPacks.length > 0;
+              return (
             <motion.button
               type="button"
               initial={{ scale: 0.9, opacity: 0 }}
@@ -430,15 +437,9 @@ function Room() {
               transition={{ delay: 0.4 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleStartGame}
-              disabled={
-                room.players.length < 3 ||
-                selectedPacks.length === 0 ||
-                isStarting
-              }
+              disabled={room.players.length < 3 || !hasPacksOrRandom || isStarting}
               className={`w-full min-h-[52px] py-4 sm:py-5 rounded-2xl font-bold text-base sm:text-lg transition-all disabled:cursor-not-allowed ${
-                room.players.length >= 3 &&
-                selectedPacks.length > 0 &&
-                !isStarting
+                room.players.length >= 3 && hasPacksOrRandom && !isStarting
                   ? 'btn-primary'
                   : 'bg-gray-700 border border-gray-600 text-gray-500'
               }`}
@@ -451,6 +452,8 @@ function Room() {
                 ? `📦 ${t('room.selectPacks')}`
                 : `🚀 ${t('room.startGame')}`}
             </motion.button>
+              );
+            })()}
           </>
         )}
       </motion.div>

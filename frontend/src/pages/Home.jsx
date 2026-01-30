@@ -121,14 +121,14 @@ function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="glass-effect rounded-2xl p-4 sm:p-6 md:p-8 mb-4 sm:mb-6"
+          className="card mb-4 w-full"
         >
           <button
             type="button"
             onClick={() => navigate('/local')}
-            className="w-full min-h-[48px] py-3.5 sm:py-4 rounded-xl border-2 border-space-cyan/50 bg-space-blue/50 hover:bg-space-cyan/20 hover:border-space-cyan active:scale-[0.98] font-semibold text-space-cyan mb-4 flex items-center justify-center gap-3 text-left"
+            className="w-full min-h-[48px] py-3.5 sm:py-4 px-4 sm:px-5 rounded-xl border-2 border-space-cyan/50 bg-space-blue/50 hover:bg-space-cyan/20 hover:border-space-cyan active:scale-[0.98] font-semibold text-space-cyan mb-4 flex items-center justify-center gap-4 text-left"
           >
-            <span className="text-2xl">📱</span>
+            <span className="text-2xl flex-shrink-0">📱</span>
             <div className="text-left flex-1 min-w-0">
               <div className="text-base sm:text-lg">{t('home.playLocal')}</div>
               <div className="text-sm font-normal text-gray-400">
@@ -155,7 +155,7 @@ function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="glass-effect rounded-2xl p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6"
+          className="card space-y-4 w-full"
         >
           <div>
             <label className="block text-sm sm:text-base font-medium mb-2 text-space-cyan">

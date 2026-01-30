@@ -275,17 +275,32 @@ io.on("connection", (socket) => {
     }
 
     try {
-      // Obtener pack; si el cliente pidió un idioma (ej. pt), preferir el mismo slug en ese idioma para palabras/categoría
-      let pack = await WordPack.findById(packId);
-      if (!pack || pack.words.length === 0) {
-        callback?.({ ok: false, error: "PACK_INVALID" });
-        return;
-      }
       const requestedLocale = clientLocale && String(clientLocale).trim().toLowerCase();
-      if (requestedLocale && !new RegExp(`^${requestedLocale}`).test(pack.locale || '')) {
-        const packInLocale = await WordPack.findOne({ slug: pack.slug, locale: new RegExp(`^${requestedLocale}`) });
-        if (packInLocale && packInLocale.words && packInLocale.words.length > 0) {
-          pack = packInLocale;
+      let pack;
+
+      if (packId === "random") {
+        const localeRegex = requestedLocale ? new RegExp(`^${requestedLocale}`) : /./;
+        const allPacks = await WordPack.find({
+          locale: localeRegex,
+          slug: { $ne: "personalizado" },
+          words: { $exists: true, $ne: [] },
+        });
+        if (!allPacks || allPacks.length === 0) {
+          callback?.({ ok: false, error: "PACK_INVALID" });
+          return;
+        }
+        pack = allPacks[Math.floor(Math.random() * allPacks.length)];
+      } else {
+        pack = await WordPack.findById(packId);
+        if (!pack || pack.words.length === 0) {
+          callback?.({ ok: false, error: "PACK_INVALID" });
+          return;
+        }
+        if (requestedLocale && !new RegExp(`^${requestedLocale}`).test(pack.locale || "")) {
+          const packInLocale = await WordPack.findOne({ slug: pack.slug, locale: new RegExp(`^${requestedLocale}`) });
+          if (packInLocale && packInLocale.words && packInLocale.words.length > 0) {
+            pack = packInLocale;
+          }
         }
       }
       const secretWord = pack.words[Math.floor(Math.random() * pack.words.length)];

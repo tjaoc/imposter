@@ -5,6 +5,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import { useLanguage } from '../context/LanguageContext';
 import { assignRoles } from '../utils/localGameLogic';
 import LanguageSelector from '../components/LanguageSelector';
+import PackSelector from '../components/PackSelector';
 import PageNav from '../components/PageNav';
 import { API_BASE } from '../config/env';
 import { capitalizeWord } from '../utils/formatWord';
@@ -90,10 +91,16 @@ function Local() {
   };
 
   const startGameWithPack = () => {
-    if (selectedPackIds.length === 0 || players.length < 3) return;
-    const randomPackId =
-      selectedPackIds[Math.floor(Math.random() * selectedPackIds.length)];
-    fetch(`${API_BASE}/api/packs/${randomPackId}`)
+    const useRandom = selectedPackIds.length === 1 && selectedPackIds[0] === 'random';
+    if ((!useRandom && selectedPackIds.length === 0) || players.length < 3) return;
+    const pool = useRandom
+      ? packs.filter((p) => p.slug !== 'personalizado')
+      : selectedPackIds;
+    if (pool.length === 0) return;
+    const packIdToFetch = useRandom
+      ? pool[Math.floor(Math.random() * pool.length)]._id
+      : pool[Math.floor(Math.random() * pool.length)];
+    fetch(`${API_BASE}/api/packs/${packIdToFetch}`)
       .then((res) => res.json())
       .then((data) => {
         if (!data.ok || !data.pack?.words?.length) return;
@@ -162,7 +169,7 @@ function Local() {
               {t('local.addPlayersDesc')}
             </p>
           </div>
-          <div className="glass-effect rounded-2xl p-4 sm:p-6 mb-4">
+          <div className="card mb-4">
             <div className="flex flex-col sm:flex-row gap-2 mb-4">
               <input
                 type="text"
@@ -258,7 +265,7 @@ function Local() {
           ) : (
             <>
               {/* Impostores */}
-              <div className="glass-effect rounded-2xl p-4 sm:p-6 mb-4">
+              <div className="card mb-4">
                 <div className="flex flex-row items-center justify-between gap-3 flex-wrap">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <span className="text-2xl flex-shrink-0">🕵️</span>
@@ -308,7 +315,7 @@ function Local() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="glass-effect rounded-2xl p-4 sm:p-6 mb-4"
+                className="card mb-4"
               >
                 <div className="flex flex-row items-center justify-between gap-3 flex-wrap">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -347,7 +354,7 @@ function Local() {
                 </div>
               </motion.div>
               {/* Duración */}
-              <div className="glass-effect rounded-2xl p-4 sm:p-6 mb-4">
+              <div className="card mb-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">⏱️</div>
@@ -380,76 +387,24 @@ function Local() {
                   </select>
                 </div>
               </div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm text-space-cyan">
-                  {t('room.selectPacksLabel')}
-                </span>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setSelectedPackIds(
-                      selectedPackIds.length === packs.length
-                        ? []
-                        : packs.map((p) => p._id)
-                    )
-                  }
-                  className="min-h-[48px] flex items-center text-sm text-space-cyan hover:text-space-cyan/80 underline active:opacity-80"
-                >
-                  {selectedPackIds.length === packs.length
-                    ? t('room.deselectAll')
-                    : t('room.selectAll')}
-                </button>
+              <div className="card mb-4">
+                <PackSelector
+                  onSelectPacks={setSelectedPackIds}
+                  selectedPackIds={selectedPackIds}
+                  allowRandom
+                />
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-2">
-                {packs.map((pack) => {
-                  const isSelected = selectedPackIds.includes(pack._id);
-                  return (
-                    <motion.button
-                      key={pack._id}
-                      type="button"
-                      onClick={() =>
-                        setSelectedPackIds((prev) =>
-                          prev.includes(pack._id)
-                            ? prev.filter((id) => id !== pack._id)
-                            : [...prev, pack._id]
-                        )
-                      }
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`min-h-[52px] p-4 rounded-xl border-2 text-left transition-all relative active:scale-[0.98] ${
-                        isSelected
-                          ? 'border-space-cyan bg-space-cyan/20'
-                          : 'border-space-blue bg-space-blue/50 hover:border-space-cyan/50'
-                      }`}
-                    >
-                      {isSelected && (
-                        <div className="absolute top-2 right-2 text-space-cyan text-xl">
-                          ✓
-                        </div>
-                      )}
-                      <span className="font-semibold text-white">
-                        {(t('packs.' + pack.slug) || '').startsWith('packs.')
-                          ? pack.name
-                          : t('packs.' + pack.slug)}
-                      </span>
-                      {pack.isAdult && <span className="ml-2 text-xs">🔞</span>}
-                    </motion.button>
-                  );
-                })}
-              </div>
-              {selectedPackIds.length > 0 && (
-                <p className="text-sm text-gray-400 text-center mb-4">
-                  {selectedPackIds.length} {t('room.packsSelected')}
-                </p>
-              )}
             </>
           )}
           <button
             type="button"
             onClick={startGameWithPack}
-            disabled={selectedPackIds.length === 0 || loadingPacks}
+            disabled={
+              ((selectedPackIds.length !== 1 || selectedPackIds[0] !== 'random') && selectedPackIds.length === 0) ||
+              loadingPacks
+            }
             className={`w-full min-h-[52px] py-4 rounded-xl font-bold transition-all active:scale-[0.98] disabled:cursor-not-allowed ${
-              selectedPackIds.length > 0 && !loadingPacks
+              ((selectedPackIds.length === 1 && selectedPackIds[0] === 'random') || selectedPackIds.length > 0) && !loadingPacks
                 ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 text-white'
                 : 'bg-gray-600 text-gray-400'
             }`}

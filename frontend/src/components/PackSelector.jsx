@@ -4,7 +4,31 @@ import { useTranslation } from '../hooks/useTranslation';
 import { useLanguage } from '../context/LanguageContext';
 import { API_BASE } from '../config/env';
 
-function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
+const PACK_ICONS = {
+  'cine-series': '🎬',
+  'deportes': '⚽',
+  'viajes-lugares': '✈️',
+  'comida-bebida': '🍕',
+  'animales': '🐾',
+  'tecnologia': '💻',
+  'musica': '🎵',
+  'profesiones': '💼',
+  'naturaleza-clima': '🌿',
+  'ciencia': '🔬',
+  'historia': '📜',
+  'arte-cultura': '🎨',
+  'moda': '👗',
+  'videojuegos': '🎮',
+  'hogar': '🏠',
+  'transporte': '🚗',
+  'salud-cuerpo': '💪',
+  'adultos': '🔞',
+  'personalizado': '✏️',
+};
+
+const RANDOM_ID = 'random';
+
+function PackSelector({ onSelectPacks, selectedPackIds = [], allowRandom = true }) {
   const { t } = useTranslation();
   const { locale } = useLanguage();
   const [packs, setPacks] = useState([]);
@@ -38,7 +62,14 @@ function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
     loadPacks();
   }, [loadPacks]);
 
+  const isRandomSelected = selectedPackIds.includes(RANDOM_ID);
+
   const handlePackToggle = (packId) => {
+    if (packId === RANDOM_ID) {
+      onSelectPacks(isRandomSelected ? [] : [RANDOM_ID]);
+      return;
+    }
+    if (isRandomSelected) return;
     const newSelected = selectedPackIds.includes(packId)
       ? selectedPackIds.filter((id) => id !== packId)
       : [...selectedPackIds, packId];
@@ -46,6 +77,10 @@ function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
   };
 
   const handleSelectAll = () => {
+    if (isRandomSelected) {
+      onSelectPacks([]);
+      return;
+    }
     if (selectedPackIds.length === packs.length) {
       onSelectPacks([]);
     } else {
@@ -76,6 +111,14 @@ function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
     );
   }
 
+  const canStart = isRandomSelected || selectedPackIds.length > 0;
+  const selectAllLabel =
+    isRandomSelected
+      ? t('room.deselectAll')
+      : selectedPackIds.length === packs.length
+        ? t('room.deselectAll')
+        : t('room.selectAll');
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between mb-2">
@@ -87,48 +130,69 @@ function PackSelector({ onSelectPacks, selectedPackIds = [] }) {
           onClick={handleSelectAll}
           className="min-h-[48px] px-3 flex items-center text-sm text-space-cyan hover:text-space-cyan/80 underline active:opacity-80"
         >
-          {selectedPackIds.length === packs.length
-            ? t('room.deselectAll')
-            : t('room.selectAll')}
+          {selectAllLabel}
         </button>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      {allowRandom && (
+        <motion.button
+          type="button"
+          onClick={() => handlePackToggle(RANDOM_ID)}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className={`w-full min-h-[52px] p-4 rounded-xl border-2 transition-all relative text-left active:scale-[0.98] flex items-center gap-3 ${
+            isRandomSelected
+              ? 'border-space-cyan bg-space-cyan/20'
+              : 'border-space-blue bg-space-blue hover:border-space-cyan/50'
+          }`}
+        >
+          <span className="text-2xl">🎲</span>
+          <span className="font-semibold text-white">
+            {t('room.randomCategory')}
+          </span>
+          {isRandomSelected && (
+            <div className="absolute top-2 right-2 text-space-cyan text-xl">✓</div>
+          )}
+        </motion.button>
+      )}
+      <div className={`grid grid-cols-2 md:grid-cols-3 gap-3 ${isRandomSelected ? 'pointer-events-none opacity-60' : ''}`}>
         {packs.map((pack) => {
           const isSelected = selectedPackIds.includes(pack._id);
+          const icon = PACK_ICONS[pack.slug] ?? '📦';
           return (
             <motion.button
               key={pack._id}
               type="button"
               onClick={() => handlePackToggle(pack._id)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className={`min-h-[52px] p-4 rounded-xl border-2 transition-all relative text-left active:scale-[0.98] ${
+              disabled={isRandomSelected}
+              whileHover={isRandomSelected ? undefined : { scale: 1.02 }}
+              whileTap={isRandomSelected ? undefined : { scale: 0.98 }}
+              className={`min-h-[52px] p-4 rounded-xl border-2 transition-all relative text-left active:scale-[0.98] flex items-center gap-2 ${
                 isSelected
                   ? 'border-space-cyan bg-space-cyan/20'
                   : 'border-space-blue bg-space-blue hover:border-space-cyan/50'
               }`}
             >
-              {isSelected && (
-                <div className="absolute top-2 right-2 text-space-cyan text-xl">
-                  ✓
-                </div>
-              )}
-              <div className="text-left">
-                <div className="font-semibold text-white mb-1">
+              <span className="text-xl flex-shrink-0">{icon}</span>
+              <div className="text-left min-w-0 flex-1">
+                <div className="font-semibold text-white truncate">
                   {(t('packs.' + pack.slug) || '').startsWith('packs.')
                     ? pack.name
                     : t('packs.' + pack.slug)}
-                  {pack.isAdult && <span className="ml-2 text-xs">🔞</span>}
+                  {pack.isAdult && <span className="ml-1 text-xs">🔞</span>}
                 </div>
-                <div className="text-sm text-gray-400">{pack.description}</div>
               </div>
+              {isSelected && (
+                <div className="absolute top-2 right-2 text-space-cyan text-xl flex-shrink-0">✓</div>
+              )}
             </motion.button>
           );
         })}
       </div>
-      {selectedPackIds.length > 0 && (
+      {canStart && (
         <p className="text-sm text-gray-400 text-center mt-2">
-          {selectedPackIds.length} {t('room.packsSelected')}
+          {isRandomSelected
+            ? t('room.randomCategorySelected')
+            : `${selectedPackIds.length} ${t('room.packsSelected')}`}
         </p>
       )}
     </div>

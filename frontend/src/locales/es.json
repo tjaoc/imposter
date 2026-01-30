@@ -60,6 +60,8 @@
     "host": "Anfitrión",
     "selectPacks": "Selecciona al menos un pack",
     "selectPacksLabel": "Selecciona uno o más packs de palabras",
+    "randomCategory": "Categoría aleatoria",
+    "randomCategorySelected": "Se elegirá una categoría al azar al iniciar.",
     "selectAll": "Seleccionar todos",
     "deselectAll": "Deseleccionar todos",
     "packsSelected": "pack(s) seleccionado(s)",
