@@ -1,5 +1,14 @@
 # 📝 Changelog - Imposter
 
+## [1.1.21] - 2026-01-30
+
+### 🐛 UI: PageNav y card Impostores
+
+- ✅ **PageNav** (Volver/Salir): mismo tamaño que selector de banderas (`min-h-[40px] min-w-[44px]`, `px-3 py-1.5`, `text-xs`, `rounded-xl`).
+- ✅ **Card Impostores** (Room y Local): botones − y + más pequeños (`w-8 h-8`, `rounded-lg`, `text-sm`); espaciado reducido (`gap-1`) para que queden más pegados al número.
+
+---
+
 ## [1.1.20] - 2026-01-30
 
 ### 🧹 CSS y locales

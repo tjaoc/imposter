@@ -9,24 +9,24 @@ function PageNav({ showBack = true, onBack, onExit, className = '' }) {
 
   return (
     <nav
-      className={`flex items-center justify-between gap-3 min-h-[48px] mb-4 ${className}`}
+      className={`flex items-center justify-between gap-2 min-h-[40px] mb-4 ${className}`}
       aria-label="Navegación"
     >
       {showBack ? (
         <button
           type="button"
           onClick={onBack}
-          className="btn-secondary min-h-[48px] min-w-[48px] px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2"
+          className="btn-secondary min-h-[40px] min-w-[44px] px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5"
         >
           ← {t('common.back')}
         </button>
       ) : (
-        <span className="min-w-[48px]" aria-hidden="true" />
+        <span className="min-w-[44px]" aria-hidden="true" />
       )}
       <button
         type="button"
         onClick={onExit}
-        className="btn-secondary min-h-[48px] px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
+        className="btn-secondary min-h-[40px] min-w-[44px] px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5"
       >
         🏠 {t('common.exit')}
       </button>

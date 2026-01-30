@@ -286,7 +286,7 @@ function Room() {
                     <span className="text-white font-semibold whitespace-nowrap">{t('room.impostors')}</span>
                     <span className="text-sm text-gray-400 hidden sm:inline truncate">{t('room.impostorsDesc')}</span>
                   </div>
-                  <div className="flex items-center gap-3 flex-shrink-0">
+                  <div className="flex items-center gap-1 flex-shrink-0">
                     <button
                       type="button"
                       onClick={() =>
@@ -296,11 +296,11 @@ function Room() {
                         }))
                       }
                       disabled={settings.impostorCount <= 1}
-                      className="min-w-[48px] min-h-[48px] w-12 h-12 rounded-xl bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xl flex items-center justify-center active:scale-95"
+                      className="min-w-[32px] min-h-[32px] w-8 h-8 rounded-lg bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-sm flex items-center justify-center active:scale-95"
                     >
                       −
                     </button>
-                    <span className="text-xl sm:text-2xl font-bold text-white w-12 text-center">
+                    <span className="text-xl sm:text-2xl font-bold text-white w-8 text-center tabular-nums">
                       {settings.impostorCount}
                     </span>
                     <button
@@ -317,7 +317,7 @@ function Room() {
                       disabled={
                         settings.impostorCount >= room.players.length - 1
                       }
-                      className="min-w-[48px] min-h-[48px] w-12 h-12 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xl flex items-center justify-center active:scale-95"
+                      className="min-w-[32px] min-h-[32px] w-8 h-8 rounded-lg bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-sm flex items-center justify-center active:scale-95"
                     >
                       +
                     </button>

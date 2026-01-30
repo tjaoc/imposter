@@ -1,4 +1,4 @@
-# 🎮 Imposter - Version 1.1.20
+# 🎮 Imposter - Version 1.1.21
 
 **Fecha de lanzamiento:** 30 de Enero, 2026  
 **Estado:** ✅ Estable
@@ -7,6 +7,7 @@
 
 ## 🎯 Resumen de la Versión
 
+**v1.1.21** – PageNav (Volver/Salir): mismo tamaño que selector de banderas (min-h-40, min-w-44, text-xs). Card Impostores: botones − y + más pequeños (w-8 h-8) y más pegados al número (gap-1).  
 **v1.1.20** – CSS: pt-content-safe reducido; footer iOS line-height 2; locales: eliminada clave selectPackDesc no usada.  
 **v1.1.19** – Duración (Room y Local): eliminada descripción "Tiempo de discusión"; etiqueta "Duración" y select en la misma línea.  
 **v1.1.18** – CSS: eliminada regla de touch targets (min-height: 48px en botones/enlaces en pointer: coarse).  
@@ -216,6 +217,6 @@ ISC - Proyecto personal y educativo
 
 ---
 
-**¡Gracias por probar Imposter v1.1.20!** 🎉
+**¡Gracias por probar Imposter v1.1.21!** 🎉
 
 Desarrollado con ❤️ por Tiago Cruz
