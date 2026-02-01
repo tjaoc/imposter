@@ -33,7 +33,10 @@ function Home() {
 
       activeSocket.emit(
         'room:create',
-        { name: playerName.trim(), settings: { botCount: Math.max(0, Math.min(10, botCount)) } },
+        {
+          name: playerName.trim(),
+          settings: { botCount: Math.max(0, Math.min(10, botCount)) },
+        },
         (response) => {
           setIsCreating(false);
           if (response && response.ok) {
@@ -105,7 +108,7 @@ function Home() {
         >
           <img
             src="/favicon.svg"
-            alt="Imposter"
+            alt="Impostor"
             className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-2 sm:mb-3"
           />
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-glow mb-2 sm:mb-3">
@@ -168,12 +171,16 @@ function Home() {
             >
               {[0, 1, 2, 3, 4, 5].map((n) => (
                 <option key={n} value={n} className="bg-space-blue text-white">
-                  {n === 0 ? t('home.noBots') : t('home.botCount', { count: n })}
+                  {n === 0
+                    ? t('home.noBots')
+                    : t('home.botCount', { count: n })}
                 </option>
               ))}
             </select>
             {botCount > 0 && (
-              <p className="text-xs text-gray-400 mt-1">{t('home.playWithBotsHint')}</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {t('home.playWithBotsHint')}
+              </p>
             )}
           </div>
 

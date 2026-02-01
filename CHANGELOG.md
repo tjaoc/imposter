@@ -1,5 +1,14 @@
 # 📝 Changelog - Imposter
 
+## [1.1.22] - 2026-01-30
+
+### 📝 Marca: Imposter → Impostor
+
+- ✅ **PWA manifest** (vite.config.js): `name`, `short_name` y `description` actualizados a "Impostor" / "Jogo de Impostor (Who is the Spy?)".
+- ✅ **Home**: alt del logo cambiado de "Imposter" a "Impostor". Formato menor en room:create y opciones de bots.
+
+---
+
 ## [1.1.21] - 2026-01-30
 
 ### 🐛 UI: PageNav y card Impostores

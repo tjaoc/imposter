@@ -39,9 +39,9 @@ export default defineConfig({
         '*.png',
       ],
       manifest: {
-        name: 'Imposter',
-        short_name: 'Imposter',
-        description: 'PWA del juego Imposter (Who is the Spy?)',
+        name: 'Impostor',
+        short_name: 'Impostor',
+        description: 'Jogo de Impostor (Who is the Spy?)',
         id: '/',
         theme_color: '#0a0e27',
         background_color: '#0a0e27',
