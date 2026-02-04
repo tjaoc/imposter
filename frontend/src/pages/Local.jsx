@@ -175,7 +175,11 @@ function Local() {
           </div>
           <div className="card mb-4">
             <div className="flex flex-col sm:flex-row gap-2 mb-4">
+              <label htmlFor="localPlayerName" className="sr-only">
+                {t('local.playerNamePlaceholder')}
+              </label>
               <input
+                id="localPlayerName"
                 type="text"
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
@@ -289,6 +293,7 @@ function Local() {
                         }))
                       }
                       disabled={settings.impostorCount <= 1}
+                      aria-label={t('room.decreaseImpostors')}
                       className="min-w-[32px] min-h-[32px] w-8 h-8 rounded-lg bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-sm flex items-center justify-center active:scale-95"
                     >
                       −
@@ -311,6 +316,7 @@ function Local() {
                         settings.impostorCount >=
                         Math.max(1, players.length - 1)
                       }
+                      aria-label={t('room.increaseImpostors')}
                       className="min-w-[32px] min-h-[32px] w-8 h-8 rounded-lg bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-sm flex items-center justify-center active:scale-95"
                     >
                       +
@@ -368,11 +374,12 @@ function Local() {
               {/* Duración */}
               <div className="card mb-4">
                 <div className="flex flex-row items-center justify-between gap-3 flex-wrap">
-                  <div className="flex items-center gap-3 min-w-0">
+                  <label htmlFor="duration" className="flex items-center gap-3 min-w-0 cursor-pointer">
                     <span className="text-2xl flex-shrink-0">⏱️</span>
                     <span className="text-white font-semibold whitespace-nowrap">{t('room.duration')}</span>
-                  </div>
+                  </label>
                   <select
+                    id="duration"
                     value={settings.discussionSeconds}
                     onChange={(e) =>
                       setSettings((prev) => ({

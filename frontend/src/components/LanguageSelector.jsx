@@ -1,9 +1,12 @@
 import { useLanguage } from '../context/LanguageContext';
 import { motion } from 'framer-motion';
+import { useTranslation } from '../hooks/useTranslation';
 
 const LOCALE_LABELS = { es: '🇪🇸', pt: '🇵🇹' };
+const LOCALE_NAMES = { es: 'Español', pt: 'Português' };
 
 export default function LanguageSelector() {
+  const { t } = useTranslation();
   const { locale, setLocale, supportedLocales } = useLanguage();
 
   return (
@@ -13,6 +16,7 @@ export default function LanguageSelector() {
           key={loc}
           type="button"
           onClick={() => setLocale(loc)}
+          aria-label={t('common.switchLanguage', { lang: LOCALE_NAMES[loc] })}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.98 }}
           className={`min-h-[40px] min-w-[44px] flex-1 flex items-center justify-center rounded-xl transition-colors active:scale-95 overflow-hidden ${

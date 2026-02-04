@@ -147,10 +147,14 @@ function Home() {
             </div>
           </div>
           <div>
-            <label className="block text-sm sm:text-base font-medium mb-2 text-space-cyan">
+            <label
+              htmlFor="playerName"
+              className="block text-sm sm:text-base font-medium mb-2 text-space-cyan"
+            >
               {t('home.yourName')}
             </label>
             <input
+              id="playerName"
               type="text"
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
@@ -161,10 +165,14 @@ function Home() {
           </div>
 
           <div>
-            <label className="block text-sm sm:text-base font-medium mb-2 text-space-cyan">
+            <label
+              htmlFor="botCount"
+              className="block text-sm sm:text-base font-medium mb-2 text-space-cyan"
+            >
               {t('home.playWithBots')}
             </label>
             <select
+              id="botCount"
               value={botCount}
               onChange={(e) => setBotCount(Number(e.target.value))}
               className="w-full px-4 py-3.5 sm:py-3 bg-space-blue border border-space-cyan/30 rounded-xl focus:outline-none focus:border-space-cyan focus:ring-2 focus:ring-space-cyan/50 text-white text-base"
@@ -204,7 +212,11 @@ function Home() {
           </div>
 
           <div>
+            <label htmlFor="roomCode" className="sr-only">
+              {t('home.roomCode')}
+            </label>
             <input
+              id="roomCode"
               type="text"
               value={roomCode}
               onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
