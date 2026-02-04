@@ -7,7 +7,8 @@ const getAllPacks = async (req, res) => {
     const filter = {};
     if (req.query.locale) {
       const locale = String(req.query.locale).trim().toLowerCase();
-      if (locale) {
+      // Validación estricta para evitar ReDoS
+      if (locale && /^[a-z0-9-]{2,10}$/i.test(locale)) {
         filter.locale = new RegExp(`^${locale}`);
       }
     }

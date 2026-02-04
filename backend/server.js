@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const helmet = require("helmet");
 const compression = require("compression");
 const http = require("http");
 const { Server } = require("socket.io");
@@ -12,6 +13,7 @@ const WordPack = require("./models/WordPack");
 const PORT = process.env.PORT || 4000;
 
 const app = express();
+app.use(helmet());
 app.use(compression());
 app.use(cors({ origin: "*", credentials: false }));
 app.use(express.json());
@@ -78,6 +80,25 @@ const getPublicRoomState = (room) => ({
   createdAt: room.createdAt,
   settings: room.settings,
 });
+
+/** Limpia todos los datos asociados a una sala cuando esta se queda vacía */
+const cleanupRoom = (code) => {
+  rooms.delete(code);
+  games.delete(code);
+
+  if (roomClueTimers.has(code)) {
+    clearTimeout(roomClueTimers.get(code));
+    roomClueTimers.delete(code);
+  }
+
+  if (roomVotingTimers.has(code)) {
+    clearTimeout(roomVotingTimers.get(code));
+    roomVotingTimers.delete(code);
+  }
+};
+
+/** Valida que un locale sea seguro para evitar ataques de ReDoS */
+const isValidLocale = (l) => typeof l === 'string' && /^[a-z0-9-]{2,10}$/i.test(l);
 
 /** Genera y envía pistas para todos los bots en la ronda indicada (roundNum) o la actual */
 function submitBotClues(io, code, games, roomClueTimers, roundNum) {
@@ -390,7 +411,7 @@ io.on("connection", (socket) => {
     socket.data.roomCode = null;
 
     if (room.players.length === 0) {
-      deleteRoomData(code);
+      cleanupRoom(code);
       return;
     }
 
@@ -414,7 +435,7 @@ io.on("connection", (socket) => {
 
     room.players = room.players.filter((player) => player.id !== socket.id);
     if (room.players.length === 0) {
-      deleteRoomData(code);
+      cleanupRoom(code);
       return;
     }
 
@@ -533,7 +554,10 @@ io.on("connection", (socket) => {
     }
 
     try {
-      const requestedLocale = clientLocale && String(clientLocale).trim().toLowerCase();
+      let requestedLocale = clientLocale && String(clientLocale).trim().toLowerCase();
+      if (requestedLocale && !isValidLocale(requestedLocale)) {
+        requestedLocale = null;
+      }
       let pack;
 
       if (packId === "random") {
@@ -963,7 +987,10 @@ io.on("connection", (socket) => {
       }
 
       // Preferir el mismo slug en el idioma de la sala (ej. pt) para palabras/categoría
-      const savedLocale = room.settings?.locale && String(room.settings.locale).trim().toLowerCase();
+      let savedLocale = room.settings?.locale && String(room.settings.locale).trim().toLowerCase();
+      if (savedLocale && !isValidLocale(savedLocale)) {
+        savedLocale = null;
+      }
       if (savedLocale && !new RegExp(`^${savedLocale}`).test(pack.locale || '')) {
         const packInLocale = await WordPack.findOne({ slug: pack.slug, locale: new RegExp(`^${savedLocale}`) });
         if (packInLocale && packInLocale.words && packInLocale.words.length > 0) {
