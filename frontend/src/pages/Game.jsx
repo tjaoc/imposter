@@ -5,6 +5,7 @@ import { useSocket } from '../hooks/useSocket';
 import { useTranslation } from '../hooks/useTranslation';
 import PageNav from '../components/PageNav';
 import { capitalizeWord } from '../utils/formatWord';
+import { getOrCreateStatsId } from '../utils/statsId';
 
 function Game() {
   const { t } = useTranslation();
@@ -683,8 +684,8 @@ function Game() {
         // Ahora unirse a la sala con el nombre correcto
         // IMPORTANTE: Si el jugador ya existe en la sala, usar su nombre original
         const joinData = existingPlayer
-          ? { code, name: existingPlayer.name } // Usar el nombre existente para preservarlo
-          : { code, name: playerName }; // Usar el nombre encontrado o por defecto
+          ? { code, name: existingPlayer.name, playerStatsId: getOrCreateStatsId() }
+          : { code, name: playerName, playerStatsId: getOrCreateStatsId() };
         socket.emit('room:join', joinData, (response) => {
           if (response && response.ok) {
             setRoom(response.room);
@@ -1485,6 +1486,7 @@ function Game() {
                         name:
                           room?.players?.find((p) => p.id === socket.id)
                             ?.name || t('common.playerDefault'),
+                        playerStatsId: getOrCreateStatsId(),
                       },
                       (joinResponse) => {
                         if (!joinResponse?.ok) {
@@ -1724,6 +1726,7 @@ function Game() {
                         name:
                           room?.players?.find((p) => p.id === socket.id)
                             ?.name || t('common.playerDefault'),
+                        playerStatsId: getOrCreateStatsId(),
                       },
                       (joinResponse) => {
                         if (!joinResponse?.ok) {

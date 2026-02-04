@@ -1,13 +1,13 @@
-# 🎮 Imposter - Version 1.1.22
+# 🎮 Imposter - Version 1.1.23
 
-**Fecha de lanzamiento:** 30 de Enero, 2026  
+**Fecha de lanzamiento:** 4 de Febrero, 2026  
 **Estado:** ✅ Estable
 
 ---
 
 ## 🎯 Resumen de la Versión
 
-**v1.1.22** – Nombre de marca: "Imposter" → "Impostor" en PWA manifest (vite) y alt del logo (Home).  
+**v1.1.23** – DOCKER.md creado, README actualizado (Próximos Pasos y estructura), estadísticas de jugador (partidas, victorias civil/impostor) en sala online.  
 **v1.1.21** – PageNav (Volver/Salir): mismo tamaño que selector de banderas (min-h-40, min-w-44, text-xs). Card Impostores: botones − y + más pequeños (w-8 h-8) y más pegados al número (gap-1).  
 **v1.1.20** – CSS: pt-content-safe reducido; footer iOS line-height 2; locales: eliminada clave selectPackDesc no usada.  
 **v1.1.19** – Duración (Room y Local): eliminada descripción "Tiempo de discusión"; etiqueta "Duración" y select en la misma línea.  
@@ -218,6 +218,6 @@ ISC - Proyecto personal y educativo
 
 ---
 
-**¡Gracias por probar Imposter v1.1.22!** 🎉
+**¡Gracias por probar Imposter v1.1.23!** 🎉
 
 Desarrollado con ❤️ por Tiago Cruz

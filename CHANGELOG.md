@@ -1,5 +1,15 @@
 # 📝 Changelog - Imposter
 
+## [1.1.23] - 2026-02-04
+
+### 📦 Docs y estadísticas
+
+- ✅ **DOCKER.md** creado con documentación completa de Docker (desarrollo y producción).
+- ✅ **README** actualizado: estructura del proyecto (imposter/), Próximos Pasos marcados como hechos, enlace a DOCKER.md.
+- ✅ **Estadísticas de jugador** en sala online: partidas jugadas, victorias como civil e impostor (en memoria en el servidor); panel en Room y soporte es/pt.
+
+---
+
 ## [1.1.22] - 2026-01-30
 
 ### 📝 Marca: Imposter → Impostor

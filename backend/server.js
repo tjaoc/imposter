@@ -37,6 +37,8 @@ const rooms = new Map();
 const games = new Map(); // Almacena el estado de los juegos activos
 const roomClueTimers = new Map(); // timeouts de ronda de pistas por sala
 const roomVotingTimers = new Map(); // timeouts de votación de bots por sala
+/** Estadísticas por jugador (key: playerStatsId desde cliente). Se pierden al reiniciar el servidor. */
+const playerStats = new Map();
 
 /**
  * Limpia todos los datos relacionados con una sala (juego, temporizadores, etc.)
@@ -99,6 +101,27 @@ const cleanupRoom = (code) => {
 
 /** Valida que un locale sea seguro para evitar ataques de ReDoS */
 const isValidLocale = (l) => typeof l === 'string' && /^[a-z0-9-]{2,10}$/i.test(l);
+
+/** Valida playerStatsId (UUID v4 u otro id alfanumérico corto) para evitar inyección */
+const isValidStatsId = (id) => typeof id === 'string' && /^[a-zA-Z0-9_-]{1,64}$/.test(id);
+
+/**
+ * Actualiza estadísticas de jugadores al terminar una partida
+ * @param {Object} gameState - Estado del juego terminado
+ * @param {string} winner - 'civilians' | 'impostors'
+ */
+function recordGameFinishedStats (gameState, winner) {
+  if (!gameState || !gameState.players) return;
+  gameState.players.forEach((player) => {
+    if (player.isBot || !player.playerStatsId || !isValidStatsId(player.playerStatsId)) return;
+    const id = player.playerStatsId;
+    const stats = playerStats.get(id) || { gamesPlayed: 0, winsCivilian: 0, winsImpostor: 0 };
+    stats.gamesPlayed += 1;
+    if (player.role === 'civilian' && winner === 'civilians') stats.winsCivilian += 1;
+    if (player.role === 'impostor' && winner === 'impostors') stats.winsImpostor += 1;
+    playerStats.set(id, stats);
+  });
+}
 
 /** Genera y envía pistas para todos los bots en la ronda indicada (roundNum) o la actual */
 function submitBotClues(io, code, games, roomClueTimers, roundNum) {
@@ -295,6 +318,7 @@ function tryProcessVoting(io, code, games, rooms) {
     gameState.players.forEach((player) => {
       io.to(player.id).emit("game:finished", finishedData);
     });
+    recordGameFinishedStats(gameState, endCheck.winner);
   } else {
     gameState.status = 'vote-results';
     const voteResultData = {
@@ -330,8 +354,11 @@ io.on("connection", (socket) => {
       code = generateRoomCode();
     }
 
+    const statsId = settings?.playerStatsId && isValidStatsId(settings.playerStatsId) ? settings.playerStatsId : null;
+    if (statsId) socket.data.playerStatsId = statsId;
+
     const botCount = Math.max(0, Math.min(10, Number(settings?.botCount) || 0));
-    const players = [{ id: socket.id, name }];
+    const players = [{ id: socket.id, name, playerStatsId: statsId || undefined }];
     for (let i = 1; i <= botCount; i++) {
       players.push({ id: `bot-${code}-${i}`, name: `Bot ${i}`, isBot: true });
     }
@@ -358,7 +385,7 @@ io.on("connection", (socket) => {
     io.to(code).emit("room:updated", getPublicRoomState(room));
   });
 
-  socket.on("room:join", ({ code, name }, callback) => {
+  socket.on("room:join", ({ code, name, playerStatsId }, callback) => {
     const room = rooms.get(code);
     if (!room) {
       callback?.({ ok: false, error: "ROOM_NOT_FOUND" });
@@ -375,12 +402,14 @@ io.on("connection", (socket) => {
       return;
     }
 
+    const statsId = playerStatsId && isValidStatsId(playerStatsId) ? playerStatsId : null;
+    if (statsId) socket.data.playerStatsId = statsId;
+
     const existing = room.players.find((player) => player.id === socket.id);
     if (!existing) {
-      room.players.push({ id: socket.id, name });
+      room.players.push({ id: socket.id, name, playerStatsId: statsId || undefined });
     } else {
-      // Si el jugador ya existe, mantener su nombre original (no actualizar)
-      // Esto preserva los nombres cuando se crea una nueva partida
+      if (statsId) existing.playerStatsId = statsId;
     }
 
     socket.join(code);
@@ -397,6 +426,16 @@ io.on("connection", (socket) => {
       return;
     }
     callback?.({ ok: true, room: getPublicRoomState(room) });
+  });
+
+  socket.on("stats:get", ({ playerStatsId: requestedId }, callback) => {
+    const id = requestedId && isValidStatsId(requestedId) ? requestedId : socket.data.playerStatsId;
+    if (!id) {
+      callback?.({ ok: true, stats: { gamesPlayed: 0, winsCivilian: 0, winsImpostor: 0 } });
+      return;
+    }
+    const stats = playerStats.get(id) || { gamesPlayed: 0, winsCivilian: 0, winsImpostor: 0 };
+    callback?.({ ok: true, stats });
   });
 
   socket.on("room:leave", () => {

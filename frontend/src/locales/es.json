@@ -88,7 +88,11 @@
     "copyCode": "Copiar código",
     "copied": "¡Copiado!",
     "roomNotFoundDesc": "La sala no existe o ya se cerró.",
-    "redirecting": "Redirigiendo en 3 segundos..."
+    "redirecting": "Redirigiendo en 3 segundos...",
+    "statsTitle": "Tus estadísticas",
+    "gamesPlayed": "Partidas",
+    "winsCivilian": "Victorias civil",
+    "winsImpostor": "Victorias impostor"
   },
   "game": {
     "discussion": "Discusión",

@@ -7,6 +7,7 @@ import { useLanguage } from '../context/LanguageContext';
 import PackSelector from '../components/PackSelector';
 import LanguageSelector from '../components/LanguageSelector';
 import PageNav from '../components/PageNav';
+import { getOrCreateStatsId } from '../utils/statsId';
 
 function Room() {
   const { t } = useTranslation();
@@ -25,6 +26,7 @@ function Room() {
     discussionSeconds: 240, // 4 minutos
     hintForImpostors: true,
   });
+  const [playerStats, setPlayerStats] = useState(null);
 
   useEffect(() => {
     if (!socket || !isConnected) {
@@ -46,12 +48,16 @@ function Room() {
       {
         code,
         name: localStorage.getItem('playerName') || t('common.playerDefault'),
+        playerStatsId: getOrCreateStatsId(),
       },
       (response) => {
         if (response && response.ok) {
           setRoom(response.room);
           setIsHost(socket.id === response.room.hostId);
           setError(null);
+          socket.emit('stats:get', {}, (statsRes) => {
+            if (statsRes?.ok && statsRes.stats) setPlayerStats(statsRes.stats);
+          });
         } else {
           const errorMsg = response?.error || 'ERROR_UNKNOWN';
           console.error('Error joining room:', errorMsg);
@@ -266,6 +272,30 @@ function Room() {
             </AnimatePresence>
           </div>
         </motion.div>
+
+        {playerStats && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="card mb-4 flex flex-row flex-wrap items-center justify-between gap-3"
+          >
+            <span className="text-gray-400 text-sm font-medium">{t('room.statsTitle')}</span>
+            <div className="flex gap-4 sm:gap-6 text-sm">
+              <span className="text-white">
+                <span className="text-gray-400">{t('room.gamesPlayed')}:</span>{' '}
+                <strong>{playerStats.gamesPlayed}</strong>
+              </span>
+              <span className="text-emerald-400">
+                <span className="text-gray-400">{t('room.winsCivilian')}:</span>{' '}
+                <strong>{playerStats.winsCivilian ?? 0}</strong>
+              </span>
+              <span className="text-amber-400">
+                <span className="text-gray-400">{t('room.winsImpostor')}:</span>{' '}
+                <strong>{playerStats.winsImpostor ?? 0}</strong>
+              </span>
+            </div>
+          </motion.div>
+        )}
 
         {isHost && (
           <>

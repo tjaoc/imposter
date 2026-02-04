@@ -13,11 +13,12 @@ PWA de alto rendimiento del juego "Imposter (Who is the Spy?)" con todas las fun
 - ✅ Capacidad offline total (Service Workers)
 - ✅ Diseño Dark Mode elegante con estética espacial/misteriosa
 - ✅ Gestión de salas en tiempo real con Socket.io
+- ✅ Estadísticas de jugador (partidas jugadas, victorias como civil/impostor)
 
 ## 📁 Estructura del Proyecto
 
 ```
-spy/
+imposter/
 ├── backend/
 │   ├── server.js          # Servidor Express + Socket.io
 │   ├── Dockerfile         # Docker para producción
@@ -137,15 +138,16 @@ El proyecto incluye configuración completa de Docker para desarrollo y producci
 - **Desarrollo**: Hot reload, volúmenes montados, MongoDB incluido
 - **Producción**: Imágenes optimizadas, multi-stage builds, Nginx, healthchecks
 
-📖 **Consulta [DOCKER.md](./DOCKER.md) para documentación completa**
+📖 **Consulta [DOCKER.md](./DOCKER.md) para documentación completa.**
 
 ## 🏗️ Próximos Pasos
 
-- [ ] Implementar lógica completa del juego (reparto de roles, votación)
-- [ ] Añadir packs de palabras iniciales a MongoDB
-- [ ] Implementar modo personalizado (añadir palabras)
-- [ ] Mejorar Service Workers para offline completo
-- [ ] Añadir estadísticas de jugadores
+- [x] Implementar lógica completa del juego (reparto de roles, votación)
+- [x] Añadir packs de palabras iniciales a MongoDB
+- [x] Implementar modo personalizado (añadir palabras)
+- [x] Mejorar Service Workers para offline completo
+- [x] Añadir estadísticas de jugadores
+- [ ] Persistir estadísticas en base de datos (opcional; actualmente en memoria por sesión del servidor)
 
 ## 📄 Licencia
 

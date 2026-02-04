@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useSocket } from '../hooks/useSocket';
 import { useTranslation } from '../hooks/useTranslation';
 import LanguageSelector from '../components/LanguageSelector';
+import { getOrCreateStatsId } from '../utils/statsId';
 
 function Home() {
   const { t } = useTranslation();
@@ -35,7 +36,10 @@ function Home() {
         'room:create',
         {
           name: playerName.trim(),
-          settings: { botCount: Math.max(0, Math.min(10, botCount)) },
+          settings: {
+            botCount: Math.max(0, Math.min(10, botCount)),
+            playerStatsId: getOrCreateStatsId(),
+          },
         },
         (response) => {
           setIsCreating(false);
@@ -71,6 +75,7 @@ function Home() {
       const joinData = {
         code: roomCode.trim().toUpperCase(),
         name: playerName.trim(),
+        playerStatsId: getOrCreateStatsId(),
       };
 
       activeSocket.emit('room:join', joinData, (response) => {
