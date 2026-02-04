@@ -38,6 +38,27 @@ const games = new Map(); // Almacena el estado de los juegos activos
 const roomClueTimers = new Map(); // timeouts de ronda de pistas por sala
 const roomVotingTimers = new Map(); // timeouts de votación de bots por sala
 
+/**
+ * Limpia todos los datos relacionados con una sala (juego, temporizadores, etc.)
+ * @param {string} code Código de la sala
+ */
+const deleteRoomData = (code) => {
+  rooms.delete(code);
+  games.delete(code);
+
+  const clueTimer = roomClueTimers.get(code);
+  if (clueTimer) {
+    clearTimeout(clueTimer);
+    roomClueTimers.delete(code);
+  }
+
+  const votingTimer = roomVotingTimers.get(code);
+  if (votingTimer) {
+    clearTimeout(votingTimer);
+    roomVotingTimers.delete(code);
+  }
+};
+
 const generateRoomCode = () => {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let code = "";
@@ -541,16 +562,23 @@ io.on("connection", (socket) => {
 
       if (packId === "random") {
         const localeRegex = requestedLocale ? new RegExp(`^${requestedLocale}`) : /./;
-        const allPacks = await WordPack.find({
-          locale: localeRegex,
-          slug: { $ne: "personalizado" },
-          words: { $exists: true, $ne: [] },
-        });
-        if (!allPacks || allPacks.length === 0) {
+        // Optimización: Usar $sample para obtener solo un pack aleatorio desde la DB
+        const randomPacks = await WordPack.aggregate([
+          {
+            $match: {
+              locale: localeRegex,
+              slug: { $ne: "personalizado" },
+              words: { $exists: true, $ne: [] },
+            },
+          },
+          { $sample: { size: 1 } },
+        ]);
+
+        if (!randomPacks || randomPacks.length === 0) {
           callback?.({ ok: false, error: "PACK_INVALID" });
           return;
         }
-        pack = allPacks[Math.floor(Math.random() * allPacks.length)];
+        pack = randomPacks[0];
       } else {
         pack = await WordPack.findById(packId);
         if (!pack || pack.words.length === 0) {
@@ -939,7 +967,8 @@ io.on("connection", (socket) => {
 
       // Si no hay packs seleccionados, obtener todos los packs disponibles
       if (packIds.length === 0) {
-        const allPacks = await WordPack.find({});
+        // Optimización: Usar proyección para traer solo los IDs
+        const allPacks = await WordPack.find({}, '_id');
         packIds = allPacks.map(p => p._id.toString());
       }
 

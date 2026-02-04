@@ -374,6 +374,7 @@ function Game() {
         socket.off('game:voting-started');
         socket.off('game:vote-result');
         socket.off('game:finished');
+        socket.off('game:players-update');
       } catch (error) {
         console.warn('⚠️ Error limpiando listeners:', error);
       }
