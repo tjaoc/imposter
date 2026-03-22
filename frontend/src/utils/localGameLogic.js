@@ -2,6 +2,16 @@
  * Lógica del juego local (un dispositivo) - espejo de backend/utils/gameLogic.js
  */
 
+/** Barajado uniforme (Fisher–Yates). */
+function shuffleArray (items) {
+  const a = [...items];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 export function assignRoles (players, secretWord, impostorCount = 1, hintWord = null) {
   if (players.length < 3) {
     throw new Error('Se necesitan al menos 3 jugadores');
@@ -10,12 +20,12 @@ export function assignRoles (players, secretWord, impostorCount = 1, hintWord = 
     throw new Error('Número de impostores inválido');
   }
 
-  const shuffled = [...players].sort(() => Math.random() - 0.5);
-  const impostors = shuffled.slice(0, impostorCount);
-  const civilians = shuffled.slice(impostorCount);
+  const impostorIds = new Set(
+    shuffleArray(players.map((p) => p.id)).slice(0, impostorCount)
+  );
 
-  return shuffled.map((player) => {
-    const isImpostor = impostors.includes(player);
+  return shuffleArray(players).map((player) => {
+    const isImpostor = impostorIds.has(player.id);
     return {
       ...player,
       role: isImpostor ? 'impostor' : 'civilian',

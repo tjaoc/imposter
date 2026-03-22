@@ -31,5 +31,6 @@ const WordPackSchema = new mongoose.Schema(
 // Si ya tenías DB con índice único en slug: en MongoDB ejecutar
 // db.wordpacks.dropIndex('slug_1') antes de volver a ejecutar el seed.
 WordPackSchema.index({ slug: 1, locale: 1 }, { unique: true });
+WordPackSchema.index({ locale: 1, name: 1 });
 
 module.exports = mongoose.model("WordPack", WordPackSchema);

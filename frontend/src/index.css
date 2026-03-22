@@ -124,3 +124,13 @@
     @apply text-gray-400 hover:text-white hover:bg-space-blue/60 active:scale-[0.98] transition-colors;
   }
 }
+
+/* Menos trabajo de animación en CSS cuando el SO pide reducir movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse {
+    animation: none !important;
+  }
+  #app-splash .splash-icon-wrap {
+    animation: none !important;
+  }
+}

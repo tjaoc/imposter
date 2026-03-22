@@ -1,5 +1,16 @@
 # 📝 Changelog - Imposter
 
+## [1.2.0] - 2026-03-22
+
+### 🚀 Rendimiento, calidad y despliegue
+
+- ✅ **Frontend**: fases de juego extraídas y carga diferida; `LazyMotion` en App; memoización y ajustes de socket/timers; `vite` sin `console`/`debugger` en build; `prefers-reduced-motion` en splash y utilidades de motion.
+- ✅ **Aleatoriedad**: impostores y orden de revelación/jugadores con barajados independientes (online y local).
+- ✅ **Backend**: `Cache-Control` en listado/detalles de packs; índice compuesto en WordPack; `trust proxy`, CORS desde `CORS_ORIGIN`, `engines.node`; blueprint Render con `npm ci` y checklist.
+- ✅ **Tests y Docker**: tests de lógica en backend y Vitest en frontend; script `docker-test.sh` y documentación asociada.
+
+---
+
 ## [1.1.23] - 2026-02-04
 
 ### 📦 Docs y estadísticas

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
+import { useMotionReduce, tx } from '../game/motionReduce';
 import { useSocket } from '../hooks/useSocket';
 import { useTranslation } from '../hooks/useTranslation';
 import LanguageSelector from '../components/LanguageSelector';
@@ -15,6 +16,7 @@ function Home() {
   const [isJoining, setIsJoining] = useState(false);
   const navigate = useNavigate();
   const { socket, connectSocket } = useSocket();
+  const reduce = useMotionReduce();
 
   const handleCreateRoom = async () => {
     if (!playerName.trim()) return;
@@ -99,16 +101,16 @@ function Home() {
       <div className="flex items-center justify-end mb-2 min-h-[48px]">
         <LanguageSelector />
       </div>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
+      <m.div
+        initial={reduce ? false : { opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={tx(reduce, { duration: 0.6 })}
         className="flex-1 flex flex-col items-center justify-center w-full max-w-md md:max-w-lg lg:max-w-xl"
       >
-        <motion.div
-          initial={{ scale: 0.9 }}
+        <m.div
+          initial={reduce ? false : { scale: 0.9 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={tx(reduce, { duration: 0.5, delay: reduce ? 0 : 0.2 })}
           className="text-center mb-4 sm:mb-5"
         >
           <img
@@ -119,12 +121,12 @@ function Home() {
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-glow mb-2 sm:mb-3">
             {t('home.title')}
           </h1>
-        </motion.div>
+        </m.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
+        <m.div
+          initial={reduce ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
+          transition={tx(reduce, { delay: reduce ? 0 : 0.2 })}
           className="card space-y-4 w-full"
         >
           <button
@@ -240,8 +242,8 @@ function Home() {
               {isJoining ? t('home.joining') : t('home.joinRoom')}
             </button>
           </div>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     </div>
   );
 }

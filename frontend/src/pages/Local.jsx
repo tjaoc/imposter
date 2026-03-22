@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
+import { useMotionReduce, tx, motionGestures } from '../game/motionReduce';
 import { useTranslation } from '../hooks/useTranslation';
 import { useLanguage } from '../context/LanguageContext';
 import { assignRoles } from '../utils/localGameLogic';
@@ -32,6 +33,7 @@ function Local() {
   const [currentRevealIndex, setCurrentRevealIndex] = useState(0);
   const [roleRevealed, setRoleRevealed] = useState(false);
   const [showCardBack, setShowCardBack] = useState(true);
+  const reduce = useMotionReduce();
 
   // Nueva partida con los mismos jugadores: venir desde resultados con state.keepPlayers
   useEffect(() => {
@@ -160,9 +162,10 @@ function Local() {
           />
           <LanguageSelector />
         </div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
+        <m.div
+          initial={reduce ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={tx(reduce, undefined)}
           className="max-w-md md:max-w-lg lg:max-w-xl mx-auto"
         >
           <div className="text-center mb-6 sm:mb-8">
@@ -199,12 +202,13 @@ function Local() {
             </div>
             <ul className="space-y-2">
               <AnimatePresence>
-                {players.map((p) => (
-                  <motion.li
+                {players.map((p, index) => (
+                  <m.li
                     key={p.id}
-                    initial={{ x: -20, opacity: 0 }}
+                    initial={reduce ? false : { x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: 20, opacity: 0 }}
+                    exit={reduce ? undefined : { x: 20, opacity: 0 }}
+                    transition={tx(reduce, { delay: reduce ? 0 : index * 0.05 })}
                     className="flex items-center justify-between p-3 sm:p-4 min-h-[48px] bg-space-blue rounded-xl"
                   >
                     <span className="text-white truncate pr-2">{p.name}</span>
@@ -215,7 +219,7 @@ function Local() {
                     >
                       {t('common.close')}
                     </button>
-                  </motion.li>
+                  </m.li>
                 ))}
               </AnimatePresence>
             </ul>
@@ -228,7 +232,7 @@ function Local() {
           >
             {players.length < 3 ? t('local.minPlayers') : t('local.selectPack')}
           </button>
-        </motion.div>
+        </m.div>
       </div>
     );
   }
@@ -244,9 +248,10 @@ function Local() {
           />
           <LanguageSelector />
         </div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
+        <m.div
+          initial={reduce ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={tx(reduce, undefined)}
           className="max-w-md mx-auto"
         >
           <div className="text-center mb-6">
@@ -325,10 +330,10 @@ function Local() {
                 </div>
               </div>
               {/* Pista para Impostores (igual que Room) */}
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
+              <m.div
+                initial={reduce ? false : { y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
+                transition={tx(reduce, { delay: reduce ? 0 : 0.2 })}
                 className="card-tight mb-4"
               >
                 <div className="flex flex-row items-center justify-between gap-3 flex-wrap">
@@ -370,7 +375,7 @@ function Local() {
                     </button>
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
               {/* Duración */}
               <div className="card mb-4">
                 <div className="flex flex-row items-center justify-between gap-3 flex-wrap">
@@ -428,7 +433,7 @@ function Local() {
           >
             {t('local.startGame')}
           </button>
-        </motion.div>
+        </m.div>
       </div>
     );
   }
@@ -448,11 +453,12 @@ function Local() {
         <div className="flex-1 flex flex-col items-center justify-center">
           <AnimatePresence mode="wait">
             {!roleRevealed ? (
-              <motion.div
+              <m.div
                 key="security"
-                initial={{ opacity: 0 }}
+                initial={reduce ? false : { opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+                exit={reduce ? undefined : { opacity: 0 }}
+                transition={tx(reduce, undefined)}
                 className="text-center w-full max-w-md"
               >
                 <p className="text-space-cyan/60 text-sm uppercase tracking-widest mb-4">
@@ -465,30 +471,31 @@ function Local() {
                 <p className="text-gray-400 text-sm mb-8">
                   {t('local.hideRoleDesc')}
                 </p>
-                <motion.button
+                <m.button
                   type="button"
                   onClick={() => {
                     setRoleRevealed(true);
                     setShowCardBack(true);
                   }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
+                  {...motionGestures(reduce, { hover: 1.05, tap: 0.98 })}
                   className="w-full max-w-xs py-4 rounded-full bg-gradient-to-r from-space-purple to-space-pink font-semibold text-white"
                 >
                   {t('local.seeMyRole')}
-                </motion.button>
-              </motion.div>
+                </m.button>
+              </m.div>
             ) : (
-              <motion.div
+              <m.div
                 key="role"
-                initial={{ opacity: 0, y: -20 }}
+                initial={reduce ? false : { opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
+                exit={reduce ? undefined : { opacity: 0 }}
+                transition={tx(reduce, undefined)}
                 className="w-full flex flex-col items-center"
               >
-                <motion.div
-                  initial={{ opacity: 0, y: -20 }}
+                <m.div
+                  initial={reduce ? false : { opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
+                  transition={tx(reduce, undefined)}
                   className="mb-6 text-center"
                 >
                   <h1 className="text-3xl font-extrabold tracking-wide text-red-400 drop-shadow-lg mb-2">
@@ -499,65 +506,65 @@ function Local() {
                   <p className="text-sm text-slate-400 uppercase tracking-[0.2em]">
                     {t('game.revealSubtitle')}
                   </p>
-                </motion.div>
+                </m.div>
 
                 <div
                   className="relative w-72 h-96 mb-8"
-                  style={{ perspective: '1200px' }}
+                  style={{ perspective: reduce ? undefined : '1200px' }}
                 >
                   <AnimatePresence mode="wait">
                     {showCardBack ? (
-                      <motion.div
+                      <m.div
                         key="card-back"
-                        initial={{ rotateY: 180, opacity: 0 }}
+                        initial={reduce ? false : { rotateY: 180, opacity: 0 }}
                         animate={{ rotateY: 0, opacity: 1 }}
-                        exit={{ rotateY: -180, opacity: 0 }}
-                        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                        exit={reduce ? undefined : { rotateY: -180, opacity: 0 }}
+                        transition={tx(reduce, { duration: 0.7, ease: [0.22, 1, 0.36, 1] })}
                         className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-900 via-indigo-900 to-slate-900 border-2 border-purple-500/50 shadow-[0_0_40px_rgba(139,92,246,0.5)] flex items-center justify-center cursor-pointer"
                         onClick={() => setShowCardBack(false)}
-                        style={{ transformStyle: 'preserve-3d' }}
+                        style={{ transformStyle: reduce ? undefined : 'preserve-3d' }}
                       >
                         <div
                           className="text-center"
-                          style={{ transform: 'translateZ(20px)' }}
+                          style={{ transform: reduce ? undefined : 'translateZ(20px)' }}
                         >
-                          <motion.div
-                            animate={{ scale: [1, 1.1, 1] }}
-                            transition={{ duration: 2, repeat: Infinity }}
+                          <m.div
+                            animate={reduce ? undefined : { scale: [1, 1.1, 1] }}
+                            transition={reduce ? undefined : { duration: 2, repeat: Infinity }}
                             className="text-6xl mb-4"
                           >
                             👁️‍🗨️
-                          </motion.div>
+                          </m.div>
                           <p className="text-slate-200 text-sm font-medium">
                             {t('game.touchToReveal')}
                           </p>
                         </div>
-                      </motion.div>
+                      </m.div>
                     ) : (
-                      <motion.div
+                      <m.div
                         key="card-front"
-                        initial={{ rotateY: 180, opacity: 0 }}
+                        initial={reduce ? false : { rotateY: 180, opacity: 0 }}
                         animate={{ rotateY: 0, opacity: 1 }}
-                        exit={{ rotateY: 180, opacity: 0 }}
-                        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                        exit={reduce ? undefined : { rotateY: 180, opacity: 0 }}
+                        transition={tx(reduce, { duration: 0.7, ease: [0.22, 1, 0.36, 1] })}
                         className="absolute inset-0 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-950 to-black border-2 border-slate-700 shadow-[0_0_40px_rgba(15,23,42,0.8)] flex flex-col items-center justify-center px-6"
                         style={{
-                          transformStyle: 'preserve-3d',
-                          backfaceVisibility: 'hidden',
+                          transformStyle: reduce ? undefined : 'preserve-3d',
+                          backfaceVisibility: reduce ? undefined : 'hidden',
                         }}
                       >
-                        <motion.div
-                          initial={{ scale: 0 }}
+                        <m.div
+                          initial={reduce ? false : { scale: 0 }}
                           animate={{ scale: 1 }}
-                          transition={{
-                            delay: 1,
+                          transition={tx(reduce, {
+                            delay: reduce ? 0 : 1,
                             type: 'spring',
                             stiffness: 200,
-                          }}
+                          })}
                           className="text-7xl mb-4"
                         >
                           {isImpostor ? '🕵️' : '🎯'}
-                        </motion.div>
+                        </m.div>
                         {isImpostor ? (
                           <>
                             <p className="text-red-400 font-semibold text-xl mb-2">
@@ -580,40 +587,39 @@ function Local() {
                             <p className="text-sm text-slate-400 mb-2">
                               {t('game.yourSecretWord')}:
                             </p>
-                            <motion.p
-                              initial={{ scale: 0.8, opacity: 0 }}
+                            <m.p
+                              initial={reduce ? false : { scale: 0.8, opacity: 0 }}
                               animate={{ scale: 1, opacity: 1 }}
-                              transition={{ delay: 1.2 }}
+                              transition={tx(reduce, { delay: reduce ? 0 : 1.2 })}
                               className="text-4xl font-extrabold text-emerald-400 drop-shadow-lg mb-4 text-center"
                               style={{
                                 textShadow: '0 0 20px rgba(16, 185, 129, 0.5)',
                               }}
                             >
                               {capitalizeWord(displayWord)}
-                            </motion.p>
+                            </m.p>
                             <p className="text-sm text-slate-400 text-center px-4">
                               {t('game.describeWithoutSaying', { count: 1 })}
                             </p>
                           </>
                         )}
-                      </motion.div>
+                      </m.div>
                     )}
                   </AnimatePresence>
                 </div>
 
-                <motion.button
+                <m.button
                   type="button"
-                  initial={{ y: 20, opacity: 0 }}
+                  initial={reduce ? false : { y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 1.5 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.97 }}
+                  transition={tx(reduce, { delay: reduce ? 0 : 1.5 })}
+                  {...motionGestures(reduce, { hover: 1.05, tap: 0.97 })}
                   onClick={handleCloseRole}
                   className="w-full max-w-xs min-h-[48px] py-4 rounded-full bg-emerald-500 hover:bg-emerald-400 font-semibold text-black tracking-wide shadow-lg shadow-emerald-500/40 transition"
                 >
                   {t('local.hideRole')}
-                </motion.button>
-              </motion.div>
+                </m.button>
+              </m.div>
             )}
           </AnimatePresence>
         </div>

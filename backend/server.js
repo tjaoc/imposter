@@ -12,10 +12,26 @@ const WordPack = require("./models/WordPack");
 
 const PORT = process.env.PORT || 4000;
 
+/** Orígenes CORS: CORS_ORIGIN (coma-separado) o "*" si no está definido (desarrollo local). */
+function getCorsOrigin () {
+  const raw = process.env.CORS_ORIGIN;
+  if (!raw || !String(raw).trim()) return "*";
+  const list = String(raw)
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (list.length === 0) return "*";
+  if (list.length === 1) return list[0];
+  return list;
+}
+
+const corsOrigin = getCorsOrigin();
+
 const app = express();
+app.set("trust proxy", 1);
 app.use(helmet());
 app.use(compression());
-app.use(cors({ origin: "*", credentials: false }));
+app.use(cors({ origin: corsOrigin, credentials: false }));
 app.use(express.json());
 
 // Rutas de API
@@ -24,7 +40,7 @@ app.use("/api/packs", wordPackRoutes);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: corsOrigin,
     credentials: false,
   },
 });

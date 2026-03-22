@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
+import { useMotionReduce, tx, motionGestures } from '../game/motionReduce';
 import { useSocket } from '../hooks/useSocket';
 import { useTranslation } from '../hooks/useTranslation';
 import { useLanguage } from '../context/LanguageContext';
@@ -27,6 +28,7 @@ function Room() {
     hintForImpostors: true,
   });
   const [playerStats, setPlayerStats] = useState(null);
+  const reduce = useMotionReduce();
 
   useEffect(() => {
     if (!socket || !isConnected) {
@@ -139,9 +141,10 @@ function Room() {
   if (error) {
     return (
       <div className="min-h-full flex items-center justify-center p-4 sm:p-6 md:p-8">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+        <m.div
+          initial={reduce ? false : { opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
+          transition={tx(reduce, undefined)}
           className="glass-effect rounded-2xl p-6 sm:p-8 max-w-md w-full text-center"
         >
           <div className="text-5xl sm:text-6xl mb-4">❌</div>
@@ -170,7 +173,7 @@ function Room() {
               {t('room.redirecting')}
             </p>
           )}
-        </motion.div>
+        </m.div>
       </div>
     );
   }
@@ -179,16 +182,17 @@ function Room() {
   if (!room) {
     return (
       <div className="min-h-full flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0 }}
+        <m.div
+          initial={reduce ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
+          transition={tx(reduce, undefined)}
           className="text-center"
         >
           <div className="animate-pulse text-space-cyan text-xl mb-4">
             {t('room.connecting')}
           </div>
           <div className="text-gray-400 text-sm">{code}</div>
-        </motion.div>
+        </m.div>
       </div>
     );
   }
@@ -200,9 +204,10 @@ function Room() {
         onBack={() => navigate(-1)}
         onExit={() => navigate('/')}
       />
-      <motion.div
-        initial={{ opacity: 0 }}
+      <m.div
+        initial={reduce ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
+        transition={tx(reduce, undefined)}
         className="max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-3xl mx-auto"
       >
         <div className="text-center mb-4">
@@ -235,9 +240,10 @@ function Room() {
           </p>
         </div>
 
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
+        <m.div
+          initial={reduce ? false : { y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
+          transition={tx(reduce, undefined)}
           className="card mb-4"
         >
           <div className="flex justify-between items-center mb-4">
@@ -255,28 +261,29 @@ function Room() {
           <div className="space-y-3">
             <AnimatePresence>
               {room.players.map((player, index) => (
-                <motion.div
+                <m.div
                   key={player.id}
-                  initial={{ x: -20, opacity: 0 }}
+                  initial={reduce ? false : { x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: 20, opacity: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  exit={reduce ? undefined : { x: 20, opacity: 0 }}
+                  transition={tx(reduce, { delay: reduce ? 0 : index * 0.1 })}
                   className="flex items-center justify-between p-3 sm:p-4 min-h-[48px] bg-space-blue rounded-xl"
                 >
                   <span className="text-white">{player.name}</span>
                   {player.isHost && (
                     <span className="text-sm text-space-cyan">👑</span>
                   )}
-                </motion.div>
+                </m.div>
               ))}
             </AnimatePresence>
           </div>
-        </motion.div>
+        </m.div>
 
         {playerStats && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
+          <m.div
+            initial={reduce ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={tx(reduce, undefined)}
             className="card mb-4 flex flex-row flex-wrap items-center justify-between gap-3"
           >
             <span className="text-gray-400 text-sm font-medium">{t('room.statsTitle')}</span>
@@ -294,21 +301,23 @@ function Room() {
                 <strong>{playerStats.winsImpostor ?? 0}</strong>
               </span>
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {isHost && (
           <>
             {/* Orden igual que Local: Impostores → Pista → Duración → Categorías */}
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
+            <m.div
+              initial={reduce ? false : { y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
+              transition={tx(reduce, undefined)}
               className="space-y-4 mb-6"
             >
               {/* Número de Impostores */}
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
+              <m.div
+                initial={reduce ? false : { y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
+                transition={tx(reduce, undefined)}
                 className="card"
               >
                 <div className="flex flex-row items-center justify-between gap-3 flex-wrap">
@@ -356,13 +365,13 @@ function Room() {
                     </button>
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
 
               {/* Pista para Impostores */}
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
+              <m.div
+                initial={reduce ? false : { y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.1 }}
+                transition={tx(reduce, { delay: reduce ? 0 : 0.1 })}
                 className="card-tight"
               >
                 <div className="flex flex-row items-center justify-between gap-3 flex-wrap">
@@ -400,10 +409,10 @@ function Room() {
                     </button>
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
 
               {/* Duración */}
-              <motion.div
+              <m.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -434,13 +443,13 @@ function Room() {
                     )}
                   </select>
                 </div>
-              </motion.div>
+              </m.div>
 
               {/* Categorías (Pack Selector) */}
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
+              <m.div
+                initial={reduce ? false : { y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
+                transition={tx(reduce, { delay: reduce ? 0 : 0.3 })}
                 className="card"
               >
                 <PackSelector
@@ -448,8 +457,8 @@ function Room() {
                   selectedPackIds={selectedPacks}
                   allowRandom
                 />
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
 
             {/* Botón Iniciar Juego */}
             {(() => {
@@ -457,12 +466,12 @@ function Room() {
                 (selectedPacks.length === 1 && selectedPacks[0] === 'random') ||
                 selectedPacks.length > 0;
               return (
-            <motion.button
+            <m.button
               type="button"
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={reduce ? false : { scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              whileTap={{ scale: 0.98 }}
+              transition={tx(reduce, { delay: reduce ? 0 : 0.4 })}
+              {...motionGestures(reduce, { hover: 1, tap: 0.98 })}
               onClick={handleStartGame}
               disabled={room.players.length < 3 || !hasPacksOrRandom || isStarting}
               className={`w-full min-h-[52px] py-4 sm:py-5 rounded-2xl font-bold text-base sm:text-lg transition-all disabled:cursor-not-allowed ${
@@ -478,12 +487,12 @@ function Room() {
                 : selectedPacks.length === 0
                 ? `📦 ${t('room.selectPacks')}`
                 : `🚀 ${t('room.startGame')}`}
-            </motion.button>
+            </m.button>
               );
             })()}
           </>
         )}
-      </motion.div>
+      </m.div>
     </div>
   );
 }

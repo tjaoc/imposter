@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useCallback, memo } from 'react';
+import { m } from 'framer-motion';
 import { useTranslation } from '../hooks/useTranslation';
 import { useLanguage } from '../context/LanguageContext';
+import { useMotionReduce, motionGestures } from '../game/motionReduce';
 import { API_BASE } from '../config/env';
 
 const PACK_ICONS = {
@@ -28,9 +29,10 @@ const PACK_ICONS = {
 
 const RANDOM_ID = 'random';
 
-function PackSelector({ onSelectPacks, selectedPackIds = [], allowRandom = true }) {
+function PackSelector ({ onSelectPacks, selectedPackIds = [], allowRandom = true }) {
   const { t } = useTranslation();
   const { locale } = useLanguage();
+  const reduce = useMotionReduce();
   const [packs, setPacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [serverError, setServerError] = useState(false);
@@ -136,11 +138,10 @@ function PackSelector({ onSelectPacks, selectedPackIds = [], allowRandom = true 
         </button>
       </div>
       {allowRandom && (
-        <motion.button
+        <m.button
           type="button"
           onClick={() => handlePackToggle(RANDOM_ID)}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          {...motionGestures(reduce)}
           className={`w-full min-h-[52px] p-4 rounded-xl border-2 transition-all relative text-left active:scale-[0.98] flex items-center gap-3 ${
             isRandomSelected
               ? 'border-space-cyan bg-space-cyan/20'
@@ -154,20 +155,19 @@ function PackSelector({ onSelectPacks, selectedPackIds = [], allowRandom = true 
           {isRandomSelected && (
             <div className="absolute top-2 right-2 text-space-cyan text-xl">✓</div>
           )}
-        </motion.button>
+        </m.button>
       )}
       <div className={`grid grid-cols-2 md:grid-cols-3 gap-3 ${isRandomSelected ? 'pointer-events-none opacity-60' : ''}`}>
         {packs.map((pack) => {
           const isSelected = selectedPackIds.includes(pack._id);
           const icon = PACK_ICONS[pack.slug] ?? '📦';
           return (
-            <motion.button
+            <m.button
               key={pack._id}
               type="button"
               onClick={() => handlePackToggle(pack._id)}
               disabled={isRandomSelected}
-              whileHover={isRandomSelected ? undefined : { scale: 1.02 }}
-              whileTap={isRandomSelected ? undefined : { scale: 0.98 }}
+              {...(isRandomSelected ? {} : motionGestures(reduce))}
               className={`min-h-[52px] p-4 rounded-xl border-2 transition-all relative text-left active:scale-[0.98] flex items-center gap-2 ${
                 isSelected
                   ? 'border-space-cyan bg-space-cyan/20'
@@ -186,7 +186,7 @@ function PackSelector({ onSelectPacks, selectedPackIds = [], allowRandom = true 
               {isSelected && (
                 <div className="absolute top-2 right-2 text-space-cyan text-xl flex-shrink-0">✓</div>
               )}
-            </motion.button>
+            </m.button>
           );
         })}
       </div>
@@ -201,4 +201,4 @@ function PackSelector({ onSelectPacks, selectedPackIds = [], allowRandom = true 
   );
 }
 
-export default PackSelector;
+export default memo(PackSelector);

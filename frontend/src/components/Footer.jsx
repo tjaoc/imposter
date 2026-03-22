@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 
 function isIOS() {
@@ -14,17 +14,15 @@ function isAndroid() {
   return /Android/i.test(navigator.userAgent);
 }
 
-function Footer() {
+function Footer () {
   const { t } = useTranslation();
   const [installHint, setInstallHint] = useState(null); // 'ios' | 'android' | null
-  const [isIOSDevice, setIsIOSDevice] = useState(false);
   const version =
     typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0';
 
   useEffect(() => {
     const ios = isIOS();
     if (ios) {
-      setIsIOSDevice(true);
       document.body.classList.add('ios');
     }
     if (ios && !window.navigator.standalone) {
@@ -59,4 +57,4 @@ function Footer() {
   );
 }
 
-export default Footer;
+export default memo(Footer);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { io } from 'socket.io-client';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:4000';
@@ -59,20 +59,19 @@ export function useSocket () {
     };
   }, []);
 
-  const connectSocket = async () => {
-    const socket = getGlobalSocket();
-    if (socket.connected) {
-      return socket;
+  const connectSocket = useCallback(async () => {
+    const s = getGlobalSocket();
+    if (s.connected) {
+      return s;
     }
-    // Si no está conectado, esperar a que se conecte
     return new Promise((resolve) => {
-      if (socket.connected) {
-        resolve(socket);
+      if (s.connected) {
+        resolve(s);
       } else {
-        socket.once('connect', () => resolve(socket));
+        s.once('connect', () => resolve(s));
       }
     });
-  };
+  }, []);
 
   return { socket, isConnected, connectSocket };
 }

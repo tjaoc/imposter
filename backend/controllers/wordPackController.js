@@ -20,6 +20,10 @@ const getAllPacks = async (req, res) => {
         packs = await WordPack.find({}, '-words').sort({ name: 1 });
       }
     }
+    res.set(
+      'Cache-Control',
+      'public, max-age=120, stale-while-revalidate=600'
+    );
     res.json({ ok: true, packs });
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
@@ -33,6 +37,10 @@ const getPackById = async (req, res) => {
     if (!pack) {
       return res.status(404).json({ ok: false, error: 'PACK_NOT_FOUND' });
     }
+    res.set(
+      'Cache-Control',
+      'public, max-age=60, stale-while-revalidate=300'
+    );
     res.json({ ok: true, pack });
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });

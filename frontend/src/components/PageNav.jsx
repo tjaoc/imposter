@@ -1,10 +1,11 @@
+import { memo } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 
 /**
  * Barra de navegación: Volver (página anterior) y Salir (ir al inicio).
  * showBack=false en Home para ocultar Volver.
  */
-function PageNav({ showBack = true, onBack, onExit, className = '' }) {
+function PageNav ({ showBack = true, onBack, onExit, className = '' }) {
   const { t } = useTranslation();
 
   return (
@@ -34,4 +35,4 @@ function PageNav({ showBack = true, onBack, onExit, className = '' }) {
   );
 }
 
-export default PageNav;
+export default memo(PageNav);

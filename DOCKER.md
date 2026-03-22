@@ -35,6 +35,30 @@ docker-compose up -d
 - **Backend** (Express + Socket.io): http://localhost:4000 — `npm run dev` con nodemon
 - **MongoDB**: localhost:27017 — base de datos `imposter`, datos en volumen `mongodb_data`
 
+### Pruebas (tests + build) con Docker
+
+No hace falta tener `docker compose up` en marcha. Usa las imágenes de desarrollo y volúmenes no persistentes:
+
+```bash
+chmod +x ./scripts/docker-test.sh   # solo la primera vez
+./scripts/docker-test.sh
+```
+
+Equivale a:
+
+- `docker compose build backend frontend`
+- `docker compose run --rm --no-deps backend npm test` (lógica `gameLogic` con Node `node:test`)
+- `docker compose run --rm --no-deps frontend npm test` (Vitest: `localGameLogic`)
+- `docker compose run --rm --no-deps frontend npm run build` (comprueba Vite en el contenedor)
+
+Si ya tienes contenedores levantados, también puedes:
+
+```bash
+docker compose exec backend npm test
+docker compose exec frontend npm test
+docker compose exec frontend npm run build
+```
+
 ### Comandos útiles
 
 ```bash

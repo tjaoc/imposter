@@ -1,7 +1,14 @@
 # Blueprint Render — Plan Hobby (gratuito)
 # Spec: https://render.com/docs/blueprint-spec
 # Pricing: https://render.com/pricing — Hobby: 1 project, 2 environments; plan: free = $0/mes.
-# Variables MONGODB_URI (sync: false), CORS_ORIGIN, VITE_*: configurar en Dashboard.
+#
+# Checklist despliegue:
+# - MONGODB_URI: Atlas u otro Mongo accesible desde internet (ej. allow 0.0.0.0/0 en Atlas para hobby).
+# - CORS_ORIGIN: URL(s) del sitio estático (frontend), misma(s) que usa el usuario en el navegador.
+#   Varias: "https://app.com,https://www.app.com"
+# - VITE_API_URL y VITE_SOCKET_URL: URL pública del servicio Node (API), sin barra final; se inyectan en el build del static.
+# - PORT lo asigna Render; el backend ya usa process.env.PORT.
+#
 # Custom domains: añadir en Dashboard → Settings → Custom Domains.
 
 projects:
@@ -14,7 +21,7 @@ projects:
             name: imposter-api-prod
             plan: free
             rootDir: backend
-            buildCommand: npm install
+            buildCommand: npm ci
             startCommand: npm start
             healthCheckPath: /health
             envVars:
@@ -29,7 +36,7 @@ projects:
             runtime: static
             name: imposter-app-prod
             rootDir: frontend
-            buildCommand: npm install && npm run build
+            buildCommand: npm ci && npm run build
             staticPublishPath: dist
             routes:
               - type: rewrite
@@ -48,7 +55,7 @@ projects:
             name: imposter-api-dev
             plan: free
             rootDir: backend
-            buildCommand: npm install
+            buildCommand: npm ci
             startCommand: npm start
             healthCheckPath: /health
             envVars:
@@ -63,7 +70,7 @@ projects:
             runtime: static
             name: imposter-app-dev
             rootDir: frontend
-            buildCommand: npm install && npm run build
+            buildCommand: npm ci && npm run build
             staticPublishPath: dist
             routes:
               - type: rewrite

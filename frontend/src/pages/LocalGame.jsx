@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m } from 'framer-motion';
+import { useMotionReduce, tx, motionGestures } from '../game/motionReduce';
 import { useTranslation } from '../hooks/useTranslation';
 import PageNav from '../components/PageNav';
 import { processVotes, checkGameEnd } from '../utils/localGameLogic';
@@ -25,6 +26,7 @@ function LocalGame() {
   const [eliminatedPlayers, setEliminatedPlayers] = useState([]);
   const [voteResult, setVoteResult] = useState(null);
   const [gameResult, setGameResult] = useState(null);
+  const reduce = useMotionReduce();
 
   useEffect(() => {
     if (!gameStateFromLocation?.players?.length) {
@@ -50,7 +52,7 @@ function LocalGame() {
       );
       setTimeLeft(remaining);
       if (remaining === 0) clearInterval(interval);
-    }, 200);
+    }, 1000);
     return () => clearInterval(interval);
   }, [phase, discussionEndsAt]);
 
@@ -222,44 +224,44 @@ function LocalGame() {
       <div className="min-h-full flex flex-col p-4 sm:p-6 md:p-8 bg-gradient-to-b from-black via-slate-950 to-black">
         <PageNav showBack onBack={() => navigate('/local')} onExit={() => navigate('/')} />
         <div className="flex-1 flex items-center justify-center">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
+          <m.div
+            initial={reduce ? false : { scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 100 }}
+            transition={tx(reduce, { type: 'spring', stiffness: 100 })}
             className="max-w-2xl w-full"
           >
             <div className="glass-effect rounded-3xl p-8 text-center">
-              <motion.h1
-                initial={{ y: 20, opacity: 0 }}
+              <m.h1
+                initial={reduce ? false : { y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
+                transition={tx(reduce, { delay: reduce ? 0 : 0.2 })}
                 className="text-4xl font-bold mb-6 text-space-cyan"
               >
                 🗳️ {t('game.voteResults')}
-              </motion.h1>
+              </m.h1>
 
               {voteResult.impostorDiscovered && voteResult.eliminated && (
-                <motion.div
-                  initial={{ y: 20, opacity: 0 }}
+                <m.div
+                  initial={reduce ? false : { y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.3 }}
+                  transition={tx(reduce, { delay: reduce ? 0 : 0.3 })}
                   className="mb-6 p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/50"
                 >
                   <p className="font-semibold text-lg text-emerald-300">
                     🎯 {t('game.impostorDiscovered')}:{' '}
                     {voteResult.eliminated.name}
                   </p>
-                </motion.div>
+                </m.div>
               )}
 
               {/* Mostrar votos: quién votó a quién; el impostor solo nombre + "Impostor" */}
               {voteResult.votesWithNames &&
                 Object.keys(voteResult.votesWithNames).length > 0 &&
                 voteResult.players?.length > 0 && (
-                  <motion.div
-                    initial={{ y: 20, opacity: 0 }}
+                  <m.div
+                    initial={reduce ? false : { y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.4 }}
+                    transition={tx(reduce, { delay: reduce ? 0 : 0.4 })}
                     className="mb-6"
                   >
                     <h3 className="text-2xl font-semibold text-white mb-4 text-center">
@@ -283,11 +285,11 @@ function LocalGame() {
                           voteInfo.votedId !== voteResult.impostor.id;
 
                         return (
-                          <motion.div
+                          <m.div
                             key={player.id || index}
-                            initial={{ x: -50, opacity: 0 }}
+                            initial={reduce ? false : { x: -50, opacity: 0 }}
                             animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.5 + index * 0.05 }}
+                            transition={tx(reduce, { delay: reduce ? 0 : 0.5 + index * 0.05 })}
                             className={`p-3 rounded-lg flex items-center justify-between ${
                               isImpostor
                                 ? 'bg-yellow-500/20 border border-yellow-500/50'
@@ -335,19 +337,19 @@ function LocalGame() {
                                 </span>
                               )}
                             </div>
-                          </motion.div>
+                          </m.div>
                         );
                       })}
                     </div>
-                  </motion.div>
+                  </m.div>
                 )}
 
               {/* Mostrar quién es el impostor */}
               {voteResult.impostor && (
-                <motion.div
-                  initial={{ y: 20, opacity: 0 }}
+                <m.div
+                  initial={reduce ? false : { y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.6 }}
+                  transition={tx(reduce, { delay: reduce ? 0 : 0.6 })}
                   className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl"
                 >
                   <p className="text-red-300 font-semibold text-lg">
@@ -356,19 +358,18 @@ function LocalGame() {
                       {voteResult.impostor.name}
                     </span>
                   </p>
-                </motion.div>
+                </m.div>
               )}
 
               {/* Botones de acción */}
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
+              <m.div
+                initial={reduce ? false : { y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.7 }}
+                transition={tx(reduce, { delay: reduce ? 0 : 0.7 })}
                 className="flex flex-col gap-3 mt-6"
               >
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                <m.button
+                  {...motionGestures(reduce)}
                   onClick={() =>
                     navigate('/local', {
                       state: {
@@ -382,18 +383,17 @@ function LocalGame() {
                   className="w-full min-h-[48px] py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl font-bold text-white text-lg shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70 transition-all"
                 >
                   🎮 {t('game.newGame')}
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                </m.button>
+                <m.button
+                  {...motionGestures(reduce)}
                   onClick={() => navigate('/')}
                   className="w-full min-h-[48px] py-4 bg-gradient-to-r from-space-purple to-space-pink rounded-xl font-bold text-white text-lg shadow-purple-500/50 hover:shadow-purple-500/70 transition-all"
                 >
                   🏠 {t('game.backToHome')}
-                </motion.button>
-              </motion.div>
+                </m.button>
+              </m.div>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     );
@@ -406,9 +406,10 @@ function LocalGame() {
       <div className="min-h-full flex flex-col p-4 sm:p-6 md:p-8 py-6 bg-gradient-to-b from-black via-slate-950 to-black">
         <PageNav showBack onBack={() => navigate('/local')} onExit={() => navigate('/')} />
         <div className="flex-1 flex items-center justify-center">
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
+        <m.div
+          initial={reduce ? false : { scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
+          transition={tx(reduce, undefined)}
           className="glass-effect rounded-3xl p-6 sm:p-8 max-w-2xl w-full text-center scroll-touch max-h-[85dvh] overflow-y-auto"
         >
           <div className="text-9xl mb-4">{impostorsWon ? '🕵️' : '🎯'}</div>
@@ -532,7 +533,7 @@ function LocalGame() {
           >
             {t('game.backToHome')}
           </button>
-        </motion.div>
+        </m.div>
         </div>
       </div>
     );

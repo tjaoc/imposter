@@ -3,6 +3,21 @@
  */
 
 /**
+ * Barajado uniforme (Fisher–Yates). Evita el sesgo de `.sort(() => Math.random() - 0.5)`.
+ * @template T
+ * @param {T[]} items
+ * @returns {T[]}
+ */
+function shuffleArray (items) {
+  const a = [...items];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/**
  * Asignar roles a los jugadores
  * @param {Array} players - Lista de jugadores
  * @param {string} secretWord - Palabra secreta
@@ -19,15 +34,13 @@ function assignRoles (players, secretWord, impostorCount = 1, hintWord = null) {
     throw new Error('Número de impostores inválido');
   }
 
-  // Copiar array para no mutar el original
-  const shuffled = [...players].sort(() => Math.random() - 0.5);
+  // Subconjunto de impostores (uniforme) — barajado independiente del orden de revelación / lista
+  const impostorIds = new Set(
+    shuffleArray(players.map((p) => p.id)).slice(0, impostorCount)
+  );
 
-  // Los primeros N jugadores son impostores
-  const impostors = shuffled.slice(0, impostorCount);
-  const civilians = shuffled.slice(impostorCount);
-
-  return shuffled.map((player) => {
-    const isImpostor = impostors.includes(player);
+  return shuffleArray(players).map((player) => {
+    const isImpostor = impostorIds.has(player.id);
 
     return {
       ...player,
